@@ -7,7 +7,7 @@ import "./globals.css"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "LLC - your trading starts here",
+  title: "LLC - your trading starts here..your profits continues",
   description: "Trade stocks and cryptocurrencies with confidence on UltimateStckTrader",
   generator: "v0.app",
   icons: {
