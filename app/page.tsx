@@ -148,5 +148,4 @@ export default function TradingDashboard() {
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
     </div>
-  )
-}
+  
