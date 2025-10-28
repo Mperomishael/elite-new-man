@@ -11,32 +11,42 @@ export async function POST(request: Request) {
       );
     }
 
-    // ✅ Replace with your actual Zoho details
-    const ZOHO_API_URL = "https://mail.zoho.com/api/accounts/{903905349}/messages";
-    const ZOHO_ACCESS_TOKEN = process.env.ZOHO_ACCESS_TOKEN; // store in .env file!
+    // ✅ Correct URL (no curly braces)
+    const ZOHO_API_URL = "https://mail.zoho.com/api/accounts/903905349/messages";
+    const ZOHO_ACCESS_TOKEN = process.env.ZOHO_ACCESS_TOKEN; // stored in .env.local
 
-    // 📨 Construct the email payload
-    const mailData = {
-      fromAddress: "ustrader@ultimatestcktrader.online",
-      toAddress: email,
-      subject: "Welcome to USTrade 🎉",
-      content: `
-        Hi ${name},<br><br>
-        Welcome to our platform! Your account has been successfully created.<br><br>
-      All you need to do is make Deposits and start trading.  Best regards,<br>
-        The Team
-      `,
-      mailFormat: "html",
-    };
+    if (!ZOHO_ACCESS_TOKEN) {
+      return NextResponse.json(
+        { success: false, message: "Missing ZOHO_ACCESS_TOKEN in environment." },
+        { status: 500 }
+      );
+    }
 
-    // 🔗 Send mail using Zoho Mail API
+    // 📨 Create FormData payload (Zoho Mail requires form submission)
+    const formData = new FormData();
+    formData.append("fromAddress", "ustrader@ultimatestcktrader.online");
+    formData.append("toAddress", email);
+    formData.append("subject", "Welcome to USTrade 🎉");
+    formData.append(
+      "content",
+      `
+      Hi ${name},<br><br>
+      Welcome to <b>Ultimate Stock Trader</b>!<br><br>
+      Your account has been successfully created.<br>
+      You can now deposit funds and start trading.<br><br>
+      Best regards,<br>
+      The USTrade Team
+      `
+    );
+    formData.append("mailFormat", "html");
+
+    // 🔗 Send the email through Zoho Mail API
     const response = await fetch(ZOHO_API_URL, {
       method: "POST",
       headers: {
         Authorization: `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify(mailData),
+      body: formData,
     });
 
     const data = await response.json();
