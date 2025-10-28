@@ -22,7 +22,16 @@ import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-servic
 
 export default function TradingDashboard() {
   const [activeView, setActiveView] = useState<
-    "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
+    | "dashboard"
+    | "history"
+    | "deposit"
+    | "withdraw"
+    | "buy"
+    | "sell"
+    | "kyc"
+    | "referrals"
+    | "support"
+    | "settings"
   >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -49,34 +58,32 @@ export default function TradingDashboard() {
     return () => unsubscribe()
   }, [])
 
- const handleLogin = async (profile: UserProfile) => {
-  setUserProfile(profile)
-  setUserName(`${profile.firstName} ${profile.lastName}`)
-  setIsAuthenticated(true)
+  const handleLogin = async (profile: UserProfile) => {
+    setUserProfile(profile)
+    setUserName(`${profile.firstName} ${profile.lastName}`)
+    setIsAuthenticated(true)
 
-  // 📨 Send welcome email via Zoho API
-  try {
-    const res = await fetch("/api/sendWelcome", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: `${profile.firstName} ${profile.lastName}`,
-        email: profile.email,
-      }),
-    })
+    // 📨 Send welcome email via Zoho API
+    try {
+      const res = await fetch("/api/sendWelcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${profile.firstName} ${profile.lastName}`,
+          email: profile.email,
+        }),
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      console.error("Zoho send error:", data)
-    } else {
-      console.log("✅ Welcome email sent:", data.message)
+      if (!res.ok) {
+        console.error("Zoho send error:", data)
+      } else {
+        console.log("✅ Welcome email sent:", data.message)
+      }
+    } catch (error) {
+      console.error("❌ Failed to send welcome email:", error)
     }
-  } catch (error) {
-    console.error("❌ Failed to send welcome email:", error)
-  }
-}
-
   }
 
   const handleLogout = async () => {
@@ -127,7 +134,7 @@ export default function TradingDashboard() {
     return <AuthPage onLogin={handleLogin} />
   }
 
-   return (
+  return (
     <div className="bg-slate-950 min-h-screen font-sans text-white pb-20">
       <TopBar
         onMenuClick={() => setIsMenuOpen(true)}
