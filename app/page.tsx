@@ -49,10 +49,34 @@ export default function TradingDashboard() {
     return () => unsubscribe()
   }, [])
 
-  const handleLogin = (profile: UserProfile) => {
-    setUserProfile(profile)
-    setUserName(`${profile.firstName} ${profile.lastName}`)
-    setIsAuthenticated(true)
+ const handleLogin = async (profile: UserProfile) => {
+  setUserProfile(profile)
+  setUserName(`${profile.firstName} ${profile.lastName}`)
+  setIsAuthenticated(true)
+
+  // 📨 Send welcome email via Zoho API
+  try {
+    const res = await fetch("/api/sendWelcomeViaZoho", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: `${profile.firstName} ${profile.lastName}`,
+        email: profile.email,
+      }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      console.error("Zoho send error:", data)
+    } else {
+      console.log("✅ Welcome email sent:", data.message)
+    }
+  } catch (error) {
+    console.error("❌ Failed to send welcome email:", error)
+  }
+}
+
   }
 
   const handleLogout = async () => {
