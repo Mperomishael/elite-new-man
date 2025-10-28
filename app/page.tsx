@@ -127,7 +127,7 @@ export default function TradingDashboard() {
     return <AuthPage onLogin={handleLogin} />
   }
 
-  return (
+   return (
     <div className="bg-slate-950 min-h-screen font-sans text-white pb-20">
       <TopBar
         onMenuClick={() => setIsMenuOpen(true)}
@@ -148,6 +148,5 @@ export default function TradingDashboard() {
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
     </div>
-    )
+  )
 }
-
