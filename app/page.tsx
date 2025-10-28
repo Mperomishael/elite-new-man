@@ -56,7 +56,7 @@ export default function TradingDashboard() {
 
   // 📨 Send welcome email via Zoho API
   try {
-    const res = await fetch("/api/sendWelcomeViaZoho", {
+    const res = await fetch("/api/sendWelcome", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
