@@ -2,18 +2,18 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Bitcoin, Wallet, Check } from "lucide-react";
 import { createWithdrawalRequest } from "@/lib/admin-service";
-import { BANKS } from "@/lib/bank"; // Keep this if you plan to use shared bank data later
+import { BANKS } from "@/lib/bank"; // Optional shared import
 
 interface WithdrawViewProps {
-  userId: string;
-  username: string;
-  availableBalance: number;
+  userId?: string;
+  username?: string;
+  availableBalance?: number;
 }
 
 export function WithdrawView({
-  userId,
-  username,
-  availableBalance,
+  userId = "",
+  username = "",
+  availableBalance = 0,
 }: WithdrawViewProps) {
   const [amount, setAmount] = useState("");
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
@@ -31,7 +31,7 @@ export function WithdrawView({
 
   const MIN_WITHDRAWAL = 100;
 
-  // ✅ Use a renamed constant to avoid naming conflicts
+  // ✅ Safe renamed constant to avoid conflicts
   const BANK_OPTIONS: Record<string, string[]> = useMemo(
     () => ({
       "United States": [
@@ -66,7 +66,7 @@ export function WithdrawView({
     []
   );
 
-  // 🧠 Auto-select first bank on country change
+  // 🧠 Auto-select first bank when country changes
   useEffect(() => {
     if (BANK_OPTIONS[bankCountry] && !bankName) {
       setBankName(BANK_OPTIONS[bankCountry][0]);
@@ -183,7 +183,10 @@ export function WithdrawView({
       <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5 flex justify-between">
         <div>
           <p className="text-slate-400 text-sm">Available Balance</p>
-          <p className="text-3xl font-bold">${availableBalance.toFixed(2)}</p>
+          {/* ✅ Safe Number conversion to avoid .toFixed() crash */}
+          <p className="text-3xl font-bold">
+            ${Number(availableBalance || 0).toFixed(2)}
+          </p>
         </div>
         <Wallet className="w-8 h-8 text-slate-600" />
       </div>
