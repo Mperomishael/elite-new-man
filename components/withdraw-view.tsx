@@ -1,9 +1,8 @@
 "use client";
-import { BANKS } from "@/lib/bank";
-
 import React, { useState, useMemo, useEffect } from "react";
-import { Bitcoin, Wallet, AlertCircle, Check } from "lucide-react";
+import { Bitcoin, Wallet, Check } from "lucide-react";
 import { createWithdrawalRequest } from "@/lib/admin-service";
+import { BANKS } from "@/lib/bank"; // Keep this if you plan to use shared bank data later
 
 interface WithdrawViewProps {
   userId: string;
@@ -31,10 +30,9 @@ export function WithdrawView({
   const [errorMessage, setErrorMessage] = useState("");
 
   const MIN_WITHDRAWAL = 100;
-  const quickPercentages = [25, 50, 75, 100];
 
-  // 🏦 Safe hardcoded list of banks
-  const BANKS: Record<string, string[]> = useMemo(
+  // ✅ Use a renamed constant to avoid naming conflicts
+  const BANK_OPTIONS: Record<string, string[]> = useMemo(
     () => ({
       "United States": [
         "Bank of America",
@@ -68,17 +66,12 @@ export function WithdrawView({
     []
   );
 
-  // 🧠 Set default bank on country change
+  // 🧠 Auto-select first bank on country change
   useEffect(() => {
-    if (BANKS[bankCountry] && !bankName) {
-      setBankName(BANKS[bankCountry][0]);
+    if (BANK_OPTIONS[bankCountry] && !bankName) {
+      setBankName(BANK_OPTIONS[bankCountry][0]);
     }
-  }, [bankCountry, bankName, BANKS]);
-
-  const handlePercentage = (p: number) => {
-    const withdrawAmount = ((availableBalance * p) / 100).toFixed(2);
-    setAmount(withdrawAmount);
-  };
+  }, [bankCountry, bankName, BANK_OPTIONS]);
 
   const handleWithdraw = async () => {
     const parsedAmount = Number(amount || "0");
@@ -121,6 +114,14 @@ export function WithdrawView({
 
       const currency = withdrawMethod === "crypto" ? selectedCrypto : "BANK";
 
+      console.log("Submitting withdrawal:", {
+        userId,
+        username,
+        parsedAmount,
+        currency,
+        destination,
+      });
+
       const result = await createWithdrawalRequest(
         userId,
         username,
@@ -128,6 +129,8 @@ export function WithdrawView({
         currency,
         destination
       );
+
+      console.log("Withdrawal result:", result);
 
       if (result?.success) {
         setIsSubmitted(true);
@@ -176,7 +179,7 @@ export function WithdrawView({
       <h2 className="text-2xl font-bold mb-1">Withdraw Funds</h2>
       <p className="text-slate-400 text-sm">Transfer funds from your balance</p>
 
-      {/* Balance display */}
+      {/* Balance Display */}
       <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5 flex justify-between">
         <div>
           <p className="text-slate-400 text-sm">Available Balance</p>
@@ -209,7 +212,7 @@ export function WithdrawView({
         </button>
       </div>
 
-      {/* Amount input */}
+      {/* Amount Input */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
         <label className="text-slate-400 text-sm block mb-2">
           Withdrawal Amount
@@ -224,7 +227,7 @@ export function WithdrawView({
         />
       </div>
 
-      {/* Wallet or bank details */}
+      {/* Wallet or Bank Details */}
       {withdrawMethod === "crypto" ? (
         <input
           type="text"
@@ -240,11 +243,11 @@ export function WithdrawView({
             onChange={(e) => {
               const c = e.target.value;
               setBankCountry(c);
-              setBankName(BANKS[c]?.[0] || "");
+              setBankName(BANK_OPTIONS[c]?.[0] || "");
             }}
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"
           >
-            {Object.keys(BANKS).map((c) => (
+            {Object.keys(BANK_OPTIONS).map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
@@ -253,7 +256,7 @@ export function WithdrawView({
             onChange={(e) => setBankName(e.target.value)}
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"
           >
-            {(BANKS[bankCountry] || []).map((b) => (
+            {(BANK_OPTIONS[bankCountry] || []).map((b) => (
               <option key={b}>{b}</option>
             ))}
           </select>
