@@ -31,7 +31,7 @@ export function WithdrawView({
 
   const MIN_WITHDRAWAL = 100;
 
-  // ✅ Safe renamed constant to avoid conflicts
+  // 🏦 Bank Options
   const BANK_OPTIONS: Record<string, string[]> = useMemo(
     () => ({
       "United States": [
@@ -73,13 +73,14 @@ export function WithdrawView({
     }
   }, [bankCountry, bankName, BANK_OPTIONS]);
 
+  // 🪙 Handle submission
   const handleWithdraw = async () => {
     const parsedAmount = Number(amount || "0");
 
     if (
+      isNaN(parsedAmount) ||
       parsedAmount < MIN_WITHDRAWAL ||
-      parsedAmount > availableBalance ||
-      isNaN(parsedAmount)
+      parsedAmount > availableBalance
     ) {
       setErrorMessage(
         parsedAmount < MIN_WITHDRAWAL
@@ -98,7 +99,7 @@ export function WithdrawView({
 
     if (withdrawMethod === "bank") {
       if (!bankCountry || !bankName || !accountNumber || !accountHolderName) {
-        setErrorMessage("Please fill all bank details.");
+        setErrorMessage("Please fill in all bank details.");
         return;
       }
     }
@@ -145,6 +146,7 @@ export function WithdrawView({
     }
   };
 
+  // ✅ Success State
   if (isSubmitted) {
     return (
       <div className="max-w-2xl mx-auto text-center space-y-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8">
@@ -165,6 +167,7 @@ export function WithdrawView({
     );
   }
 
+  // 🧾 Computed states
   const parsedAmount = Number(amount || "0");
   const formDisabled = isLoading || availableBalance < MIN_WITHDRAWAL;
   const isSubmitDisabled =
@@ -179,11 +182,10 @@ export function WithdrawView({
       <h2 className="text-2xl font-bold mb-1">Withdraw Funds</h2>
       <p className="text-slate-400 text-sm">Transfer funds from your balance</p>
 
-      {/* Balance Display */}
+      {/* 💰 Balance Display */}
       <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5 flex justify-between">
         <div>
           <p className="text-slate-400 text-sm">Available Balance</p>
-          {/* ✅ Safe Number conversion to avoid .toFixed() crash */}
           <p className="text-3xl font-bold">
             ${Number(availableBalance || 0).toFixed(2)}
           </p>
@@ -191,11 +193,11 @@ export function WithdrawView({
         <Wallet className="w-8 h-8 text-slate-600" />
       </div>
 
-      {/* Withdrawal Type */}
+      {/* 🔄 Withdrawal Type */}
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => setWithdrawMethod("crypto")}
-          className={`p-4 rounded-xl border-2 ${
+          className={`p-4 rounded-xl border-2 transition ${
             withdrawMethod === "crypto"
               ? "border-emerald-500 bg-emerald-500/10"
               : "border-slate-800 hover:border-slate-700"
@@ -205,7 +207,7 @@ export function WithdrawView({
         </button>
         <button
           onClick={() => setWithdrawMethod("bank")}
-          className={`p-4 rounded-xl border-2 ${
+          className={`p-4 rounded-xl border-2 transition ${
             withdrawMethod === "bank"
               ? "border-emerald-500 bg-emerald-500/10"
               : "border-slate-800 hover:border-slate-700"
@@ -215,11 +217,9 @@ export function WithdrawView({
         </button>
       </div>
 
-      {/* Amount Input */}
+      {/* 💵 Amount Input */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <label className="text-slate-400 text-sm block mb-2">
-          Withdrawal Amount
-        </label>
+        <label className="text-slate-400 text-sm block mb-2">Withdrawal Amount</label>
         <input
           type="number"
           step="0.01"
@@ -230,7 +230,7 @@ export function WithdrawView({
         />
       </div>
 
-      {/* Wallet or Bank Details */}
+      {/* 🏦 Wallet or Bank Details */}
       {withdrawMethod === "crypto" ? (
         <input
           type="text"
@@ -254,6 +254,7 @@ export function WithdrawView({
               <option key={c}>{c}</option>
             ))}
           </select>
+
           <select
             value={bankName}
             onChange={(e) => setBankName(e.target.value)}
@@ -263,12 +264,14 @@ export function WithdrawView({
               <option key={b}>{b}</option>
             ))}
           </select>
+
           <input
             value={accountHolderName}
             onChange={(e) => setAccountHolderName(e.target.value)}
             placeholder="Account Holder Name"
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"
           />
+
           <input
             value={accountNumber}
             onChange={(e) => setAccountNumber(e.target.value)}
@@ -278,12 +281,14 @@ export function WithdrawView({
         </div>
       )}
 
+      {/* ⚠️ Error Message */}
       {errorMessage && (
         <p className="text-sm text-red-400 bg-red-600/10 border border-red-600/20 rounded-xl p-3">
           {errorMessage}
         </p>
       )}
 
+      {/* 🚀 Submit Button */}
       <button
         onClick={handleWithdraw}
         disabled={isSubmitDisabled}
