@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardView } from "@/components/dashboard-view"
 import { TransactionHistory } from "@/components/transaction-history"
 import { DepositView } from "@/components/deposit-view"
@@ -15,12 +18,12 @@ import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
-import { AuthPage } from "@/components/auth-page"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
 
 export default function TradingDashboard() {
+  const router = useRouter()
   const [activeView, setActiveView] = useState<
     "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
   >("dashboard")
@@ -42,12 +45,13 @@ export default function TradingDashboard() {
       } else {
         setIsAuthenticated(false)
         setUserProfile(null)
+        router.push("/auth/login")
       }
       setIsLoading(false)
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [router])
 
   const handleLogin = async (profile: UserProfile) => {
     setUserProfile(profile)
@@ -81,6 +85,7 @@ export default function TradingDashboard() {
     await signOutUser()
     setIsAuthenticated(false)
     setUserProfile(null)
+    router.push("/auth/login")
   }
 
   const renderView = () => {
@@ -124,7 +129,7 @@ export default function TradingDashboard() {
   }
 
   if (!isAuthenticated) {
-    return <AuthPage onLogin={handleLogin} />
+    return null
   }
 
   return (
