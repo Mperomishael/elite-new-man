@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
-
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
+import { onAuthStateChanged } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import { auth } from "@/lib/firebase"
+import { isAdminByEmail } from "@/lib/admin-service"
+import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
 import { DashboardView } from "@/components/dashboard-view"
 import { TransactionHistory } from "@/components/transaction-history"
 import { DepositView } from "@/components/deposit-view"
@@ -18,11 +20,8 @@ import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/lib/firebase"
-import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
 
-export default function TradingDashboard() {
+export default function RootPage() {
   const router = useRouter()
   const [activeView, setActiveView] = useState<
     "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
@@ -32,6 +31,29 @@ export default function TradingDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [userName, setUserName] = useState("")
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // No user logged in - redirect to login
+        router.push("/auth/login")
+      } else {
+        // User is logged in - check if admin
+        const isAdmin = user.email ? await isAdminByEmail(user.email) : false
+
+        if (isAdmin) {
+          // Admin user - redirect to admin panel
+          router.push("/admin")
+        } else {
+          // Regular user - redirect to dashboard
+          router.push("/dashboard")
+        }
+      }
+      setIsLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [router])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
