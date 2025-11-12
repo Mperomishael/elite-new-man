@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardView } from "@/components/dashboard-view"
 import { TransactionHistory } from "@/components/transaction-history"
 import { DepositView } from "@/components/deposit-view"
@@ -17,7 +20,6 @@ import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
-import { useRouter } from "next/navigation"
 import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
 
 export default function TradingDashboard() {
@@ -41,6 +43,8 @@ export default function TradingDashboard() {
           setIsAuthenticated(true)
         }
       } else {
+        setIsAuthenticated(false)
+        setUserProfile(null)
         router.push("/auth/login")
       }
       setIsLoading(false)
@@ -54,6 +58,7 @@ export default function TradingDashboard() {
     setUserName(`${profile.firstName} ${profile.lastName}`)
     setIsAuthenticated(true)
 
+    // 📨 Send welcome email via Zoho API
     try {
       const res = await fetch("/api/sendWelcome", {
         method: "POST",
