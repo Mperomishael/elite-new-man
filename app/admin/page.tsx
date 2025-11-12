@@ -17,8 +17,8 @@ export default function AdminPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // Not logged in - redirect to login
-        router.push("/auth/login")
+        // Not logged in - redirect to admin login
+        router.push("/admin/login")
         setIsLoading(false)
         return
       }
