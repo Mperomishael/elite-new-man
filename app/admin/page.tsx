@@ -1,152 +1,78 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DashboardView } from "@/components/dashboard-view"
-import { TransactionHistory } from "@/components/transaction-history"
-import { DepositView } from "@/components/deposit-view"
-import { WithdrawView } from "@/components/withdraw-view"
-import { BuyingView } from "@/components/buying-view"
-import { SellingView } from "@/components/selling-view"
-import { BottomNav } from "@/components/bottom-nav"
-import { TopBar } from "@/components/top-bar"
-import { SideMenu } from "@/components/side-menu"
-import { KycView } from "@/components/kyc-view"
-import { ReferralsView } from "@/components/referrals-view"
-import { SupportView } from "@/components/support-view"
-import { ActivityNotifications } from "@/components/activity-notifications"
-import { SettingsView } from "@/components/settings-view"
-import { AuthPage } from "@/components/auth-page"
 import { onAuthStateChanged } from "firebase/auth"
+import { useRouter } from "next/navigation"
 import { auth } from "@/lib/firebase"
-import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
+import { isAdminByEmail, createAdminRecord } from "@/lib/admin-service"
+import { AdminDashboard } from "@/components/admin/admin-dashboard"
 
-export default function TradingDashboard() {
-  const [activeView, setActiveView] = useState<
-    "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
-  >("dashboard")
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+export default function AdminPage() {
+  const router = useRouter()
+  const [isAdminUser, setIsAdminUser] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
-  const [userName, setUserName] = useState("")
+  const [adminId, setAdminId] = useState("")
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const profile = await getUserProfile(user.uid)
-        if (profile) {
-          setUserProfile(profile)
-          setUserName(`${profile.firstName} ${profile.lastName}`)
-          setIsAuthenticated(true)
-        }
+      if (!user) {
+        // Not logged in - redirect to login
+        router.push("/auth/login")
+        setIsLoading(false)
+        return
+      }
+
+      if (!user.email) {
+        setError("Email not found on user account")
+        setIsLoading(false)
+        return
+      }
+
+      const adminStatus = await isAdminByEmail(user.email)
+      if (adminStatus) {
+        // Create/update admin record
+        await createAdminRecord(user.uid, user.email)
+        setIsAdminUser(true)
+        setAdminId(user.uid)
+        setError("")
       } else {
-        setIsAuthenticated(false)
-        setUserProfile(null)
+        // Not an admin - redirect to user dashboard
+        setError("Access denied. Redirecting to dashboard...")
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 1500)
       }
       setIsLoading(false)
     })
 
     return () => unsubscribe()
-  }, [])
-
-  const handleLogin = async (profile: UserProfile) => {
-    setUserProfile(profile)
-    setUserName(`${profile.firstName} ${profile.lastName}`)
-    setIsAuthenticated(true)
-
-    // 📨 Send welcome email via Zoho API
-    try {
-      const res = await fetch("/api/sendWelcome", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: `${profile.firstName} ${profile.lastName}`,
-          email: profile.email,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        console.error("Zoho send error:", data)
-      } else {
-        console.log("✅ Welcome email sent:", data.message)
-      }
-    } catch (error) {
-      console.error("❌ Failed to send welcome email:", error)
-    }
-  }
-
-  const handleLogout = async () => {
-    await signOutUser()
-    setIsAuthenticated(false)
-    setUserProfile(null)
-  }
-
-  const renderView = () => {
-    switch (activeView) {
-      case "dashboard":
-        return <DashboardView userName={userName} onNavigate={setActiveView} />
-      case "history":
-        return <TransactionHistory />
-      case "deposit":
-        return <DepositView />
-      case "withdraw":
-        return (
-          <WithdrawView userId={userProfile?.uid} username={userName} availableBalance={userProfile?.balance || 0} />
-        )
-      case "buy":
-        return <BuyingView />
-      case "sell":
-        return <SellingView />
-      case "kyc":
-        return <KycView />
-      case "referrals":
-        return <ReferralsView />
-      case "support":
-        return <SupportView />
-      case "settings":
-        return <SettingsView userName={userName} />
-      default:
-        return <DashboardView userName={userName} onNavigate={setActiveView} />
-    }
-  }
+  }, [router])
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Loading...</p>
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading Admin Panel...</p>
         </div>
       </div>
     )
   }
 
-  if (!isAuthenticated) {
-    return <AuthPage onLogin={handleLogin} />
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="bg-slate-900 border border-red-500/20 rounded-lg p-8 max-w-md text-center">
+          <p className="text-slate-400 mb-6">{error}</p>
+        </div>
+      </div>
+    )
   }
 
-  return (
-    <div className="bg-slate-950 min-h-screen font-sans text-white pb-20">
-      <TopBar
-        onMenuClick={() => setIsMenuOpen(true)}
-        userName={userName}
-        onNavigateToKyc={() => setActiveView("kyc")}
-        onLogout={handleLogout}
-      />
-      <SideMenu
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        activeView={activeView}
-        onNavigate={(view) => {
-          setActiveView(view)
-          setIsMenuOpen(false)
-        }}
-      />
-      <ActivityNotifications />
-      <main className="px-4 pt-4">{renderView()}</main>
-      <BottomNav activeView={activeView} onNavigate={setActiveView} />
-    </div>
-  )
+  if (!isAdminUser) {
+    return null
+  }
+
+  return <AdminDashboard adminId={adminId} />
 }
