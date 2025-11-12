@@ -22,16 +22,7 @@ import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-servic
 
 export default function TradingDashboard() {
   const [activeView, setActiveView] = useState<
-    | "dashboard"
-    | "history"
-    | "deposit"
-    | "withdraw"
-    | "buy"
-    | "sell"
-    | "kyc"
-    | "referrals"
-    | "support"
-    | "settings"
+    "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
   >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -101,7 +92,9 @@ export default function TradingDashboard() {
       case "deposit":
         return <DepositView />
       case "withdraw":
-        return <WithdrawView />
+        return (
+          <WithdrawView userId={userProfile?.uid} username={userName} availableBalance={userProfile?.balance || 0} />
+        )
       case "buy":
         return <BuyingView />
       case "sell":
