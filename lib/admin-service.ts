@@ -15,7 +15,7 @@ export interface WithdrawalRequest {
   userId: string
   username: string
   amount: number
-  crypto: "BTC" | "USDT"
+  crypto: "BTC" | "USDT" | string
   walletAddress: string
   status: "pending" | "approved" | "rejected"
   requestedAt: string
@@ -110,24 +110,56 @@ export async function createWithdrawalRequest(
   userId: string,
   username: string,
   amount: number,
-  crypto: "BTC" | "USDT",
-  walletAddress: string,
-): Promise<{ success: boolean; error?: string; requestId?: string }> {
+  crypto: "BTC" | "USDT" | string,
+  destination: string,
+): Promise<{ success: boolean; error?: string; requestId?: string; newBalance?: number }> {
   try {
     const requestId = `WD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+    // Get current user profile to check balance
+    const userDocRef = doc(db, "users", userId)
+    const userSnap = await getDoc(userDocRef)
+
+    if (!userSnap.exists()) {
+      return { success: false, error: "User not found" }
+    }
+
+    const userData = userSnap.data()
+    const currentBalance = userData.balance || 0
+
+    if (currentBalance < amount) {
+      return { success: false, error: "Insufficient balance" }
+    }
+
+    // Create withdrawal request with bank or crypto details
     const withdrawalRequest: WithdrawalRequest = {
       id: requestId,
       userId,
       username,
       amount,
-      crypto,
-      walletAddress,
+      crypto: crypto as "BTC" | "USDT",
+      walletAddress: destination,
       status: "pending",
       requestedAt: new Date().toISOString(),
     }
 
     await setDoc(doc(db, "withdrawalRequests", requestId), withdrawalRequest)
-    return { success: true, requestId }
+
+    const newBalance = currentBalance - amount
+    await setDoc(userDocRef, { balance: newBalance }, { merge: true })
+
+    const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    await setDoc(doc(db, "users", userId, "transactions", transactionId), {
+      id: transactionId,
+      type: "withdraw",
+      amount,
+      currency: crypto === "BANK" ? "BANK" : crypto,
+      status: "pending",
+      timestamp: new Date().toISOString(),
+      description: `Withdrawal request #${requestId}`,
+    })
+
+    return { success: true, requestId, newBalance }
   } catch (error: any) {
     console.error("[v0] Create withdrawal request error:", error)
     return { success: false, error: error.message }
