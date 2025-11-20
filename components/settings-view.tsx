@@ -2,17 +2,19 @@
 
 import { useState } from "react"
 import { User, Mail, Phone, MapPin, Lock, Bell, Shield, Eye, EyeOff } from "lucide-react"
+import type { UserProfile } from "@/lib/auth-service"
 
 interface SettingsViewProps {
   userName: string
+  userProfile?: UserProfile
 }
 
-export function SettingsView({ userName }: SettingsViewProps) {
+export function SettingsView({ userName, userProfile }: SettingsViewProps) {
   const [activeTab, setActiveTab] = useState<"profile" | "security" | "notifications">("profile")
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     fullName: userName,
-    email: "mauro@example.com",
+    email: userProfile?.email || "loading...",
     phone: "+1 (555) 123-4567",
     address: "123 Trading Street, New York, NY 10001",
     currentPassword: "",
@@ -111,12 +113,10 @@ export function SettingsView({ userName }: SettingsViewProps) {
                 <Mail className="w-4 h-4" />
                 Email Address
               </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+              <div className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-300 flex items-center">
+                <p>{formData.email}</p>
+                <span className="text-xs text-slate-500 ml-2">(Verified)</span>
+              </div>
             </div>
 
             <div>
