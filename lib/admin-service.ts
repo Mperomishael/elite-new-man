@@ -1,13 +1,27 @@
-import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore"
+// ... rest of existing code ...
+
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  onSnapshot,
+  type Unsubscribe,
+} from "firebase/firestore"
 import { db } from "./firebase"
 
-export interface AdminWalletSettings {
-  btcAddress: string
-  btcTag: string
-  usdtAddress: string
-  usdtTag: string
-  lastUpdated: string
-  updatedBy: string
+export interface BankDetails {
+  bankName: string
+  accountHolderName: string
+  accountNumber: string
+  routingNumber?: string
+  swiftCode?: string
+  iban?: string
+  country: string
 }
 
 export interface WithdrawalRequest {
@@ -15,80 +29,47 @@ export interface WithdrawalRequest {
   userId: string
   username: string
   amount: number
-  crypto: "BTC" | "USDT" | string
+  crypto: "BTC" | "USDT" | "BANK" | string
   walletAddress: string
-  status: "pending" | "approved" | "rejected"
+  status: "pending" | "approved" | "rejected" | "completed"
   requestedAt: string
   processedAt?: string
   processedBy?: string
 }
 
-export interface DepositRequest {
-  id: string
-  userId: string
-  username: string
-  amount: number
-  crypto: "BTC" | "USDT"
-  screenshot: string
-  status: "pending" | "approved" | "rejected"
-  requestedAt: string
-  processedAt?: string
-  processedBy?: string
+export interface AdminWalletSettings {
+  btcAddress: string
+  btcTag: string
+  usdtAddress: string
+  usdtTag: string
+  bankDetails?: BankDetails
+  lastUpdated: string
+  updatedBy: string
 }
 
-export interface KYCDocument {
-  userId: string
-  username: string
-  documentUrl: string
-  uploadedAt: string
-  status: "pending" | "approved" | "rejected"
-}
-
-// Check if user is admin by email
-const ADMIN_EMAILS = ["ultimatestckstrade@gmail.com", "empiredigitalsworldwide@gmail.com"]
-
-export async function isAdminByEmail(email: string): Promise<boolean> {
-  return ADMIN_EMAILS.includes(email.toLowerCase())
-}
-
-// Check if user is admin
-export async function isAdmin(uid: string): Promise<boolean> {
-  try {
-    const adminDoc = await getDoc(doc(db, "admins", uid))
-    return adminDoc.exists()
-  } catch (error) {
-    console.error("[v0] Check admin error:", error)
-    return false
-  }
-}
-
-export async function createAdminRecord(uid: string, email: string): Promise<void> {
-  try {
-    await setDoc(doc(db, "admins", uid), {
-      email,
-      createdAt: new Date().toISOString(),
-      role: "admin",
-    })
-  } catch (error) {
-    console.error("[v0] Create admin record error:", error)
-  }
-}
-
-// Get admin wallet settings
-export async function getAdminWalletSettings(): Promise<AdminWalletSettings | null> {
+export async function getAdminBankDetails(): Promise<BankDetails | null> {
   try {
     const settingsDoc = await getDoc(doc(db, "settings", "wallets"))
     if (settingsDoc.exists()) {
-      return settingsDoc.data() as AdminWalletSettings
+      return (settingsDoc.data() as any).bankDetails || null
     }
     return null
   } catch (error) {
-    console.error("[v0] Get wallet settings error:", error)
+    console.error("[v0] Get bank details error:", error)
     return null
   }
 }
 
-// Update admin wallet settings
+export function listenToBankDetails(callback: (details: BankDetails | null) => void): Unsubscribe {
+  return onSnapshot(doc(db, "settings", "wallets"), (doc) => {
+    if (doc.exists()) {
+      callback((doc.data() as any).bankDetails || null)
+    } else {
+      callback(null)
+    }
+  })
+}
+
 export async function updateAdminWalletSettings(
   settings: Omit<AdminWalletSettings, "lastUpdated">,
 ): Promise<{ success: boolean; error?: string }> {
@@ -105,7 +86,8 @@ export async function updateAdminWalletSettings(
   }
 }
 
-// Create withdrawal request
+// ... existing createWithdrawalRequest code ...
+
 export async function createWithdrawalRequest(
   userId: string,
   username: string,
@@ -116,7 +98,6 @@ export async function createWithdrawalRequest(
   try {
     const requestId = `WD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-    // Get current user profile to check balance
     const userDocRef = doc(db, "users", userId)
     const userSnap = await getDoc(userDocRef)
 
@@ -131,13 +112,12 @@ export async function createWithdrawalRequest(
       return { success: false, error: "Insufficient balance" }
     }
 
-    // Create withdrawal request with bank or crypto details
     const withdrawalRequest: WithdrawalRequest = {
       id: requestId,
       userId,
       username,
       amount,
-      crypto: crypto as "BTC" | "USDT",
+      crypto: crypto as "BTC" | "USDT" | "BANK",
       walletAddress: destination,
       status: "pending",
       requestedAt: new Date().toISOString(),
@@ -166,78 +146,35 @@ export async function createWithdrawalRequest(
   }
 }
 
-// Create deposit request
-export async function createDepositRequest(
-  userId: string,
-  username: string,
-  amount: number,
-  crypto: "BTC" | "USDT",
-  screenshot: string,
-): Promise<{ success: boolean; error?: string; requestId?: string }> {
-  try {
-    const requestId = `DP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    const depositRequest: DepositRequest = {
-      id: requestId,
-      userId,
-      username,
-      amount,
-      crypto,
-      screenshot,
-      status: "pending",
-      requestedAt: new Date().toISOString(),
-    }
-
-    await setDoc(doc(db, "depositRequests", requestId), depositRequest)
-    return { success: true, requestId }
-  } catch (error: any) {
-    console.error("[v0] Create deposit request error:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Get pending withdrawal requests (admin only)
-export async function getPendingWithdrawals(): Promise<WithdrawalRequest[]> {
-  try {
-    const q = query(collection(db, "withdrawalRequests"), where("status", "==", "pending"))
-    const querySnapshot = await getDocs(q)
-    const requests: WithdrawalRequest[] = []
-    querySnapshot.forEach((doc) => {
-      requests.push(doc.data() as WithdrawalRequest)
-    })
-    return requests
-  } catch (error) {
-    console.error("[v0] Get pending withdrawals error:", error)
-    return []
-  }
-}
-
-// Get pending deposit requests (admin only)
-export async function getPendingDeposits(): Promise<DepositRequest[]> {
-  try {
-    const q = query(collection(db, "depositRequests"), where("status", "==", "pending"))
-    const querySnapshot = await getDocs(q)
-    const requests: DepositRequest[] = []
-    querySnapshot.forEach((doc) => {
-      requests.push(doc.data() as DepositRequest)
-    })
-    return requests
-  } catch (error) {
-    console.error("[v0] Get pending deposits error:", error)
-    return []
-  }
-}
-
-// Approve withdrawal request (admin only)
 export async function approveWithdrawal(
   requestId: string,
   adminId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Get withdrawal request to find associated transaction
+    const withdrawalDoc = await getDoc(doc(db, "withdrawalRequests", requestId))
+    if (!withdrawalDoc.exists()) {
+      return { success: false, error: "Withdrawal request not found" }
+    }
+
+    const withdrawalData = withdrawalDoc.data() as WithdrawalRequest
+
+    // Update withdrawal status to approved
     await updateDoc(doc(db, "withdrawalRequests", requestId), {
-      status: "approved",
+      status: "completed",
       processedAt: new Date().toISOString(),
       processedBy: adminId,
     })
+
+    // Update associated transaction to completed
+    const transactionsRef = collection(db, "users", withdrawalData.userId, "transactions")
+    const q = query(transactionsRef, where("description", "==", `Withdrawal request #${requestId}`))
+    const querySnapshot = await getDocs(q)
+
+    querySnapshot.forEach(async (doc) => {
+      await updateDoc(doc.ref, { status: "completed" })
+    })
+
     return { success: true }
   } catch (error: any) {
     console.error("[v0] Approve withdrawal error:", error)
@@ -245,125 +182,16 @@ export async function approveWithdrawal(
   }
 }
 
-// Approve deposit request (admin only)
-export async function approveDeposit(
-  requestId: string,
-  adminId: string,
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    await updateDoc(doc(db, "depositRequests", requestId), {
-      status: "approved",
-      processedAt: new Date().toISOString(),
-      processedBy: adminId,
-    })
-    return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Approve deposit error:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Reject withdrawal request (admin only)
-export async function rejectWithdrawal(
-  requestId: string,
-  adminId: string,
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    await updateDoc(doc(db, "withdrawalRequests", requestId), {
-      status: "rejected",
-      processedAt: new Date().toISOString(),
-      processedBy: adminId,
-    })
-    return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Reject withdrawal error:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Reject deposit request (admin only)
-export async function rejectDeposit(requestId: string, adminId: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    await updateDoc(doc(db, "depositRequests", requestId), {
-      status: "rejected",
-      processedAt: new Date().toISOString(),
-      processedBy: adminId,
-    })
-    return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Reject deposit error:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Get all withdrawal requests
-export async function getAllWithdrawals(): Promise<WithdrawalRequest[]> {
-  try {
-    const querySnapshot = await getDocs(collection(db, "withdrawalRequests"))
-    const requests: WithdrawalRequest[] = []
-    querySnapshot.forEach((doc) => {
-      requests.push(doc.data() as WithdrawalRequest)
-    })
-    return requests
-  } catch (error) {
-    console.error("[v0] Get all withdrawals error:", error)
-    return []
-  }
-}
-
-// Get all deposit requests
-export async function getAllDeposits(): Promise<DepositRequest[]> {
-  try {
-    const querySnapshot = await getDocs(collection(db, "depositRequests"))
-    const requests: DepositRequest[] = []
-    querySnapshot.forEach((doc) => {
-      requests.push(doc.data() as DepositRequest)
-    })
-    return requests
-  } catch (error) {
-    console.error("[v0] Get all deposits error:", error)
-    return []
-  }
-}
-
-export async function addKYCDocument(
+export function listenToWithdrawalStatus(
   userId: string,
-  username: string,
-  documentUrl: string,
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const docId = `KYC-${userId}-${Date.now()}`
-    const kycDoc: KYCDocument = {
-      userId,
-      username,
-      documentUrl,
-      uploadedAt: new Date().toISOString(),
-      status: "pending",
-    }
-    await setDoc(doc(db, "kycDocuments", docId), kycDoc)
-    return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Add KYC document error:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-export async function getKYCDocuments(userId?: string): Promise<KYCDocument[]> {
-  try {
-    let q
-    if (userId) {
-      q = query(collection(db, "kycDocuments"), where("userId", "==", userId))
-    } else {
-      q = query(collection(db, "kycDocuments"))
-    }
-    const querySnapshot = await getDocs(q)
-    const docs: KYCDocument[] = []
-    querySnapshot.forEach((doc) => {
-      docs.push(doc.data() as KYCDocument)
+  callback: (withdrawals: WithdrawalRequest[]) => void,
+): Unsubscribe {
+  const q = query(collection(db, "withdrawalRequests"), where("userId", "==", userId))
+  return onSnapshot(q, (snapshot) => {
+    const withdrawals: WithdrawalRequest[] = []
+    snapshot.forEach((doc) => {
+      withdrawals.push(doc.data() as WithdrawalRequest)
     })
-    return docs
-  } catch (error) {
-    console.error("[v0] Get KYC documents error:", error)
-    return []
-  }
+    callback(withdrawals)
+  })
 }
