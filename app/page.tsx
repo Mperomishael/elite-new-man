@@ -35,17 +35,13 @@ export default function RootPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // No user logged in - redirect to login
         router.push("/auth/login")
       } else {
-        // User is logged in - check if admin
         const isAdmin = user.email ? await isAdminByEmail(user.email) : false
 
         if (isAdmin) {
-          // Admin user - redirect to admin panel
           router.push("/admin")
         } else {
-          // Regular user - redirect to dashboard
           router.push("/dashboard")
         }
       }
@@ -80,7 +76,6 @@ export default function RootPage() {
     setUserName(`${profile.firstName} ${profile.lastName}`)
     setIsAuthenticated(true)
 
-    // 📨 Send welcome email via Zoho API
     try {
       const res = await fetch("/api/sendWelcome", {
         method: "POST",
@@ -96,10 +91,10 @@ export default function RootPage() {
       if (!res.ok) {
         console.error("Zoho send error:", data)
       } else {
-        console.log("✅ Welcome email sent:", data.message)
+        console.log("Welcome email sent:", data.message)
       }
     } catch (error) {
-      console.error("❌ Failed to send welcome email:", error)
+      console.error("Failed to send welcome email:", error)
     }
   }
 
@@ -115,9 +110,9 @@ export default function RootPage() {
       case "dashboard":
         return <DashboardView userName={userName} onNavigate={setActiveView} />
       case "history":
-        return <TransactionHistory />
+        return userProfile?.uid ? <TransactionHistory userId={userProfile.uid} /> : <div>Loading...</div>
       case "deposit":
-        return <DepositView />
+        return userProfile ? <DepositView userId={userProfile.uid} username={userName} /> : <div>Loading...</div>
       case "withdraw":
         return (
           <WithdrawView userId={userProfile?.uid} username={userName} availableBalance={userProfile?.balance || 0} />
