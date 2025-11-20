@@ -299,6 +299,7 @@ export function BuyingView() {
               const assetPrice = assets.find((a) => a.symbol === selectedAsset)?.price || 0
               const quantity = buyAmount / assetPrice
 
+              // Enhanced buy button with real-time transaction sync
               await addTransaction(user.uid, {
                 type: "buy",
                 amount: buyAmount,
@@ -310,7 +311,8 @@ export function BuyingView() {
 
               setUserBalance(newBalance)
               setAmount("")
-              alert("Purchase successful!")
+              setSelectedAsset(null)
+              alert("Purchase successful! Check transaction history for details.")
             }}
           >
             Buy {selectedAsset}
