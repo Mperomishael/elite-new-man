@@ -30,7 +30,7 @@ const activities = [
 
 const mockTradingNews: Omit<TradingNews, "id" | "timestamp" | "isRead">[] = [
   {
-    title: "Bitcoin Surges Past $115,000",
+    title: "Bitcoin Surges Past $45,000",
     description: "Bitcoin reaches highest level in months amid market optimism",
     source: "TradingView",
     category: "crypto",
@@ -55,7 +55,7 @@ const mockTradingNews: Omit<TradingNews, "id" | "timestamp" | "isRead">[] = [
   },
   {
     title: "Ethereum Breaks Resistance",
-    description: "ETH hits on growing DeFi adoption",
+    description: "ETH hits $3,000 on growing DeFi adoption",
     source: "TradingView",
     category: "crypto",
     symbol: "ETH",
@@ -63,7 +63,7 @@ const mockTradingNews: Omit<TradingNews, "id" | "timestamp" | "isRead">[] = [
   },
   {
     title: "Oil Prices Rally",
-    description: "Crude oil reaches high barrel on supply concerns",
+    description: "Crude oil reaches $85/barrel on supply concerns",
     source: "TradingView",
     category: "market",
     symbol: "CL",
@@ -196,7 +196,6 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
           </div>
         </div>
       ) : (
-        // Regular Activity Notification
         <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4 pr-12">
           <button
             onClick={() => setIsVisible(false)}
@@ -209,6 +208,14 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
             {currentActivity.action} <span className="text-emerald-400 font-semibold">${currentActivity.amount}</span>
             {currentActivity.type === "profit" && " profit"}
           </p>
+        </div>
+      )}
+
+      {notificationType !== "news" && (
+        <div className="mt-4 bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+          <div id="tradingview-news-ticker" className="tradingview-widget-container">
+            <div className="tradingview-widget-container__widget"></div>
+          </div>
         </div>
       )}
     </div>
