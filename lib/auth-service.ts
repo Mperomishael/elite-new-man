@@ -40,10 +40,7 @@ export interface Transaction {
 // Create user profile in Firestore
 export async function createUserProfile(
   user: User,
-  profileData: Omit<
-    UserProfile,
-    "uid" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName"
-  >,
+  profileData: Omit<UserProfile, "uid" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">,
 ) {
   const isAdmin = user.email === "ultimatestckstrade@gmail.com" || user.email === "empiredigitalsworldwide@gmail.com"
 
@@ -55,7 +52,7 @@ export async function createUserProfile(
     kycDocuments: [],
     kycStatus: "pending",
     createdAt: new Date().toISOString(),
-    displayName: `${profileData.firstName} ${profileData.lastName}`
+    displayName: `${profileData.firstName} ${profileData.lastName}`,
   }
 
   await setDoc(doc(db, "users", user.uid), userProfile)
@@ -100,13 +97,13 @@ export async function signUpWithEmail(
     // Trigger Zoho welcome mail via serverless route (no auth header needed)
     try {
       const displayName = `${profileData.firstName} ${profileData.lastName}`
-      await fetch("/api/sendWelcomeViaZoho", {
+      await fetch("/api/sendWelcome", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: displayName, email }),
       })
     } catch (error) {
-      console.error("Failed to send Zoho welcome email:", error)
+      console.error("Failed to send welcome email:", error)
     }
 
     return { success: true, user, userProfile }
