@@ -1,5 +1,3 @@
-// ... rest of existing code ...
-
 import {
   doc,
   setDoc,
@@ -37,6 +35,19 @@ export interface WithdrawalRequest {
   processedBy?: string
 }
 
+export interface DepositRequest {
+  id: string
+  userId: string
+  username: string
+  amount: number
+  currency: "BTC" | "USDT" | "BANK"
+  proofScreenshot: string
+  status: "pending" | "completed"
+  requestedAt: string
+  processedAt?: string
+  processedBy?: string
+}
+
 export interface AdminWalletSettings {
   btcAddress: string
   btcTag: string
@@ -45,6 +56,45 @@ export interface AdminWalletSettings {
   bankDetails?: BankDetails
   lastUpdated: string
   updatedBy: string
+}
+
+export async function isAdminByEmail(email: string): Promise<boolean> {
+  const adminEmails = ["ultimatestckstrade@gmail.com", "empiredigitalsworldwide@gmail.com"]
+  return adminEmails.includes(email)
+}
+
+export async function createAdminRecord(
+  userId: string,
+  email: string,
+  displayName: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminRecord = {
+      userId,
+      email,
+      displayName,
+      createdAt: new Date().toISOString(),
+      role: "admin",
+    }
+    await setDoc(doc(db, "admins", userId), adminRecord)
+    return { success: true }
+  } catch (error: any) {
+    console.error("[v0] Create admin record error:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+export async function getAdminWalletSettings(): Promise<AdminWalletSettings | null> {
+  try {
+    const settingsDoc = await getDoc(doc(db, "settings", "wallets"))
+    if (settingsDoc.exists()) {
+      return settingsDoc.data() as AdminWalletSettings
+    }
+    return null
+  } catch (error) {
+    console.error("[v0] Get admin wallet settings error:", error)
+    return null
+  }
 }
 
 export async function getAdminBankDetails(): Promise<BankDetails | null> {
@@ -85,8 +135,6 @@ export async function updateAdminWalletSettings(
     return { success: false, error: error.message }
   }
 }
-
-// ... existing createWithdrawalRequest code ...
 
 export async function createWithdrawalRequest(
   userId: string,
@@ -151,7 +199,6 @@ export async function approveWithdrawal(
   adminId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Get withdrawal request to find associated transaction
     const withdrawalDoc = await getDoc(doc(db, "withdrawalRequests", requestId))
     if (!withdrawalDoc.exists()) {
       return { success: false, error: "Withdrawal request not found" }
@@ -159,14 +206,12 @@ export async function approveWithdrawal(
 
     const withdrawalData = withdrawalDoc.data() as WithdrawalRequest
 
-    // Update withdrawal status to approved
     await updateDoc(doc(db, "withdrawalRequests", requestId), {
       status: "completed",
       processedAt: new Date().toISOString(),
       processedBy: adminId,
     })
 
-    // Update associated transaction to completed
     const transactionsRef = collection(db, "users", withdrawalData.userId, "transactions")
     const q = query(transactionsRef, where("description", "==", `Withdrawal request #${requestId}`))
     const querySnapshot = await getDocs(q)
@@ -180,6 +225,99 @@ export async function approveWithdrawal(
     console.error("[v0] Approve withdrawal error:", error)
     return { success: false, error: error.message }
   }
+}
+
+export async function createDepositRequest(
+  userId: string,
+  username: string,
+  amount: number,
+  currency: "BTC" | "USDT" | "BANK",
+  proofScreenshot: string,
+): Promise<{ success: boolean; error?: string; requestId?: string }> {
+  try {
+    const requestId = `DEPOSIT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+    const depositRequest = {
+      id: requestId,
+      userId,
+      username,
+      amount,
+      currency,
+      proofScreenshot,
+      status: "pending",
+      requestedAt: new Date().toISOString(),
+    }
+
+    await setDoc(doc(db, "depositRequests", requestId), depositRequest)
+
+    const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    await setDoc(doc(db, "users", userId, "transactions", transactionId), {
+      id: transactionId,
+      type: "deposit",
+      amount,
+      currency,
+      status: "pending",
+      timestamp: new Date().toISOString(),
+      description: `Deposit request #${requestId}`,
+    })
+
+    return { success: true, requestId }
+  } catch (error: any) {
+    console.error("[v0] Create deposit request error:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+export async function approveDeposit(
+  requestId: string,
+  adminId: string,
+  creditAmount?: number,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const depositDoc = await getDoc(doc(db, "depositRequests", requestId))
+    if (!depositDoc.exists()) {
+      return { success: false, error: "Deposit request not found" }
+    }
+
+    const depositData = depositDoc.data() as any
+    const amount = creditAmount || depositData.amount
+
+    await updateDoc(doc(db, "depositRequests", requestId), {
+      status: "completed",
+      processedAt: new Date().toISOString(),
+      processedBy: adminId,
+    })
+
+    const userDocRef = doc(db, "users", depositData.userId)
+    const userSnap = await getDoc(userDocRef)
+    const currentBalance = userSnap.exists() ? (userSnap.data() as any).balance || 0 : 0
+    const newBalance = currentBalance + amount
+
+    await setDoc(userDocRef, { balance: newBalance }, { merge: true })
+
+    const transactionsRef = collection(db, "users", depositData.userId, "transactions")
+    const q = query(transactionsRef, where("description", "==", `Deposit request #${requestId}`))
+    const querySnapshot = await getDocs(q)
+
+    querySnapshot.forEach(async (doc) => {
+      await updateDoc(doc.ref, { status: "completed" })
+    })
+
+    return { success: true }
+  } catch (error: any) {
+    console.error("[v0] Approve deposit error:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+export function listenToDepositRequests(callback: (deposits: any[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, "depositRequests"), (snapshot) => {
+    const deposits: any[] = []
+    snapshot.forEach((doc) => {
+      deposits.push({ ...doc.data(), docId: doc.id })
+    })
+    callback(deposits)
+  })
 }
 
 export function listenToWithdrawalStatus(
