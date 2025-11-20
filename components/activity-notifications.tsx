@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { X, AlertCircle } from "lucide-react"
+import type { UserProfile } from "@/lib/auth-service"
 
 const activities = [
   { country: "South Africa", action: "made", amount: 322, type: "profit" },
@@ -31,14 +32,18 @@ const kycNotification = {
   message: "Complete your KYC verification to unlock higher trading limits",
 }
 
-export function ActivityNotifications() {
+interface ActivityNotificationsProps {
+  userProfile?: UserProfile
+}
+
+export function ActivityNotifications({ userProfile }: ActivityNotificationsProps) {
   const [currentActivity, setCurrentActivity] = useState(activities[0])
   const [isVisible, setIsVisible] = useState(false)
   const [showKyc, setShowKyc] = useState(false)
 
   useEffect(() => {
     const showNotification = () => {
-      const shouldShowKyc = Math.random() < 0.2
+      const shouldShowKyc = Math.random() < 0.2 && userProfile?.kycStatus !== "approved"
 
       if (shouldShowKyc) {
         setShowKyc(true)
@@ -59,7 +64,7 @@ export function ActivityNotifications() {
     const interval = setInterval(showNotification, 30000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [userProfile?.kycStatus])
 
   if (!isVisible) return null
 
