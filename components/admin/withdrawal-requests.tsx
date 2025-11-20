@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getPendingWithdrawals, approveWithdrawal, type WithdrawalRequest } from "@/lib/admin-service"
-import { updateUserBalance, getUserProfile } from "@/lib/auth-service"
+import { onSnapshot, collection, query, where, type Unsubscribe } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import { approveWithdrawal, type WithdrawalRequest } from "@/lib/admin-service"
+import { getUserProfile } from "@/lib/auth-service"
 import { Button } from "@/components/ui/button"
 
 interface WithdrawalRequestsProps {
@@ -15,19 +17,33 @@ export function WithdrawalRequests({ adminId }: WithdrawalRequestsProps) {
   const [processing, setProcessing] = useState<string | null>(null)
 
   useEffect(() => {
-    loadRequests()
-  }, [])
+    let unsubscribe: Unsubscribe | null = null
 
-  const loadRequests = async () => {
-    const data = await getPendingWithdrawals()
-    setRequests(data)
-    setLoading(false)
-  }
+    try {
+      const q = query(collection(db, "withdrawalRequests"), where("status", "==", "pending"))
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const requestsList: WithdrawalRequest[] = []
+        snapshot.forEach((doc) => {
+          requestsList.push(doc.data() as WithdrawalRequest)
+        })
+        setRequests(requestsList)
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error("[v0] Error setting up withdrawal listener:", error)
+      setLoading(false)
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [])
 
   const handleApprove = async (request: WithdrawalRequest) => {
     setProcessing(request.id)
 
-    // Get user profile to update balance
     const userProfile = await getUserProfile(request.userId)
     if (!userProfile) {
       alert("User not found")
@@ -35,16 +51,13 @@ export function WithdrawalRequests({ adminId }: WithdrawalRequestsProps) {
       return
     }
 
-    // Deduct amount from user balance
-    const newBalance = userProfile.balance - request.amount
-    await updateUserBalance(request.userId, newBalance)
-
-    // Approve withdrawal
+    // Note: Balance was already deducted when withdrawal request was created
+    // Just approve the withdrawal here
     const result = await approveWithdrawal(request.id, adminId)
 
     if (result.success) {
-      // Remove from list
-      setRequests(requests.filter((r) => r.id !== request.id))
+      // Remove from list (real-time listener will handle this)
+      console.log("[v0] Withdrawal approved successfully")
     } else {
       alert(`Error: ${result.error}`)
     }
@@ -64,7 +77,7 @@ export function WithdrawalRequests({ adminId }: WithdrawalRequestsProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Withdrawal Requests</h2>
-        <p className="text-slate-400">Review and approve pending withdrawal requests</p>
+        <p className="text-slate-400">Review and approve pending withdrawal requests (Real-time updates enabled)</p>
       </div>
 
       {requests.length === 0 ? (
@@ -98,12 +111,31 @@ export function WithdrawalRequests({ adminId }: WithdrawalRequestsProps) {
 
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Wallet Address:</span>
-                  <span className="text-white font-mono text-xs">{request.walletAddress}</span>
+                  <span className="text-slate-400">Withdrawal Type:</span>
+                  <span className="text-white font-semibold">
+                    {request.crypto === "BANK" ? "Bank Transfer" : "Cryptocurrency"}
+                  </span>
                 </div>
+                {request.crypto === "BANK" ? (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Destination:</span>
+                    <span className="text-white font-mono text-xs">Bank Account</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Wallet Address:</span>
+                    <span className="text-white font-mono text-xs">{request.walletAddress.substring(0, 20)}...</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Requested:</span>
                   <span className="text-white">{new Date(request.requestedAt).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400">
+                    {request.status}
+                  </span>
                 </div>
               </div>
 
