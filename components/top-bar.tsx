@@ -2,14 +2,16 @@
 
 import { Menu, Bell } from "lucide-react"
 import { useState } from "react"
+import type { UserProfile } from "@/lib/auth-service"
 
 interface TopBarProps {
   onMenuClick: () => void
   userName: string
   onNavigateToKyc: () => void
+  userProfile?: UserProfile
 }
 
-export function TopBar({ onMenuClick, userName, onNavigateToKyc }: TopBarProps) {
+export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile }: TopBarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
 
   return (
@@ -54,30 +56,31 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc }: TopBarProps) 
                   </div>
                 </div>
 
-                {/* KYC Notification */}
-                <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">🔐</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm mb-1">Complete KYC Verification</p>
-                      <p className="text-xs text-slate-400 mb-2">
-                        Verify your identity to unlock higher trading limits and withdrawal amounts.
-                      </p>
-                      <button
-                        onClick={() => {
-                          setShowNotifications(false)
-                          onNavigateToKyc()
-                        }}
-                        className="text-xs bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg transition-colors"
-                      >
-                        Verify Now
-                      </button>
-                      <p className="text-xs text-slate-500 mt-2">2 hours ago</p>
+                {userProfile?.kycStatus !== "approved" && (
+                  <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl">🔐</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm mb-1">Complete KYC Verification</p>
+                        <p className="text-xs text-slate-400 mb-2">
+                          Verify your identity to unlock higher trading limits and withdrawal amounts.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setShowNotifications(false)
+                            onNavigateToKyc()
+                          }}
+                          className="text-xs bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg transition-colors"
+                        >
+                          Verify Now
+                        </button>
+                        <p className="text-xs text-slate-500 mt-2">2 hours ago</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Trading Activity */}
                 <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
