@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, getDocs, query, where } from "firebase/firestore"
+import { collection, query, where, onSnapshot, type Unsubscribe } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
 export function AdminStats() {
@@ -15,40 +15,40 @@ export function AdminStats() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadStats()
-  }, [])
+    const unsubscribers: Unsubscribe[] = []
 
-  const loadStats = async () => {
     try {
-      // Get total users
-      const usersSnapshot = await getDocs(collection(db, "users"))
-      let totalBalance = 0
-      usersSnapshot.forEach((doc) => {
-        const data = doc.data()
-        totalBalance += data.balance || 0
-      })
-
-      // Get pending withdrawals
       const withdrawalsQuery = query(collection(db, "withdrawalRequests"), where("status", "==", "pending"))
-      const withdrawalsSnapshot = await getDocs(withdrawalsQuery)
-
-      // Get pending deposits
-      const depositsQuery = query(collection(db, "depositRequests"), where("status", "==", "pending"))
-      const depositsSnapshot = await getDocs(depositsQuery)
-
-      setStats({
-        totalUsers: usersSnapshot.size,
-        totalBalance,
-        pendingWithdrawals: withdrawalsSnapshot.size,
-        pendingDeposits: depositsSnapshot.size,
-        totalTransactions: 0, // You can calculate this from all user transactions
+      const unsubWithdrawals = onSnapshot(withdrawalsQuery, (snapshot) => {
+        setStats((prev) => ({
+          ...prev,
+          pendingWithdrawals: snapshot.size,
+        }))
+        setLoading(false)
       })
+      unsubscribers.push(unsubWithdrawals)
+
+      const depositsQuery = query(collection(db, "depositRequests"), where("status", "==", "pending"))
+      const unsubDeposits = onSnapshot(depositsQuery, (snapshot) => {
+        setStats((prev) => ({
+          ...prev,
+          pendingDeposits: snapshot.size,
+        }))
+        setLoading(false)
+      })
+      unsubscribers.push(unsubDeposits)
+
+      // Note: For totalUsers and totalBalance, these are less frequently updated
+      // Consider adding a real-time listener here as well if needed
     } catch (error) {
-      console.error("[v0] Load stats error:", error)
-    } finally {
+      console.error("[v0] Setup listeners error:", error)
       setLoading(false)
     }
-  }
+
+    return () => {
+      unsubscribers.forEach((unsub) => unsub())
+    }
+  }, [])
 
   if (loading) {
     return (
