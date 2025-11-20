@@ -128,7 +128,7 @@ export default function RootPage() {
       case "support":
         return <SupportView />
       case "settings":
-        return <SettingsView userName={userName} />
+        return <SettingsView userName={userName} userProfile={userProfile || undefined} />
       default:
         return <DashboardView userName={userName} onNavigate={setActiveView} />
     }
@@ -155,7 +155,7 @@ export default function RootPage() {
         onMenuClick={() => setIsMenuOpen(true)}
         userName={userName}
         onNavigateToKyc={() => setActiveView("kyc")}
-        onLogout={handleLogout}
+        userProfile={userProfile || undefined}
       />
       <SideMenu
         isOpen={isMenuOpen}
@@ -166,7 +166,7 @@ export default function RootPage() {
           setIsMenuOpen(false)
         }}
       />
-      <ActivityNotifications />
+      <ActivityNotifications userProfile={userProfile || undefined} />
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
     </div>
