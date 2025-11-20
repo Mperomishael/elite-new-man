@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getUserTransactions } from "@/lib/auth-service"
+import { onSnapshot, collection, query, orderBy, type Unsubscribe } from "firebase/firestore"
+import { db } from "@/lib/firebase"
 import { Search, Filter, TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
 import type { Transaction } from "@/lib/auth-service"
 
@@ -15,14 +16,37 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
-    loadTransactions()
-  }, [userId])
+    if (!userId) {
+      console.warn("[v0] No userId provided to TransactionHistory")
+      setLoading(false)
+      return
+    }
 
-  const loadTransactions = async () => {
-    const data = await getUserTransactions(userId)
-    setTransactions(data)
-    setLoading(false)
-  }
+    let unsubscribe: Unsubscribe | null = null
+
+    try {
+      const transactionsRef = collection(db, "users", userId, "transactions")
+      const q = query(transactionsRef, orderBy("timestamp", "desc"))
+
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const transactionsList: Transaction[] = []
+        snapshot.forEach((doc) => {
+          transactionsList.push(doc.data() as Transaction)
+        })
+        setTransactions(transactionsList)
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error("[v0] Error setting up transaction listener:", error)
+      setLoading(false)
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [userId])
 
   const filteredTransactions = transactions.filter(
     (t) =>
@@ -108,7 +132,13 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
               <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800">
                 <span>{new Date(transaction.timestamp).toLocaleString()}</span>
                 <span
-                  className={`capitalize ${transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"}`}
+                  className={`capitalize px-2 py-1 rounded text-xs font-medium ${
+                    transaction.status === "completed"
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : transaction.status === "pending"
+                        ? "bg-yellow-500/20 text-yellow-400"
+                        : "bg-red-500/20 text-red-400"
+                  }`}
                 >
                   {transaction.status}
                 </span>
