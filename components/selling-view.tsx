@@ -308,7 +308,6 @@ export function SellingView() {
             ))}
           </div>
 
-          {/* Sell Button */}
           <button
             disabled={!amount || Number.parseFloat(amount) <= 0}
             onClick={async () => {
@@ -340,7 +339,8 @@ export function SellingView() {
 
               setUserBalance(newBalance)
               setAmount("")
-              alert("Sale successful!")
+              setSelectedAsset(null)
+              alert("Sale successful! Check transaction history for details.")
             }}
             className="w-full bg-red-500 hover:bg-red-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
           >
