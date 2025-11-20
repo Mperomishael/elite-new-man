@@ -1,18 +1,21 @@
-// ...existing code...
 "use client"
 
 import type React from "react"
 import { useState, useEffect } from "react"
 import { Bitcoin, Copy, Check, Upload, AlertCircle } from "lucide-react"
-import { getAdminWalletSettings, createDepositRequest } from "@/lib/admin-service"
-import type { AdminWalletSettings } from "@/lib/admin-service"
+import { getAdminWalletSettings, createDepositRequest, listenToBankDetails } from "@/lib/admin-service"
+import type { AdminWalletSettings, BankDetails } from "@/lib/admin-service"
 
 interface DepositViewProps {
   userId: string
   username: string
 }
 
-function TypingText({ text, duration = 3000, className = "" }: { text: string; duration?: number; className?: string }) {
+function TypingText({
+  text,
+  duration = 3000,
+  className = "",
+}: { text: string; duration?: number; className?: string }) {
   const [visible, setVisible] = useState("")
   const [cursorOn, setCursorOn] = useState(true)
   const [completed, setCompleted] = useState(false)
@@ -47,8 +50,13 @@ function TypingText({ text, duration = 3000, className = "" }: { text: string; d
     }
   }, [text, duration])
 
-  // small "pop" when completed
-  const transformStyle = completed ? { transform: "scale(1.04)", transition: "transform 220ms ease-out", textShadow: "0 6px 18px rgba(34,197,94,0.12)" } : {}
+  const transformStyle = completed
+    ? {
+        transform: "scale(1.04)",
+        transition: "transform 220ms ease-out",
+        textShadow: "0 6px 18px rgba(34,197,94,0.12)",
+      }
+    : {}
 
   return (
     <span className={className} style={{ display: "inline-block", ...transformStyle }}>
@@ -63,15 +71,16 @@ function TypingText({ text, duration = 3000, className = "" }: { text: string; d
 export function DepositView({ userId, username }: DepositViewProps) {
   const [step, setStep] = useState<"amount" | "payment">("amount")
   const [amount, setAmount] = useState("")
+  const [depositMethod, setDepositMethod] = useState<"crypto" | "bank">("crypto")
   const [selectedCrypto, setSelectedCrypto] = useState<"BTC" | "USDT">("BTC")
   const [walletSettings, setWalletSettings] = useState<AdminWalletSettings | null>(null)
+  const [bankDetails, setBankDetails] = useState<BankDetails | null>(null)
   const [copiedAddress, setCopiedAddress] = useState(false)
   const [copiedTag, setCopiedTag] = useState(false)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // new states
   const [isLoadingWallet, setIsLoadingWallet] = useState(false)
   const [walletError, setWalletError] = useState<string | null>(null)
 
@@ -81,11 +90,9 @@ export function DepositView({ userId, username }: DepositViewProps) {
       setWalletError(null)
       try {
         const settings = await getAdminWalletSettings()
-        // normalize common key names returned by admin service
         if (settings) {
           const normalized: Partial<AdminWalletSettings> = {
             btcAddress:
-              // prefer camelCase, fallback to snake_case or nested
               (settings as any).btcAddress ||
               (settings as any).btc_address ||
               (settings as any).btc?.address ||
@@ -116,7 +123,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
         } else {
           setWalletSettings(null)
           setWalletError("No wallet settings returned from server.")
-          console.warn("getAdminWalletSettings returned null/undefined")
         }
       } catch (err) {
         console.error("Failed to fetch admin wallet settings:", err)
@@ -127,7 +133,12 @@ export function DepositView({ userId, username }: DepositViewProps) {
       }
     }
 
+    const unsubscribe = listenToBankDetails((details) => {
+      setBankDetails(details)
+    })
+
     fetchWalletSettings()
+    return () => unsubscribe()
   }, [])
 
   const handleCryptoChange = (crypto: "BTC" | "USDT") => {
@@ -138,24 +149,21 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
   const handleProceedToPayment = () => {
     const parsed = Number.parseFloat(amount || "0")
-    const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
-    const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : walletSettings?.usdtTag
 
-    if (parsed >= 50 && walletAddress) {
-      // if tag is required for this currency ensure it's present
-      const needsTag = !!tag // previous UX expects tag displayed; still allow proceed if address present but warn
-      if (!needsTag) {
-        // proceed but warn in console; admin may not require tag
-        console.warn("Proceeding without tag/memo for", selectedCrypto)
+    if (depositMethod === "crypto") {
+      const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
+      if (parsed >= 50 && walletAddress) {
+        setStep("payment")
+      } else {
+        if (parsed < 50) console.warn("Deposit amount below minimum:", parsed)
+        if (!walletAddress) setWalletError("Deposit wallet address not configured by admin.")
       }
-      setStep("payment")
     } else {
-      // keep UX simple: block if amount too low or address missing
-      if (parsed < 50) {
-        console.warn("Deposit amount below minimum:", parsed)
-      }
-      if (!walletAddress) {
-        setWalletError("Deposit wallet address not configured by admin.")
+      if (parsed >= 50 && bankDetails) {
+        setStep("payment")
+      } else {
+        if (parsed < 50) console.warn("Deposit amount below minimum:", parsed)
+        if (!bankDetails) setWalletError("Bank details not configured by admin.")
       }
     }
   }
@@ -182,9 +190,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
   }
 
   const handleSubmit = async () => {
-    if (screenshot && walletSettings) {
+    if (screenshot) {
       setIsLoading(true)
-      // Convert file to base64 for storage
       const reader = new FileReader()
       reader.onloadend = async () => {
         const base64Screenshot = reader.result as string
@@ -192,7 +199,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
           userId,
           username,
           Number.parseFloat(amount),
-          selectedCrypto,
+          depositMethod === "crypto" ? selectedCrypto : "BANK",
           base64Screenshot,
         )
 
@@ -207,7 +214,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
     }
   }
 
-  // use normalized accessors
   const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
   const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : walletSettings?.usdtTag
 
@@ -215,13 +221,39 @@ export function DepositView({ userId, username }: DepositViewProps) {
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-1">Deposit Funds</h2>
-        <p className="text-slate-400 text-sm">Add money to your trading account via cryptocurrency</p>
+        <p className="text-slate-400 text-sm">Add money to your trading account via cryptocurrency or bank transfer</p>
       </div>
 
       {!isSubmitted ? (
         <>
           {step === "amount" ? (
             <>
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Deposit Method</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setDepositMethod("crypto")}
+                    className={`p-4 rounded-xl border-2 transition ${
+                      depositMethod === "crypto"
+                        ? "border-emerald-500 bg-emerald-500/10"
+                        : "border-slate-800 hover:border-slate-700"
+                    }`}
+                  >
+                    Crypto
+                  </button>
+                  <button
+                    onClick={() => setDepositMethod("bank")}
+                    className={`p-4 rounded-xl border-2 transition ${
+                      depositMethod === "bank"
+                        ? "border-emerald-500 bg-emerald-500/10"
+                        : "border-slate-800 hover:border-slate-700"
+                    }`}
+                  >
+                    Bank Transfer
+                  </button>
+                </div>
+              </div>
+
               {/* Amount Input */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <label className="text-sm font-medium">Deposit Amount (USD)</label>
@@ -239,111 +271,80 @@ export function DepositView({ userId, username }: DepositViewProps) {
                 <p className="text-xs text-slate-400">Minimum deposit: $50.00</p>
               </div>
 
-              {/* Crypto Selection */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">Select Cryptocurrency</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => handleCryptoChange("BTC")}
-                    className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                      selectedCrypto === "BTC"
-                        ? "border-emerald-500 bg-emerald-500/10"
-                        : "border-slate-800 bg-slate-900 hover:border-slate-700"
-                    }`}
-                  >
-                    <Bitcoin className="w-6 h-6 text-orange-400" />
-                    <div className="text-left">
-                      <p className="font-bold">Bitcoin</p>
-                      <p className="text-xs text-slate-400">BTC</p>
-                    </div>
-                    {selectedCrypto === "BTC" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
-                  </button>
+              {depositMethod === "crypto" && (
+                <>
+                  {/* Crypto Selection */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Select Cryptocurrency</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => handleCryptoChange("BTC")}
+                        className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                          selectedCrypto === "BTC"
+                            ? "border-emerald-500 bg-emerald-500/10"
+                            : "border-slate-800 bg-slate-900 hover:border-slate-700"
+                        }`}
+                      >
+                        <Bitcoin className="w-6 h-6 text-orange-400" />
+                        <div className="text-left">
+                          <p className="font-bold">Bitcoin</p>
+                          <p className="text-xs text-slate-400">BTC</p>
+                        </div>
+                        {selectedCrypto === "BTC" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
+                      </button>
 
-                  <button
-                    onClick={() => handleCryptoChange("USDT")}
-                    className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                      selectedCrypto === "USDT"
-                        ? "border-emerald-500 bg-emerald-500/10"
-                        : "border-slate-800 bg-slate-900 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                      ₮
+                      <button
+                        onClick={() => handleCryptoChange("USDT")}
+                        className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                          selectedCrypto === "USDT"
+                            ? "border-emerald-500 bg-emerald-500/10"
+                            : "border-slate-800 bg-slate-900 hover:border-slate-700"
+                        }`}
+                      >
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                          ₮
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold">Tether</p>
+                          <p className="text-xs text-slate-400">USDT</p>
+                        </div>
+                        {selectedCrypto === "USDT" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
+                      </button>
                     </div>
-                    <div className="text-left">
-                      <p className="font-bold">Tether</p>
-                      <p className="text-xs text-slate-400">USDT</p>
-                    </div>
-                    {selectedCrypto === "USDT" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
-                  </button>
+                  </div>
+
+                  {/* Wallet status */}
+                  <div className="space-y-2">
+                    {isLoadingWallet ? (
+                      <div className="flex items-center gap-3">
+                        <TypingText
+                          text="generating your wallet address"
+                          duration={3000}
+                          className="text-sm text-emerald-400"
+                        />
+                      </div>
+                    ) : walletError ? (
+                      <div className="flex items-center gap-3">
+                        <p className="text-xs text-red-300">{walletError}</p>
+                      </div>
+                    ) : !walletSettings ? (
+                      <p className="text-xs text-red-300">No wallet settings available.</p>
+                    ) : (
+                      <p className="text-xs text-slate-400">Deposit address loaded</p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {depositMethod === "bank" && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                  <p className="text-xs text-blue-300">
+                    {bankDetails
+                      ? "Bank details are available for deposit"
+                      : "Bank deposit is being configured by admin"}
+                  </p>
                 </div>
-              </div>
-
-              {/* Wallet status / retry */}
-              <div className="space-y-2">
-                {isLoadingWallet ? (
-                  <div className="flex items-center gap-3">
-                    <TypingText text="generating your wallet address" duration={3000} className="text-sm text-emerald-400" />
-                  </div>
-                ) : walletError ? (
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs text-red-300">{walletError}</p>
-                    <button
-                      onClick={() => {
-                        setWalletError(null)
-                        setIsLoadingWallet(true)
-                        // re-run effect by calling getAdminWalletSettings directly
-                        getAdminWalletSettings()
-                          .then((s) => {
-                            // same normalization as above
-                            const normalized: Partial<AdminWalletSettings> = {
-                              btcAddress:
-                                (s as any).btcAddress ||
-                                (s as any).btc_address ||
-                                (s as any).btc?.address ||
-                                (s as any).btc ||
-                                null,
-                              btcTag:
-                                (s as any).btcTag ||
-                                (s as any).btc_tag ||
-                                (s as any).btc?.tag ||
-                                (s as any).btcMemo ||
-                                (s as any).btc_memo ||
-                                null,
-                              usdtAddress:
-                                (s as any).usdtAddress ||
-                                (s as any).usdt_address ||
-                                (s as any).usdt?.address ||
-                                (s as any).usdt ||
-                                null,
-                              usdtTag:
-                                (s as any).usdtTag ||
-                                (s as any).usdt_tag ||
-                                (s as any).usdt?.tag ||
-                                (s as any).usdtMemo ||
-                                (s as any).usdt_memo ||
-                                null,
-                            }
-                            setWalletSettings(normalized as AdminWalletSettings)
-                            setWalletError(null)
-                          })
-                          .catch((err) => {
-                            console.error("Retry getAdminWalletSettings failed:", err)
-                            setWalletError("Retry failed. Check server.")
-                          })
-                          .finally(() => setIsLoadingWallet(false))
-                      }}
-                      className="text-xs text-emerald-400 hover:text-emerald-300"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                ) : !walletSettings ? (
-                  <p className="text-xs text-red-300">No wallet settings available.</p>
-                ) : (
-                  <p className="text-xs text-slate-400">Deposit address loaded</p>
-                )}
-              </div>
+              )}
 
               {/* Proceed Button */}
               <button
@@ -352,13 +353,14 @@ export function DepositView({ userId, username }: DepositViewProps) {
                   !amount ||
                   Number.parseFloat(amount || "0") < 50 ||
                   isLoadingWallet ||
-                  !walletSettings ||
-                  // also disable if selected currency has no address
-                  !(selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress)
+                  (depositMethod === "crypto" &&
+                    (!walletSettings ||
+                      !(selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress))) ||
+                  (depositMethod === "bank" && !bankDetails)
                 }
                 className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
               >
-                {!walletSettings ? "Loading wallet..." : "Proceed to Payment"}
+                {depositMethod === "crypto" && !walletSettings ? "Loading wallet..." : "Proceed to Payment"}
               </button>
             </>
           ) : (
@@ -371,11 +373,12 @@ export function DepositView({ userId, username }: DepositViewProps) {
               <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
                 <p className="text-sm text-slate-400 mb-1">Deposit Amount</p>
                 <p className="text-3xl font-bold text-emerald-400">${amount}</p>
-                <p className="text-xs text-slate-400 mt-1">via {selectedCrypto}</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  via {depositMethod === "crypto" ? selectedCrypto : "Bank Transfer"}
+                </p>
               </div>
 
-              {/* Wallet Address */}
-              {walletAddress ? (
+              {depositMethod === "crypto" && walletAddress ? (
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                   <div>
                     <label className="text-sm text-slate-400 mb-2 block">Wallet Address</label>
@@ -404,16 +407,58 @@ export function DepositView({ userId, username }: DepositViewProps) {
                     </div>
                   </div>
                 </div>
-              ) : (
+              ) : depositMethod === "bank" && bankDetails ? (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-300">Bank Details for Deposit</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-slate-400">Bank Name</p>
+                      <p className="text-sm font-semibold text-white">{bankDetails.bankName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400">Account Holder</p>
+                      <p className="text-sm font-semibold text-white">{bankDetails.accountHolderName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400">Account Number / IBAN</p>
+                      <div className="flex items-center justify-between gap-2 mt-1">
+                        <p className="text-sm font-mono text-white break-all">{bankDetails.accountNumber}</p>
+                        <button
+                          onClick={() => copyToClipboard(bankDetails.accountNumber, "address")}
+                          className="flex-shrink-0 p-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
+                        >
+                          {copiedAddress ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    {bankDetails.routingNumber && (
+                      <div>
+                        <p className="text-xs text-slate-400">Routing Number</p>
+                        <p className="text-sm font-mono text-white">{bankDetails.routingNumber}</p>
+                      </div>
+                    )}
+                    {bankDetails.swiftCode && (
+                      <div>
+                        <p className="text-xs text-slate-400">SWIFT Code</p>
+                        <p className="text-sm font-mono text-white">{bankDetails.swiftCode}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs text-slate-400">Country</p>
+                      <p className="text-sm font-semibold text-white">{bankDetails.country}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : depositMethod === "bank" ? (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex gap-3">
                   <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-300">Wallet address not configured. Please contact support.</p>
+                  <p className="text-sm text-red-300">Bank details not configured. Please contact support.</p>
                 </div>
-              )}
+              ) : null}
 
               {/* Upload Screenshot */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <label className="text-sm font-medium mb-3 block">Upload Payment Screenshot</label>
+                <label className="text-sm font-medium mb-3 block">Upload Payment Proof / Screenshot</label>
                 <div className="border-2 border-dashed border-slate-700 rounded-xl p-8 text-center hover:border-emerald-500 transition-colors">
                   <input
                     type="file"
@@ -439,7 +484,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
               {/* Submit Button */}
               <button
                 onClick={handleSubmit}
-                disabled={!screenshot || isLoading || !walletAddress}
+                disabled={!screenshot || isLoading}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
               >
                 {isLoading ? "Submitting..." : "Submit Deposit"}
@@ -451,7 +496,17 @@ export function DepositView({ userId, username }: DepositViewProps) {
                 <div className="text-sm text-blue-300">
                   <p className="font-semibold mb-1">Important:</p>
                   <ul className="space-y-1 text-xs">
-                    <li>• Send only {selectedCrypto} to this address</li>
+                    {depositMethod === "crypto" ? (
+                      <>
+                        <li>• Send only {selectedCrypto} to this address</li>
+                        <li>• Include the memo/tag if provided</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>• Transfer funds to the bank account shown above</li>
+                        <li>• Use your username as transfer reference</li>
+                      </>
+                    )}
                     <li>• Upload a clear screenshot of your payment</li>
                     <li>• Your account will be credited after approval</li>
                   </ul>
@@ -461,7 +516,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
           )}
         </>
       ) : (
-        /* Success Message */
         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center space-y-4">
           <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto">
             <Check className="w-8 h-8 text-white" />
@@ -469,8 +523,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
           <div>
             <h3 className="text-xl font-bold text-emerald-400 mb-2">Deposit Submitted!</h3>
             <p className="text-slate-300 text-sm">
-              Your deposit request has been received and is pending approval. You will be notified once your
-              account is credited.
+              Your deposit request has been received and is pending approval. You will be notified once your account is
+              credited.
             </p>
           </div>
           <button
@@ -489,4 +543,3 @@ export function DepositView({ userId, username }: DepositViewProps) {
     </div>
   )
 }
-// ...existing code...
