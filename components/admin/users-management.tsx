@@ -41,7 +41,7 @@ export function UsersManagement() {
             kycDocuments: data.kycDocuments || [],
             kycStatus: data.kycStatus || "pending",
             createdAt: data.createdAt || "",
-            emailVerified: data.emailVerified || false,
+            displayName: data.displayName || "",
           } as UserProfile)
         }
       })
@@ -166,6 +166,13 @@ export function UsersManagement() {
                 onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm text-slate-400 mb-2 block">Email</label>
+            <div className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-300">
+              {editForm.email}
             </div>
           </div>
 
@@ -304,6 +311,7 @@ export function UsersManagement() {
             <thead className="bg-slate-800">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">User</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Email</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Main Balance</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Profit Balance</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">KYC Status</th>
@@ -321,6 +329,9 @@ export function UsersManagement() {
                         </p>
                         <p className="text-sm text-slate-400">@{user.username}</p>
                       </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <p className="text-sm text-slate-300">{user.email}</p>
                     </td>
                     <td className="px-4 py-4">
                       <span className="text-emerald-500 font-semibold">${(user.balance || 0).toLocaleString()}</span>
@@ -353,7 +364,7 @@ export function UsersManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                     No users found
                   </td>
                 </tr>
