@@ -1,18 +1,31 @@
 "use client"
 
 import { Menu, Bell } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { UserProfile } from "@/lib/auth-service"
+import { getMessageCount } from "@/lib/news-service"
 
 interface TopBarProps {
   onMenuClick: () => void
   userName: string
   onNavigateToKyc: () => void
   userProfile?: UserProfile
+  userId?: string
 }
 
-export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile }: TopBarProps) {
+export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, userId }: TopBarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
+  const [messageCount, setMessageCount] = useState(0)
+
+  useEffect(() => {
+    const updateCount = async () => {
+      if (userId) {
+        const count = await getMessageCount(userId)
+        setMessageCount(count)
+      }
+    }
+    updateCount()
+  }, [userId])
 
   return (
     <header className="sticky top-0 z-40 bg-slate-950 border-b border-slate-900 backdrop-blur-sm px-4 py-3 md:py-4">
@@ -31,13 +44,27 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile }: 
             className="relative text-white hover:text-cyan-400 transition-colors p-2 -mr-2 active:scale-95"
           >
             <Bell className="w-5 h-5 md:w-6 md:h-6" />
-            <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-cyan-400 ring-2 ring-slate-950"></span>
+            {messageCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 flex items-center justify-center bg-amber-500 text-white text-xs font-bold w-5 h-5 rounded-full">
+                {messageCount > 99 ? "99+" : messageCount}
+              </span>
+            )}
+            {messageCount === 0 && (
+              <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-cyan-400 ring-2 ring-slate-950"></span>
+            )}
           </button>
 
           {showNotifications && (
             <div className="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50">
               <div className="p-4 border-b border-slate-800">
-                <h3 className="font-bold text-sm">Notifications</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-sm">Notifications</h3>
+                  {messageCount > 0 && (
+                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full font-semibold">
+                      {messageCount} new
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="max-h-96 overflow-y-auto">
                 {/* Welcome Message */}
