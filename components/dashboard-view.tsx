@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown } from "lucide-react"
-import { auth } from "@/lib/firebase"
-import { getUserProfile } from "@/lib/auth-service"
+import { auth, db } from "@/lib/firebase"
+import { MoonStarIcon as onSnapshot } from "lucide-react"
 
 interface DashboardViewProps {
   userName: string
@@ -116,18 +116,19 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   }, [])
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser
-      if (user) {
-        const profile = await getUserProfile(user.uid)
-        if (profile) {
-          setBalance(profile.balance)
-          setProfitBalance(profile.profitBalance)
-          setSelectedCurrency(profile.currency || "USD")
-        }
+    const user = auth.currentUser
+    if (!user) return
+
+    const unsubscribe = onSnapshot.doc(db, "users", user.uid).onSnapshot((docSnap: any) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        setBalance(data.balance || 0)
+        setProfitBalance(data.profitBalance || 0)
+        setSelectedCurrency(data.currency || "USD")
       }
-    }
-    fetchUserData()
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const cryptoData = [
