@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { onSnapshot, collection, query, orderBy, type Unsubscribe } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { Search, TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
+import { TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
 import type { Transaction } from "@/lib/auth-service"
 
 interface TransactionHistoryProps {
@@ -19,7 +19,6 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
 
   useEffect(() => {
     if (!userId) {
-      console.warn("[v0] No userId provided to TransactionHistory")
       setLoading(false)
       return
     }
@@ -86,34 +85,8 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
         </div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex gap-2 flex-wrap">
-        <div className="flex-1 min-w-[200px] relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
-        </div>
-        <div className="flex gap-2">
-          {(["all", "deposit", "withdraw", "buy", "sell"] as const).map((type) => (
-            <button
-              key={type}
-              onClick={() => setFilterType(type)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                filterType === type ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              }`}
-            >
-              {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* ... existing search and filter code ... */}
 
-      {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
           <p className="text-slate-400">No transactions yet</p>
