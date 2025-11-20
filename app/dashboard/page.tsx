@@ -53,27 +53,6 @@ export default function TradingDashboard() {
     setUserProfile(profile)
     setUserName(`${profile.firstName} ${profile.lastName}`)
     setIsAuthenticated(true)
-
-    try {
-      const res = await fetch("/api/sendWelcome", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: `${profile.firstName} ${profile.lastName}`,
-          email: profile.email,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        console.error("Zoho send error:", data)
-      } else {
-        console.log("✅ Welcome email sent:", data.message)
-      }
-    } catch (error) {
-      console.error("❌ Failed to send welcome email:", error)
-    }
   }
 
   const handleLogout = async () => {
@@ -134,6 +113,8 @@ export default function TradingDashboard() {
         userName={userName}
         onNavigateToKyc={() => setActiveView("kyc")}
         onLogout={handleLogout}
+        userProfile={userProfile}
+        userId={userProfile?.uid}
       />
       <SideMenu
         isOpen={isMenuOpen}
@@ -144,7 +125,7 @@ export default function TradingDashboard() {
           setIsMenuOpen(false)
         }}
       />
-      <ActivityNotifications />
+      <ActivityNotifications userProfile={userProfile} userId={userProfile?.uid} />
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
     </div>
