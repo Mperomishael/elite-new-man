@@ -31,7 +31,9 @@ interface SideMenuProps {
       | "kyc"
       | "referrals"
       | "support"
-      | "settings",
+      | "settings"
+      | "license"
+      | "terms",
   ) => void
 }
 
@@ -45,8 +47,10 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
     { id: "sell", label: "Selling", icon: TrendingDown },
     { id: "kyc", label: "KYC Verification", icon: FileCheck },
     { id: "referrals", label: "Referrals", icon: Users },
+    { id: "license", label: "Company License", icon: FileCheck },
+    { id: "terms", label: "Terms & Conditions", icon: FileCheck },
     { id: "support", label: "Email Support", icon: Mail },
-    { id: "settings", label: "Settings", icon: Settings }, // Added "settings" to the menu items
+    { id: "settings", label: "Settings", icon: Settings },
   ]
 
   return (
