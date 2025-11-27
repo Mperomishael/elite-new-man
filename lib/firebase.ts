@@ -1,3 +1,4 @@
+// firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app"
 import { getAuth, GoogleAuthProvider } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
@@ -12,9 +13,10 @@ const firebaseConfig = {
   measurementId: "G-HYCZTE5T1V",
 }
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
+// Ensure single app instance
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+
+// Export core instances
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-
 export const googleProvider = new GoogleAuthProvider()
