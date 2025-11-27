@@ -15,6 +15,8 @@ import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
+import { LicenseView } from "@/components/license-view"
+import { TermsView } from "@/components/terms-view"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
@@ -23,7 +25,18 @@ import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-servic
 export default function TradingDashboard() {
   const router = useRouter()
   const [activeView, setActiveView] = useState<
-    "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
+    | "dashboard"
+    | "history"
+    | "deposit"
+    | "withdraw"
+    | "buy"
+    | "sell"
+    | "kyc"
+    | "referrals"
+    | "support"
+    | "settings"
+    | "license"
+    | "terms"
   >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -53,6 +66,27 @@ export default function TradingDashboard() {
     setUserProfile(profile)
     setUserName(`${profile.firstName} ${profile.lastName}`)
     setIsAuthenticated(true)
+
+    try {
+      const res = await fetch("/api/sendWelcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${profile.firstName} ${profile.lastName}`,
+          email: profile.email,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        console.error("Zoho send error:", data)
+      } else {
+        console.log("✅ Welcome email sent:", data.message)
+      }
+    } catch (error) {
+      console.error("❌ Failed to send welcome email:", error)
+    }
   }
 
   const handleLogout = async () => {
@@ -67,7 +101,7 @@ export default function TradingDashboard() {
       case "dashboard":
         return <DashboardView userName={userName} onNavigate={setActiveView} />
       case "history":
-        return <TransactionHistory />
+        return <TransactionHistory userId={userProfile?.uid || ""} />
       case "deposit":
         return <DepositView />
       case "withdraw":
@@ -86,6 +120,10 @@ export default function TradingDashboard() {
         return <SupportView />
       case "settings":
         return <SettingsView userName={userName} />
+      case "license":
+        return <LicenseView />
+      case "terms":
+        return <TermsView />
       default:
         return <DashboardView userName={userName} onNavigate={setActiveView} />
     }
@@ -113,8 +151,6 @@ export default function TradingDashboard() {
         userName={userName}
         onNavigateToKyc={() => setActiveView("kyc")}
         onLogout={handleLogout}
-        userProfile={userProfile}
-        userId={userProfile?.uid}
       />
       <SideMenu
         isOpen={isMenuOpen}
@@ -125,9 +161,10 @@ export default function TradingDashboard() {
           setIsMenuOpen(false)
         }}
       />
-      <ActivityNotifications userProfile={userProfile} userId={userProfile?.uid} />
+      <ActivityNotifications />
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
     </div>
   )
 }
+v
