@@ -216,9 +216,11 @@ export async function approveWithdrawal(
     const q = query(transactionsRef, where("description", "==", `Withdrawal request #${requestId}`))
     const querySnapshot = await getDocs(q)
 
-    querySnapshot.forEach(async (doc) => {
-      await updateDoc(doc.ref, { status: "completed" })
-    })
+    for (const d of querySnapshot.docs) {
+      await updateDoc(doc(db, "users", withdrawalData.userId, "transactions", d.id), {
+        status: "completed",
+      })
+    }
 
     return { success: true }
   } catch (error: any) {
@@ -299,9 +301,11 @@ export async function approveDeposit(
     const q = query(transactionsRef, where("description", "==", `Deposit request #${requestId}`))
     const querySnapshot = await getDocs(q)
 
-    querySnapshot.forEach(async (doc) => {
-      await updateDoc(doc.ref, { status: "completed" })
-    })
+    for (const d of querySnapshot.docs) {
+      await updateDoc(doc(db, "users", depositData.userId, "transactions", d.id), {
+        status: "completed",
+      })
+    }
 
     return { success: true }
   } catch (error: any) {
@@ -309,6 +313,7 @@ export async function approveDeposit(
     return { success: false, error: error.message }
   }
 }
+
 
 export function listenToDepositRequests(callback: (deposits: any[]) => void): Unsubscribe {
   return onSnapshot(collection(db, "depositRequests"), (snapshot) => {
