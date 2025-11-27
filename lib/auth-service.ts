@@ -1,3 +1,5 @@
+"use client"
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -5,10 +7,22 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth"
-import { doc, setDoc, getDoc } from "firebase/firestore"
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  serverTimestamp,
+  type Timestamp,
+} from "firebase/firestore"
 import { auth, db } from "./firebase"
 
 export { auth }
+
+// ------------------ Interfaces ------------------
 
 export interface UserProfile {
   uid: string
@@ -23,7 +37,7 @@ export interface UserProfile {
   profitBalance: number
   kycDocuments: string[]
   kycStatus: "pending" | "approved" | "rejected"
-  createdAt: string
+  createdAt: Timestamp
   displayName: string
 }
 
@@ -33,25 +47,26 @@ export interface Transaction {
   amount: number
   currency: string
   status: "pending" | "completed" | "failed"
-  timestamp: string
+  timestamp: Timestamp
   description: string
 }
 
-// Create user profile in Firestore
+// ------------------ User Profile ------------------
+
 export async function createUserProfile(
   user: User,
-  profileData: Omit<UserProfile, "uid" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">,
+  profileData: Omit<UserProfile, "uid" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">
 ) {
-  const isAdmin = user.email === "ultimatestckstrade@gmail.com" || user.email === "empiredigitalsworldwide@gmail.com"
+  const isAdmin = ["ultimatestckstrade@gmail.com", "empiredigitalsworldwide@gmail.com"].includes(user.email || "")
 
   const userProfile: UserProfile = {
     uid: user.uid,
     ...profileData,
-    balance: isAdmin ? 100000000000 : 0,
+    balance: isAdmin ? 100_000_000_000 : 0,
     profitBalance: 0,
     kycDocuments: [],
     kycStatus: "pending",
-    createdAt: new Date().toISOString(),
+    createdAt: serverTimestamp() as Timestamp,
     displayName: `${profileData.firstName} ${profileData.lastName}`,
   }
 
@@ -59,184 +74,163 @@ export async function createUserProfile(
   return userProfile
 }
 
-// Get user profile from Firestore
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const docRef = doc(db, "users", uid)
   const docSnap = await getDoc(docRef)
-
-  if (docSnap.exists()) {
-    return docSnap.data() as UserProfile
-  }
-  return null
+  if (!docSnap.exists()) return null
+  return docSnap.data() as UserProfile
 }
 
-// Sign up with email and password
+// ------------------ Auth Functions ------------------
+
 export async function signUpWithEmail(
   email: string,
   password: string,
-  profileData: Omit<
-    UserProfile,
-    "uid" | "email" | "balance" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName"
-  >,
+  profileData: Omit<UserProfile, "uid" | "email" | "balance" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">
 ) {
   try {
-    // Create user account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
     const user = userCredential.user
 
-    // Update user profile with display name
+    // Update display name
     const displayName = `${profileData.firstName} ${profileData.lastName}`
     await updateProfile(user, { displayName })
 
-    // Create user profile in Firestore
-    const userProfile = await createUserProfile(user, {
-      ...profileData,
-      email,
-    })
+    // Create Firestore profile
+    const userProfile = await createUserProfile(user, { ...profileData, email })
 
-    // Trigger Zoho welcome mail via serverless route (no auth header needed)
+    // Optional: Trigger welcome email via serverless
     try {
-      const displayName = `${profileData.firstName} ${profileData.lastName}`
       await fetch("/api/sendWelcome", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: displayName, email }),
       })
-    } catch (error) {
-      console.error("Failed to send welcome email:", error)
+    } catch (err) {
+      console.error("Failed to send welcome email:", err)
     }
 
     return { success: true, user, userProfile }
-  } catch (error: any) {
-    console.error("[v0] Sign up error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Sign up error:", err)
+    return { success: false, error: err.message || "Sign up failed" }
   }
 }
 
-// Sign in with email and password
 export async function signInWithEmail(email: string, password: string) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const user = userCredential.user
-
-    // Get user profile
     const userProfile = await getUserProfile(user.uid)
-
-    if (!userProfile) {
-      return { success: false, error: "User profile not found" }
-    }
-
+    if (!userProfile) return { success: false, error: "User profile not found" }
     return { success: true, user, userProfile }
-  } catch (error: any) {
-    console.error("[v0] Sign in error:", error)
-    let errorMessage = "Invalid email or password"
-    if (error.code === "auth/user-not-found") {
-      errorMessage = "No account found with this email"
-    } else if (error.code === "auth/wrong-password") {
-      errorMessage = "Incorrect password"
-    } else if (error.code === "auth/too-many-requests") {
-      errorMessage = "Too many failed attempts. Please try again later"
-    }
-    return { success: false, error: errorMessage }
+  } catch (err: any) {
+    console.error("[v0] Sign in error:", err)
+    let message = "Invalid email or password"
+    if (err.code === "auth/user-not-found") message = "No account found with this email"
+    else if (err.code === "auth/wrong-password") message = "Incorrect password"
+    else if (err.code === "auth/too-many-requests") message = "Too many failed attempts. Try later"
+    return { success: false, error: message }
   }
 }
 
-// Sign out
 export async function signOutUser() {
   try {
     await signOut(auth)
     return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Sign out error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Sign out error:", err)
+    return { success: false, error: err.message }
   }
 }
 
-// Update user balance
-export async function updateUserBalance(uid: string, newBalance: number) {
-  try {
-    await setDoc(doc(db, "users", uid), { balance: newBalance }, { merge: true })
-    return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Update balance error:", error)
-    return { success: false, error: error.message }
-  }
-}
+// ------------------ Transactions ------------------
 
-// Add transaction
-export async function addTransaction(uid: string, transaction: Omit<Transaction, "id">) {
+export async function addTransaction(uid: string, transaction: Omit<Transaction, "id" | "timestamp">) {
   try {
-    const transactionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const transactionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
     const transactionData: Transaction = {
       id: transactionId,
       ...transaction,
+      timestamp: serverTimestamp() as Timestamp,
     }
 
     await setDoc(doc(db, "users", uid, "transactions", transactionId), transactionData)
     return { success: true, transaction: transactionData }
-  } catch (error: any) {
-    console.error("[v0] Add transaction error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Add transaction error:", err)
+    return { success: false, error: err.message }
   }
 }
 
-// Get user transactions
 export async function getUserTransactions(uid: string): Promise<Transaction[]> {
   try {
-    const { collection, query, orderBy, getDocs } = await import("firebase/firestore")
     const transactionsRef = collection(db, "users", uid, "transactions")
     const q = query(transactionsRef, orderBy("timestamp", "desc"))
-    const querySnapshot = await getDocs(q)
+    const snapshot = await getDocs(q)
 
     const transactions: Transaction[] = []
-    querySnapshot.forEach((doc) => {
-      transactions.push(doc.data() as Transaction)
+    snapshot.forEach((doc) => {
+      const data = doc.data() as Transaction
+      transactions.push({
+        ...data,
+        timestamp: data.timestamp && "toDate" in data.timestamp ? data.timestamp.toDate() as any : new Date(data.timestamp),
+      })
     })
 
     return transactions
-  } catch (error) {
-    console.error("[v0] Get transactions error:", error)
+  } catch (err) {
+    console.error("[v0] Get transactions error:", err)
     return []
   }
 }
 
-// Update both main and profit balance
-export async function updateUserBalances(uid: string, mainBalance?: number, profitBalance?: number) {
-  try {
-    const updateData: any = {}
-    if (mainBalance !== undefined) updateData.balance = mainBalance
-    if (profitBalance !== undefined) updateData.profitBalance = profitBalance
+// ------------------ Balances ------------------
 
-    await setDoc(doc(db, "users", uid), updateData, { merge: true })
+export async function updateUserBalance(uid: string, newBalance: number) {
+  try {
+    await setDoc(doc(db, "users", uid), { balance: newBalance }, { merge: true })
     return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Update balances error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Update balance error:", err)
+    return { success: false, error: err.message }
   }
 }
 
-// Update user profile fields
+export async function updateUserBalances(uid: string, mainBalance?: number, profitBalance?: number) {
+  try {
+    const updates: any = {}
+    if (mainBalance !== undefined) updates.balance = mainBalance
+    if (profitBalance !== undefined) updates.profitBalance = profitBalance
+    await setDoc(doc(db, "users", uid), updates, { merge: true })
+    return { success: true }
+  } catch (err: any) {
+    console.error("[v0] Update balances error:", err)
+    return { success: false, error: err.message }
+  }
+}
+
+// ------------------ Profile Updates ------------------
+
 export async function updateUserProfile(uid: string, updates: Partial<UserProfile>) {
   try {
     await setDoc(doc(db, "users", uid), updates, { merge: true })
     return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Update profile error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Update profile error:", err)
+    return { success: false, error: err.message }
   }
 }
 
-// Add KYC documents
 export async function addKYCDocument(uid: string, documentUrl: string) {
   try {
-    const userProfile = await getUserProfile(uid)
-    if (!userProfile) return { success: false, error: "User not found" }
-
-    const updatedDocs = [...(userProfile.kycDocuments || []), documentUrl]
+    const profile = await getUserProfile(uid)
+    if (!profile) return { success: false, error: "User not found" }
+    const updatedDocs = [...(profile.kycDocuments || []), documentUrl]
     await setDoc(doc(db, "users", uid), { kycDocuments: updatedDocs }, { merge: true })
     return { success: true }
-  } catch (error: any) {
-    console.error("[v0] Add KYC document error:", error)
-    return { success: false, error: error.message }
+  } catch (err: any) {
+    console.error("[v0] Add KYC document error:", err)
+    return { success: false, error: err.message }
   }
 }
