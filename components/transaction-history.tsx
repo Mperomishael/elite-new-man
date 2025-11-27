@@ -1,70 +1,49 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { onSnapshot, collection, query, orderBy, type Unsubscribe } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
+import { getUserTransactions } from "@/lib/auth-service"
+import { Search, Filter, TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
 import type { Transaction } from "@/lib/auth-service"
 
 interface TransactionHistoryProps {
-  userId: string
+  userId?: string
 }
 
 export function TransactionHistory({ userId }: TransactionHistoryProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState<"all" | "deposit" | "withdraw" | "buy" | "sell">("all")
-  const [isConnected, setIsConnected] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    if (!userId) {
+    if (userId) {
+      loadTransactions()
+    } else {
+      setError("User not authenticated")
       setLoading(false)
-      return
-    }
-
-    let unsubscribe: Unsubscribe | null = null
-
-    try {
-      const transactionsRef = collection(db, "users", userId, "transactions")
-      const q = query(transactionsRef, orderBy("timestamp", "desc"))
-
-      unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const transactionsList: Transaction[] = []
-          snapshot.forEach((doc) => {
-            transactionsList.push(doc.data() as Transaction)
-          })
-          setTransactions(transactionsList)
-          setLoading(false)
-          setIsConnected(true)
-          console.log("[v0] Transaction history synced, count:", transactionsList.length)
-        },
-        (error) => {
-          console.error("[v0] Transaction listener error:", error)
-          setIsConnected(false)
-          setLoading(false)
-        },
-      )
-    } catch (error) {
-      console.error("[v0] Error setting up transaction listener:", error)
-      setIsConnected(false)
-      setLoading(false)
-    }
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe()
-      }
     }
   }, [userId])
 
+  const loadTransactions = async () => {
+    if (!userId) return
+    
+    try {
+      setLoading(true)
+      setError("")
+      const data = await getUserTransactions(userId)
+      setTransactions(data)
+    } catch (err) {
+      console.error("Error loading transactions:", err)
+      setError("Failed to load transactions")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const filteredTransactions = transactions.filter(
     (t) =>
-      (filterType === "all" || t.type === filterType) &&
-      (t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.currency.toLowerCase().includes(searchTerm.toLowerCase())),
+      t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.currency.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   if (loading) {
@@ -75,18 +54,40 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
     )
   }
 
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Transaction History</h2>
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isConnected ? "bg-emerald-500" : "bg-red-500"}`}></div>
-          <span className="text-xs text-slate-400">{isConnected ? "Live sync" : "Disconnected"}</span>
-        </div>
       </div>
 
-      {/* ... existing search and filter code ... */}
+      {/* Search and Filter */}
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+        <button className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 hover:bg-slate-800 transition-colors">
+          <Filter className="w-4 h-4" />
+        </button>
+      </div>
 
+      {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
           <p className="text-slate-400">No transactions yet</p>
@@ -133,13 +134,7 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
               <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800">
                 <span>{new Date(transaction.timestamp).toLocaleString()}</span>
                 <span
-                  className={`capitalize px-2 py-1 rounded text-xs font-medium transition-all ${
-                    transaction.status === "completed"
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : transaction.status === "pending"
-                        ? "bg-yellow-500/20 text-yellow-400 animate-pulse"
-                        : "bg-red-500/20 text-red-400"
-                  }`}
+                  className={`capitalize ${transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"}`}
                 >
                   {transaction.status}
                 </span>
