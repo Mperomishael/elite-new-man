@@ -15,7 +15,9 @@ interface BottomNavProps {
       | "kyc"
       | "referrals"
       | "support"
-      | "settings",
+      | "settings"
+      | "license"
+      | "terms",
   ) => void
 }
 
