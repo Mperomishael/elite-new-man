@@ -1,18 +1,20 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { Search, Filter, TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
+import { getUserTransactions } from "@/lib/auth-service"
+import {
+  Search,
+  Filter,
+  TrendingUp,
+  TrendingDown,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+} from "lucide-react"
+import type { Transaction } from "@/lib/auth-service"
+import type { Timestamp } from "firebase/firestore"
 
-interface Transaction {
-  id: string
-  type: "buy" | "sell" | "deposit" | "withdraw"
-  amount: number
-  currency: string
-  description: string
-  status: "pending" | "completed"
-  timestamp: any // Firestore Timestamp or string
+interface TransactionWithDate extends Transaction {
+  timestamp: Date
 }
 
 interface TransactionHistoryProps {
@@ -20,54 +22,47 @@ interface TransactionHistoryProps {
 }
 
 export function TransactionHistory({ userId }: TransactionHistoryProps) {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [transactions, setTransactions] = useState<TransactionWithDate[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [error, setError] = useState("")
 
   useEffect(() => {
-    if (!userId) {
+    if (userId) {
+      loadTransactions()
+    } else {
       setError("User not authenticated")
       setLoading(false)
-      return
     }
-
-    setLoading(true)
-    setError("")
-
-    const q = query(
-      collection(db, "users", userId, "transactions"),
-      orderBy("timestamp", "desc")
-    )
-
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const data: Transaction[] = snapshot.docs.map((doc) => {
-          const t = doc.data() as Transaction
-          return {
-            ...t,
-            id: doc.id,
-            timestamp: t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp),
-          }
-        })
-        setTransactions(data)
-        setLoading(false)
-      },
-      (err) => {
-        console.error("Error fetching transactions:", err)
-        setError("Failed to load transactions")
-        setLoading(false)
-      }
-    )
-
-    return () => unsubscribe()
   }, [userId])
+
+  const loadTransactions = async () => {
+    if (!userId) return
+
+    try {
+      setLoading(true)
+      setError("")
+      const data = await getUserTransactions(userId)
+
+      // Convert Firestore timestamps to Date
+      const parsedData = data.map((t) => ({
+        ...t,
+        timestamp: (t.timestamp as Timestamp)?.toDate() ?? new Date(),
+      }))
+
+      setTransactions(parsedData)
+    } catch (err) {
+      console.error("Error loading transactions:", err)
+      setError("Failed to load transactions")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredTransactions = transactions.filter(
     (t) =>
       t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.currency.toLowerCase().includes(searchTerm.toLowerCase())
+      t.currency.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   if (loading) {
