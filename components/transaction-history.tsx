@@ -1,9 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getUserTransactions } from "@/lib/auth-service"
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore"
+import { db } from "@/lib/firebase"
 import { Search, Filter, TrendingUp, TrendingDown, ArrowDownToLine, ArrowUpFromLine } from "lucide-react"
-import type { Transaction } from "@/lib/auth-service"
+
+interface Transaction {
+  id: string
+  type: "buy" | "sell" | "deposit" | "withdraw"
+  amount: number
+  currency: string
+  description: string
+  status: "pending" | "completed"
+  timestamp: any // Firestore Timestamp or string
+}
 
 interface TransactionHistoryProps {
   userId?: string
@@ -16,34 +26,48 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    if (userId) {
-      loadTransactions()
-    } else {
+    if (!userId) {
       setError("User not authenticated")
       setLoading(false)
+      return
     }
-  }, [userId])
 
-  const loadTransactions = async () => {
-    if (!userId) return
-    
-    try {
-      setLoading(true)
-      setError("")
-      const data = await getUserTransactions(userId)
-      setTransactions(data)
-    } catch (err) {
-      console.error("Error loading transactions:", err)
-      setError("Failed to load transactions")
-    } finally {
-      setLoading(false)
-    }
-  }
+    setLoading(true)
+    setError("")
+
+    const q = query(
+      collection(db, "users", userId, "transactions"),
+      orderBy("timestamp", "desc")
+    )
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data: Transaction[] = snapshot.docs.map((doc) => {
+          const t = doc.data() as Transaction
+          return {
+            ...t,
+            id: doc.id,
+            timestamp: t.timestamp?.toDate ? t.timestamp.toDate() : new Date(t.timestamp),
+          }
+        })
+        setTransactions(data)
+        setLoading(false)
+      },
+      (err) => {
+        console.error("Error fetching transactions:", err)
+        setError("Failed to load transactions")
+        setLoading(false)
+      }
+    )
+
+    return () => unsubscribe()
+  }, [userId])
 
   const filteredTransactions = transactions.filter(
     (t) =>
       t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.currency.toLowerCase().includes(searchTerm.toLowerCase()),
+      t.currency.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) {
@@ -103,10 +127,10 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
                       transaction.type === "buy"
                         ? "bg-emerald-500/10"
                         : transaction.type === "sell"
-                          ? "bg-red-500/10"
-                          : transaction.type === "deposit"
-                            ? "bg-blue-500/10"
-                            : "bg-orange-500/10"
+                        ? "bg-red-500/10"
+                        : transaction.type === "deposit"
+                        ? "bg-blue-500/10"
+                        : "bg-orange-500/10"
                     }`}
                   >
                     {transaction.type === "buy" && <TrendingUp className="w-5 h-5 text-emerald-400" />}
@@ -132,9 +156,11 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800">
-                <span>{new Date(transaction.timestamp).toLocaleString()}</span>
+                <span>{transaction.timestamp.toLocaleString()}</span>
                 <span
-                  className={`capitalize ${transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"}`}
+                  className={`capitalize ${
+                    transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"
+                  }`}
                 >
                   {transaction.status}
                 </span>
