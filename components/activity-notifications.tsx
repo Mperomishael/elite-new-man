@@ -71,11 +71,6 @@ const mockTradingNews: Omit<TradingNews, "id" | "timestamp" | "isRead">[] = [
   },
 ]
 
-const kycNotification = {
-  type: "kyc",
-  message: "Complete your KYC verification to unlock higher trading limits",
-}
-
 interface ActivityNotificationsProps {
   userProfile?: UserProfile
   userId?: string
@@ -85,19 +80,14 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
   const [currentActivity, setCurrentActivity] = useState<any>(activities[0])
   const [currentNews, setCurrentNews] = useState<any>(mockTradingNews[0])
   const [isVisible, setIsVisible] = useState(false)
-  const [showKyc, setShowKyc] = useState(false)
-  const [notificationType, setNotificationType] = useState<"activity" | "news" | "kyc">("activity")
+  const [notificationType, setNotificationType] = useState<"activity" | "news">("activity")
   const [messageCount, setMessageCount] = useState(0)
 
   useEffect(() => {
     const showNotification = () => {
-      const shouldShowKyc = Math.random() < 0.15 && userProfile?.kycStatus !== "approved"
-      const shouldShowNews = Math.random() < 0.5 && !shouldShowKyc
+      const shouldShowNews = Math.random() < 0.5
 
-      if (shouldShowKyc) {
-        setShowKyc(true)
-        setNotificationType("kyc")
-      } else if (shouldShowNews) {
+      if (shouldShowNews) {
         const randomNews = mockTradingNews[Math.floor(Math.random() * mockTradingNews.length)]
         setCurrentNews(randomNews)
         setNotificationType("news")
@@ -114,12 +104,10 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
             changePercent: randomNews.changePercent,
           })
         }
-        setShowKyc(false)
       } else {
         const randomActivity = activities[Math.floor(Math.random() * activities.length)]
         setCurrentActivity(randomActivity)
         setNotificationType("activity")
-        setShowKyc(false)
       }
 
       setIsVisible(true)
@@ -133,32 +121,13 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
     const interval = setInterval(showNotification, 30000)
 
     return () => clearInterval(interval)
-  }, [userProfile?.kycStatus, userId])
+  }, [userId])
 
   if (!isVisible) return null
 
   return (
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300 max-w-md w-full px-4">
-      {showKyc ? (
-        <div className="bg-gradient-to-r from-emerald-900 to-cyan-900 border border-emerald-500/50 rounded-xl shadow-2xl p-4 pr-12">
-          <button
-            onClick={() => setIsVisible(false)}
-            className="absolute top-2 right-2 text-slate-400 hover:text-white transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-semibold text-white mb-1">KYC Verification Required</p>
-              <p className="text-xs text-slate-300 mb-2">{kycNotification.message}</p>
-              <button className="text-xs bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg transition-colors">
-                Verify Now
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : notificationType === "news" ? (
+      {notificationType === "news" ? (
         <div className="bg-gradient-to-r from-amber-900 to-orange-900 border border-amber-500/50 rounded-xl shadow-2xl p-4 pr-12">
           <button
             onClick={() => setIsVisible(false)}
