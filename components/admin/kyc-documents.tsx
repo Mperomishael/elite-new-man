@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { collection, query, where, getDocs, onSnapshot, doc, setDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { FileText, Download, Eye } from "lucide-react"
+import { logUserActivity } from "@/lib/auth-service"
 
 interface KYCDocumentsProps {
   userId?: string
@@ -66,6 +67,11 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
         await setDoc(doc(db, "kycDocuments", selectedDoc.id), { status }, { merge: true })
         // update user's profile kycStatus
         await setDoc(doc(db, "users", selectedDoc.userId), { kycStatus: status }, { merge: true })
+        // log activity
+        await logUserActivity(selectedDoc.userId, {
+          type: "kyc_approved",
+          description: `KYC verification ${status === "approved" ? "approved" : "rejected"}`,
+        })
         setSelectedDoc({ ...selectedDoc, status })
       } catch (error) {
         console.error("[v0] Review KYC doc error:", error)
