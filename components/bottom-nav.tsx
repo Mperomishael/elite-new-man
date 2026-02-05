@@ -8,6 +8,7 @@ interface BottomNavProps {
     view:
       | "dashboard"
       | "history"
+      | "activity"
       | "deposit"
       | "withdraw"
       | "buy"
