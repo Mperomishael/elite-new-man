@@ -20,7 +20,19 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files)
-      setFiles([...files, ...newFiles])
+      // filter allowed types and enforce max 5MB per file
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "application/pdf"]
+      const maxBytes = 5 * 1024 * 1024
+      const filtered = newFiles.filter((f) => {
+        if (!allowedTypes.includes(f.type)) return false
+        if (f.size > maxBytes) return false
+        return true
+      })
+      const rejected = newFiles.filter((f) => !filtered.includes(f))
+      if (rejected.length > 0) {
+        setMessage("Some files were rejected. Only PNG/JPG/PDF files under 5MB are allowed.")
+      }
+      setFiles([...files, ...filtered])
     }
   }
 
@@ -76,7 +88,7 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
             <Upload className="w-8 h-8 text-slate-400" />
             <div>
               <p className="text-white font-medium">Click to upload or drag and drop</p>
-              <p className="text-xs text-slate-400">PNG, JPG, PDF up to 10MB</p>
+              <p className="text-xs text-slate-400">PNG, JPG, PDF up to 5MB</p>
             </div>
           </div>
           <input type="file" multiple accept=".png,.jpg,.jpeg,.pdf" onChange={handleFileSelect} className="hidden" />
