@@ -258,7 +258,6 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </button>
-          </button>
         </div>
       )}
 
