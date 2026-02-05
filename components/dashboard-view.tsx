@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import { auth, db } from "@/lib/firebase"
-import { MoonStarIcon as onSnapshot } from "lucide-react"
+import { doc, onSnapshot } from "firebase/firestore"
 
 interface DashboardViewProps {
   userName: string
@@ -119,7 +119,8 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
     const user = auth.currentUser
     if (!user) return
 
-    const unsubscribe = onSnapshot.doc(db, "users", user.uid).onSnapshot((docSnap: any) => {
+    const docRef = doc(db, "users", user.uid)
+    const unsubscribe = onSnapshot(docRef, (docSnap: any) => {
       if (docSnap.exists()) {
         const data = docSnap.data()
         setBalance(data.balance || 0)
