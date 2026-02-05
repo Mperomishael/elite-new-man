@@ -4,6 +4,7 @@ import {
   X,
   Home,
   History,
+  Clock,
   ArrowDownToLine,
   ArrowUpFromLine,
   TrendingUp,
@@ -24,6 +25,7 @@ interface SideMenuProps {
     view:
       | "dashboard"
       | "history"
+      | "activity"
       | "deposit"
       | "withdraw"
       | "buy"
@@ -41,6 +43,7 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: Home },
     { id: "history", label: "Transaction History", icon: History },
+    { id: "activity", label: "Activity Log", icon: Clock },
     { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
     { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
     { id: "buy", label: "Buying", icon: TrendingUp },
