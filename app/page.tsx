@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import { auth } from "@/lib/firebase"
 import { isAdminByEmail } from "@/lib/admin-service"
-import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
+import { getUserProfile, signOutUser, logUserActivity, type UserProfile } from "@/lib/auth-service"
 import { DashboardView } from "@/components/dashboard-view"
 import { TransactionHistory } from "@/components/transaction-history"
 import { DepositView } from "@/components/deposit-view"
@@ -20,11 +20,12 @@ import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
+import { ActivityPanel } from "@/components/activity-panel"
 
 export default function RootPage() {
   const router = useRouter()
   const [activeView, setActiveView] = useState<
-    "dashboard" | "history" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
+    "dashboard" | "history" | "activity" | "deposit" | "withdraw" | "buy" | "sell" | "kyc" | "referrals" | "support" | "settings"
   >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -59,6 +60,16 @@ export default function RootPage() {
           setUserProfile(profile)
           setUserName(`${profile.firstName} ${profile.lastName}`)
           setIsAuthenticated(true)
+
+          // Log login activity
+          try {
+            await logUserActivity(user.uid, {
+              type: "login",
+              description: `${profile.displayName || profile.firstName + " " + profile.lastName} logged in`,
+            })
+          } catch (error) {
+            console.error("[v0] Failed to log login activity:", error)
+          }
         }
       } else {
         setIsAuthenticated(false)
@@ -111,6 +122,8 @@ export default function RootPage() {
         return <DashboardView userName={userName} onNavigate={setActiveView} />
       case "history":
         return userProfile?.uid ? <TransactionHistory userId={userProfile.uid} /> : <div>Loading...</div>
+      case "activity":
+        return userProfile?.uid ? <ActivityPanel userId={userProfile.uid} maxItems={50} /> : <div>Loading...</div>
       case "deposit":
         return userProfile ? <DepositView userId={userProfile.uid} username={userName} /> : <div>Loading...</div>
       case "withdraw":
