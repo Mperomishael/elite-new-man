@@ -50,6 +50,7 @@ export function KycView() {
   const isVerified = userProfile?.kycStatus === "approved"
   const isPending = userProfile?.kycStatus === "pending"
   const isRejected = userProfile?.kycStatus === "rejected"
+  const isNotStarted = userProfile?.kycStatus === "not-started"
   const balanceLimit = 1000000
 
   return (
@@ -98,6 +99,11 @@ export function KycView() {
               <>
                 <AlertCircle className="w-5 h-5 text-red-400" />
                 <span className="text-lg font-bold text-red-400">Rejected</span>
+              </>
+            ) : isNotStarted ? (
+              <>
+                <Lock className="w-5 h-5 text-slate-400" />
+                <span className="text-lg font-bold text-slate-400">Not Started</span>
               </>
             ) : (
               <>
@@ -176,9 +182,6 @@ export function KycView() {
           </div>
         </div>
       )}
-
-      {/* Requirements Section */}
-      {!isVerified && (
         <div>
           <h3 className="font-semibold text-white mb-4">Required Documents</h3>
           <div className="space-y-3 mb-6">
