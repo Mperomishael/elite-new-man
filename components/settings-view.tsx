@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { User, Mail, Phone, MapPin, Lock, Bell, Shield, Eye, EyeOff } from "lucide-react"
+import { useState, useEffect } from "react"
+import { User, Mail, Phone, MapPin, Lock, Bell, Shield, Eye, EyeOff, Wallet, Check, AlertCircle } from "lucide-react"
+import { updateUserProfile } from "@/lib/auth-service"
 import type { UserProfile } from "@/lib/auth-service"
 
 interface SettingsViewProps {
@@ -12,10 +13,13 @@ interface SettingsViewProps {
 export function SettingsView({ userName, userProfile }: SettingsViewProps) {
   const [activeTab, setActiveTab] = useState<"profile" | "security" | "notifications">("profile")
   const [showPassword, setShowPassword] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [formData, setFormData] = useState({
     fullName: userName,
+    username: userProfile?.username || "",
     email: userProfile?.email || "loading...",
-    phone: "+1 (555) 123-4567",
+    phone: userProfile?.phone || "+1 (555) 123-4567",
     address: "123 Trading Street, New York, NY 10001",
     currentPassword: "",
     newPassword: "",
@@ -29,12 +33,52 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
     marketingEmails: false,
   })
 
+  // Update form when userProfile changes
+  useEffect(() => {
+    if (userProfile) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: userName,
+        username: userProfile.username || "",
+        email: userProfile.email || "",
+        phone: userProfile.phone || "",
+      }))
+    }
+  }, [userProfile, userName])
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleNotificationToggle = (field: string) => {
     setNotifications((prev) => ({ ...prev, [field]: !prev[field as keyof typeof prev] }))
+  }
+
+  const handleSaveProfile = async () => {
+    if (!userProfile?.uid) return
+    
+    setIsSaving(true)
+    setSaveMessage(null)
+    
+    try {
+      const result = await updateUserProfile(userProfile.uid, {
+        firstName: formData.fullName.split(" ")[0] || "",
+        lastName: formData.fullName.split(" ").slice(1).join(" ") || "",
+        username: formData.username,
+        phone: formData.phone,
+      })
+
+      if (result.success) {
+        setSaveMessage({ type: "success", text: "Profile updated successfully!" })
+        setTimeout(() => setSaveMessage(null), 3000)
+      } else {
+        setSaveMessage({ type: "error", text: result.error || "Failed to update profile" })
+      }
+    } catch (error) {
+      setSaveMessage({ type: "error", text: "An error occurred while saving" })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -84,6 +128,38 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
       {/* Profile Tab */}
       {activeTab === "profile" && (
         <div className="space-y-4">
+          {/* Account Balance Card */}
+          <div className="bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 border border-emerald-500/50 rounded-2xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-400 mb-1">Account Balance</p>
+                <p className="text-3xl font-bold text-emerald-400">
+                  ${(userProfile?.balance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+              <Wallet className="w-12 h-12 text-emerald-400 opacity-50" />
+            </div>
+            <div className="flex gap-4 mt-4">
+              <div className="flex-1">
+                <p className="text-xs text-slate-400">Profit Balance</p>
+                <p className="text-lg font-semibold text-cyan-400">
+                  ${(userProfile?.profitBalance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-slate-400">Account Status</p>
+                <p className="text-lg font-semibold">
+                  {userProfile?.kycStatus === "approved" ? (
+                    <span className="text-emerald-400">✓ Verified</span>
+                  ) : (
+                    <span className="text-yellow-400">— Pending</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Information Card */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900">
@@ -91,9 +167,24 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
               </div>
               <div>
                 <h3 className="font-bold text-lg">{userName}</h3>
-                <p className="text-sm text-slate-400">Professional Trader</p>
+                <p className="text-sm text-slate-400">Account ID: {userProfile?.uid?.slice(0, 8)}...</p>
               </div>
             </div>
+
+            {saveMessage && (
+              <div className={`flex items-center gap-2 p-3 rounded-lg ${
+                saveMessage.type === "success"
+                  ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400"
+                  : "bg-red-500/20 border border-red-500/50 text-red-400"
+              }`}>
+                {saveMessage.type === "success" ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <AlertCircle className="w-4 h-4" />
+                )}
+                <span className="text-sm">{saveMessage.text}</span>
+              </div>
+            )}
 
             <div>
               <label className="text-sm text-slate-400 mb-2 flex items-center gap-2">
@@ -105,6 +196,20 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
                 value={formData.fullName}
                 onChange={(e) => handleInputChange("fullName", e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-400 mb-2 flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Username
+              </label>
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) => handleInputChange("username", e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Enter your username"
               />
             </div>
 
@@ -146,8 +251,13 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
             </div>
           </div>
 
-          <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
-            Save Changes
+          <button 
+            onClick={handleSaveProfile}
+            disabled={isSaving}
+            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all active:scale-95"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
           </button>
         </div>
       )}
