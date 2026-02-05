@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, query, where, getDocs } from "firebase/firestore"
+import { collection, query, where, getDocs, onSnapshot, doc, setDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { FileText, Download, Eye } from "lucide-react"
 
@@ -10,10 +10,11 @@ interface KYCDocumentsProps {
 }
 
 interface KYCDocument {
+  id?: string
   userId: string
   username: string
   documentUrl: string
-  uploadedAt: string
+  uploadedAt: number
   status: "pending" | "approved" | "rejected"
 }
 
@@ -23,10 +24,8 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
   const [selectedDoc, setSelectedDoc] = useState<KYCDocument | null>(null)
 
   useEffect(() => {
-    loadDocuments()
-  }, [userId])
-
-  const loadDocuments = async () => {
+    // Use real-time listener so admin sees uploads and status changes live
+    let unsubscribe: any = null
     try {
       let q
       if (userId) {
@@ -34,18 +33,22 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
       } else {
         q = query(collection(db, "kycDocuments"))
       }
-
-      const querySnapshot = await getDocs(q)
-      const docs: KYCDocument[] = []
-      querySnapshot.forEach((doc) => {
-        docs.push(doc.data() as KYCDocument)
+      unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const docs: KYCDocument[] = []
+        querySnapshot.forEach((d) => docs.push({ id: d.id, ...(d.data() as KYCDocument) }))
+        setDocuments(docs)
+        setLoading(false)
       })
-      setDocuments(docs)
     } catch (error) {
       console.error("[v0] Load KYC documents error:", error)
-    } finally {
       setLoading(false)
     }
+
+    return () => unsubscribe && unsubscribe()
+  }, [userId])
+
+  const loadDocuments = async () => {
+    // kept for compatibility but no longer required
   }
 
   if (loading) {
@@ -57,6 +60,18 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
   }
 
   if (selectedDoc) {
+    const handleReview = async (status: "approved" | "rejected") => {
+      try {
+        // update kycDocuments entry
+        await setDoc(doc(db, "kycDocuments", selectedDoc.id), { status }, { merge: true })
+        // update user's profile kycStatus
+        await setDoc(doc(db, "users", selectedDoc.userId), { kycStatus: status }, { merge: true })
+        setSelectedDoc({ ...selectedDoc, status })
+      } catch (error) {
+        console.error("[v0] Review KYC doc error:", error)
+      }
+    }
+
     return (
       <div className="space-y-4">
         <button
@@ -102,6 +117,18 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
               <Download className="w-4 h-4" />
               Download
             </a>
+            <button
+              onClick={() => handleReview("approved")}
+              className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 rounded-lg"
+            >
+              Approve
+            </button>
+            <button
+              onClick={() => handleReview("rejected")}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg"
+            >
+              Reject
+            </button>
           </div>
         </div>
       </div>
