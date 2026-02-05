@@ -188,6 +188,18 @@ export async function addKYCDocument(uid: string, documentUrl: string) {
 
     const updatedDocs = [...(profile.kycDocuments || []), documentUrl]
     await setDoc(doc(db, "users", uid), { kycDocuments: updatedDocs }, { merge: true })
+
+    // Also create a record in the kycDocuments collection for admin review
+    const kycId = `KYC-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+    await setDoc(doc(db, "kycDocuments", kycId), {
+      id: kycId,
+      userId: uid,
+      username: profile.displayName || profile.username || profile.email,
+      documentUrl,
+      uploadedAt: Timestamp.now().toMillis(),
+      status: "pending",
+    })
+
     return { success: true }
   } catch (error: any) {
     console.error("[v0] Add KYC document error:", error)
