@@ -220,3 +220,49 @@ export async function updateUserBalances(uid: string, mainBalance?: number, prof
     return { success: false, error: error.message }
   }
 }
+// -------------------------
+// ACTIVITY LOGGING
+// -------------------------
+
+export interface Activity {
+  id?: string
+  userId: string
+  username: string
+  type: "login" | "deposit_approved" | "withdrawal_approved" | "kyc_approved" | "balance_change" | "profile_update"
+  description: string
+  amount?: number
+  previousValue?: number | string
+  newValue?: number | string
+  timestamp: Timestamp
+}
+
+// Log user activity
+export async function logUserActivity(uid: string, activity: Omit<Activity, "id" | "userId" | "timestamp">) {
+  try {
+    const profile = await getUserProfile(uid)
+    if (!profile) return { success: false, error: "User not found" }
+
+    const activityId = `ACT-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+    await setDoc(doc(db, "activities", activityId), {
+      id: activityId,
+      userId: uid,
+      username: profile.displayName || profile.username || profile.email,
+      ...activity,
+      timestamp: Timestamp.now(),
+    })
+
+    return { success: true }
+  } catch (error: any) {
+    console.error("[v0] Log activity error:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Listen to user activities in real-time
+export function listenToUserActivities(uid: string, callback: (activities: Activity[]) => void): Unsubscribe {
+  const q = query(collection(db, "activities"), where("userId", "==", uid), orderBy("timestamp", "desc"))
+  return onSnapshot(q, (snap) => {
+    const activities = snap.docs.map((d) => d.data() as Activity)
+    callback(activities)
+  })
+}
