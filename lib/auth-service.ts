@@ -36,7 +36,7 @@ export interface UserProfile {
   balance: number
   profitBalance: number
   kycDocuments: string[]
-  kycStatus: "pending" | "approved" | "rejected"
+  kycStatus: "not-started" | "pending" | "approved" | "rejected"
   createdAt: Timestamp
   displayName: string
 }
@@ -57,7 +57,7 @@ export async function createUserProfile(
     balance: isAdmin ? 100000000000 : 0,
     profitBalance: 0,
     kycDocuments: [],
-    kycStatus: "pending",
+    kycStatus: "not-started",
     createdAt: Timestamp.now(),
     displayName: `${profileData.firstName} ${profileData.lastName}`,
   }
@@ -164,7 +164,22 @@ export async function getUserTransactions(uid: string): Promise<Transaction[]> {
 export function listenToUserTransactions(uid: string, callback: (transactions: Transaction[]) => void): Unsubscribe {
   const txnRef = collection(db, "users", uid, "transactions")
   const q = query(txnRef, orderBy("timestamp", "desc"))
-  return onSnapshot(q, (snap) => callback(snap.docs.map((d) => d.data() as Transaction)))
+  return onSnapshot(
+    q,
+    (snap) => {
+      try {
+        const transactions = snap.docs.map((d) => d.data() as Transaction)
+        callback(transactions)
+      } catch (error) {
+        console.error("[v0] Error processing transactions:", error)
+        callback([])
+      }
+    },
+    (error) => {
+      console.error("[v0] Transaction listener error:", error)
+      callback([])
+    }
+  )
 }
 
 // -------------------------
