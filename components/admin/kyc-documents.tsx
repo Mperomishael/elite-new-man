@@ -158,28 +158,37 @@ export function KYCDocuments({ userId }: KYCDocumentsProps) {
           {documents.map((doc, index) => (
             <div
               key={index}
-              className="bg-slate-900 rounded-lg border border-slate-800 p-4 flex items-center justify-between"
+              className="bg-slate-900 rounded-lg border border-slate-800 p-4 space-y-3"
             >
-              <div>
-                <p className="text-white font-medium">{doc.username}</p>
-                <p className="text-sm text-slate-400">{new Date(doc.uploadedAt).toLocaleString()}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-white font-medium text-lg">{doc.username}</p>
+                  <p className="text-sm text-slate-400">Submitted: {new Date(doc.uploadedAt).toLocaleString()}</p>
+                  <p className="text-xs text-slate-500 mt-1">Document ID: {doc.id?.slice(0, 20)}...</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
+                      doc.status === "approved"
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : doc.status === "rejected"
+                          ? "bg-red-500/20 text-red-400"
+                          : "bg-yellow-500/20 text-yellow-400"
+                    }`}
+                  >
+                    {doc.status === "approved" ? "✓" : doc.status === "rejected" ? "✕" : "⏳"}
+                    {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    doc.status === "approved"
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : doc.status === "rejected"
-                        ? "bg-red-500/20 text-red-400"
-                        : "bg-yellow-500/20 text-yellow-400"
-                  }`}
-                >
-                  {doc.status}
-                </span>
-                <button onClick={() => setSelectedDoc(doc)} className="text-amber-500 hover:text-amber-400 p-2">
-                  <Eye className="w-5 h-5" />
-                </button>
-              </div>
+
+              <button
+                onClick={() => setSelectedDoc(doc)}
+                className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-lg transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                Review Document
+              </button>
             </div>
           ))}
         </div>

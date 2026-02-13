@@ -20,9 +20,21 @@ import {
   type Unsubscribe,
 } from "firebase/firestore"
 import { auth, db } from "./firebase"
-import type { Transaction } from "./admin-service"
 
 export { auth }
+
+export interface Transaction {
+  id: string
+  type: "buy" | "sell" | "deposit" | "withdraw" | "transfer"
+  amount: number
+  currency: string
+  status: "pending" | "completed" | "failed" | "rejected"
+  timestamp: any // Firestore Timestamp or Date
+  description: string
+  receiptUrl?: string
+  walletAddress?: string
+  proofScreenshot?: string
+}
 
 export interface UserProfile {
   uid: string
@@ -33,12 +45,14 @@ export interface UserProfile {
   phone: string
   currency: string
   country: string
+  address?: string
   balance: number
   profitBalance: number
   kycDocuments: string[]
   kycStatus: "not-started" | "pending" | "approved" | "rejected"
   createdAt: Timestamp
   displayName: string
+  onboardingCompleted: boolean
 }
 
 // -------------------------
@@ -54,12 +68,14 @@ export async function createUserProfile(
   const userProfile: UserProfile = {
     uid: user.uid,
     ...profileData,
+    address: undefined,
     balance: isAdmin ? 100000000000 : 0,
     profitBalance: 0,
     kycDocuments: [],
     kycStatus: "not-started",
     createdAt: Timestamp.now(),
     displayName: `${profileData.firstName} ${profileData.lastName}`,
+    onboardingCompleted: false,
   }
 
   await setDoc(doc(db, "users", user.uid), userProfile)

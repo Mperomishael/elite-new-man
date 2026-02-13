@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore"
 import { db } from "./firebase"
 import type { UserProfile, Transaction } from "./auth-service"
+export type { Transaction }
 
 // -------------------------
 // INTERFACES
@@ -251,17 +252,18 @@ export async function createDepositRequest(
 
     await setDoc(doc(db, "depositRequests", requestId), deposit)
 
-    // Add transaction
-    const txnId = `TXN-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-    await setDoc(doc(db, "users", userId, "transactions", txnId), {
-      id: txnId,
-      type: "deposit",
-      amount,
-      currency,
-      status: "pending",
-      timestamp: Timestamp.now(),
-      description: `Deposit request #${requestId}`,
-    })
+  // Add transaction with receipt
+  const txnId = `TXN-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  await setDoc(doc(db, "users", userId, "transactions", txnId), {
+  id: txnId,
+  type: "deposit",
+  amount,
+  currency,
+  status: "pending",
+  timestamp: Timestamp.now(),
+  description: `Deposit request #${requestId}`,
+  receiptUrl: proofScreenshot,
+  })
 
     return { success: true, requestId }
   } catch (error: any) {

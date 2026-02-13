@@ -154,22 +154,25 @@ export function DepositRequests({ adminId }: DepositRequestsProps) {
               </div>
 
               {request.proofScreenshot && (
-                <div className="mb-6">
-                  <button
-                    onClick={() => setSelectedProof(selectedProof === request.id ? null : request.id)}
-                    className="text-sm text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-2"
-                  >
-                    {selectedProof === request.id ? "Hide" : "View"} Proof Screenshot
-                  </button>
+                <div className="mb-6 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-300 bg-blue-500/20 px-2 py-1 rounded">📋 Receipt</span>
+                    <button
+                      onClick={() => setSelectedProof(selectedProof === request.id ? null : request.id)}
+                      className="text-sm text-emerald-400 hover:text-emerald-300 font-medium"
+                    >
+                      {selectedProof === request.id ? "Hide" : "View"} Proof
+                    </button>
+                  </div>
                   {selectedProof === request.id && (
-                    <div className="mt-3 bg-slate-800 rounded-lg p-3 border border-slate-700">
+                    <div className="bg-slate-800 rounded-lg p-3 border border-slate-700 overflow-x-auto">
                       <img
                         src={request.proofScreenshot}
-                        alt="Deposit proof"
-                        className="max-h-64 rounded max-w-full"
+                        alt="Deposit receipt"
+                        className="max-h-96 rounded max-w-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
-                          target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%231e293b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='16'%3EImage not available%3C/text%3E%3C/svg%3E"
+                          target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%231e293b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='16'%3EReceipt unavailable%3C/text%3E%3C/svg%3E"
                         }}
                       />
                     </div>

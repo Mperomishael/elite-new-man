@@ -17,6 +17,7 @@ import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
 import { LicenseView } from "@/components/license-view"
 import { TermsView } from "@/components/terms-view"
+import { OnboardingModal } from "@/components/onboarding-modal"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
@@ -44,6 +45,7 @@ export default function TradingDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [userName, setUserName] = useState("")
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -53,6 +55,11 @@ export default function TradingDashboard() {
           setUserProfile(profile)
           setUserName(`${profile.firstName} ${profile.lastName}`)
           setIsAuthenticated(true)
+
+          // Check if onboarding is needed
+          if (!profile.onboardingCompleted) {
+            setShowOnboarding(true)
+          }
 
           // Generate sample transactions if user has none
           try {
@@ -209,6 +216,21 @@ export default function TradingDashboard() {
       <ActivityNotifications />
       <main className="px-4 pt-4">{renderView()}</main>
       <BottomNav activeView={activeView} onNavigate={setActiveView} />
+      {userProfile && (
+        <OnboardingModal
+          userProfile={userProfile}
+          isOpen={showOnboarding}
+          onClose={(updated) => {
+            setShowOnboarding(false)
+            if (updated) {
+              // Refresh user profile to get updated onboardingCompleted status
+              getUserProfile(userProfile.uid).then((profile) => {
+                if (profile) setUserProfile(profile)
+              })
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
