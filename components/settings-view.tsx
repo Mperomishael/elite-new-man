@@ -20,6 +20,7 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
     username: userProfile?.username || "",
     email: userProfile?.email || "",
     phone: userProfile?.phone || "",
+    address: userProfile?.address || "",
     country: userProfile?.country || "",
     currency: userProfile?.currency || "",
     currentPassword: "",
@@ -43,6 +44,7 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
         username: userProfile.username || "",
         email: userProfile.email || "",
         phone: userProfile.phone || "",
+        address: userProfile.address || "",
         country: userProfile.country || "",
         currency: userProfile.currency || "",
       }))
@@ -69,6 +71,7 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
         lastName: formData.fullName.split(" ").slice(1).join(" ") || "",
         username: formData.username,
         phone: formData.phone,
+        address: formData.address,
         country: formData.country,
         currency: formData.currency,
       })
@@ -239,6 +242,21 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
                 value={formData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-400 mb-2 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Street Address
+              </label>
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Enter your street address"
               />
             </div>
 
