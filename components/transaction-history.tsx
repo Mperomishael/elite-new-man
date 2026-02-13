@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getUserTransactions } from "@/lib/auth-service"
+import { listenToUserTransactions } from "@/lib/auth-service"
 import {
   Search,
   Filter,
@@ -14,7 +14,7 @@ import type { Transaction } from "@/lib/auth-service"
 import type { Timestamp } from "firebase/firestore"
 
 interface TransactionWithDate extends Transaction {
-  timestamp: Date
+  timestamp: Date | Timestamp
 }
 
 interface TransactionHistoryProps {
@@ -28,36 +28,28 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    if (userId) {
-      loadTransactions()
-    } else {
+    if (!userId) {
       setError("User not authenticated")
       setLoading(false)
+      return
     }
-  }, [userId])
 
-  const loadTransactions = async () => {
-    if (!userId) return
+    setLoading(false)
+    setError("")
 
-    try {
-      setLoading(true)
-      setError("")
-      const data = await getUserTransactions(userId)
-
+    // Use real-time listener instead of one-time fetch
+    const unsubscribe = listenToUserTransactions(userId, (data) => {
       // Convert Firestore timestamps to Date
       const parsedData = data.map((t) => ({
         ...t,
-        timestamp: (t.timestamp as Timestamp)?.toDate() ?? new Date(),
+        timestamp: (t.timestamp as any)?.toDate?.() ?? new Date(t.timestamp as any),
       }))
 
       setTransactions(parsedData)
-    } catch (err) {
-      console.error("Error loading transactions:", err)
-      setError("Failed to load transactions")
-    } finally {
-      setLoading(false)
-    }
-  }
+    })
+
+    return () => unsubscribe()
+  }, [userId])
 
   const filteredTransactions = transactions.filter(
     (t) =>
@@ -151,7 +143,11 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800">
-                <span>{transaction.timestamp.toLocaleString()}</span>
+                <span>
+                  {transaction.timestamp instanceof Date
+                    ? transaction.timestamp.toLocaleString()
+                    : (transaction.timestamp as any)?.toDate?.()?.toLocaleString() ?? new Date().toLocaleString()}
+                </span>
                 <span
                   className={`capitalize ${
                     transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"

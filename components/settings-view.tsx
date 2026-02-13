@@ -18,9 +18,10 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
   const [formData, setFormData] = useState({
     fullName: userName,
     username: userProfile?.username || "",
-    email: userProfile?.email || "loading...",
-    phone: userProfile?.phone || "+1 (555) 123-4567",
-    address: "123 Trading Street, New York, NY 10001",
+    email: userProfile?.email || "",
+    phone: userProfile?.phone || "",
+    country: userProfile?.country || "",
+    currency: userProfile?.currency || "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -42,6 +43,8 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
         username: userProfile.username || "",
         email: userProfile.email || "",
         phone: userProfile.phone || "",
+        country: userProfile.country || "",
+        currency: userProfile.currency || "",
       }))
     }
   }, [userProfile, userName])
@@ -66,6 +69,8 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
         lastName: formData.fullName.split(" ").slice(1).join(" ") || "",
         username: formData.username,
         phone: formData.phone,
+        country: formData.country,
+        currency: formData.currency,
       })
 
       if (result.success) {
@@ -240,13 +245,28 @@ export function SettingsView({ userName, userProfile }: SettingsViewProps) {
             <div>
               <label className="text-sm text-slate-400 mb-2 flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                Address
+                Country
               </label>
               <input
                 type="text"
-                value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
+                value={formData.country}
+                onChange={(e) => handleInputChange("country", e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Your country"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-400 mb-2 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Currency
+              </label>
+              <input
+                type="text"
+                value={formData.currency}
+                onChange={(e) => handleInputChange("currency", e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="USD, EUR, etc."
               />
             </div>
           </div>

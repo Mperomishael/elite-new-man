@@ -20,7 +20,8 @@ import { TermsView } from "@/components/terms-view"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
-import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
+import { getUserProfile, signOutUser, addTransaction, type UserProfile } from "@/lib/auth-service"
+import { Timestamp } from "firebase/firestore"
 
 export default function TradingDashboard() {
   const router = useRouter()
@@ -52,6 +53,50 @@ export default function TradingDashboard() {
           setUserProfile(profile)
           setUserName(`${profile.firstName} ${profile.lastName}`)
           setIsAuthenticated(true)
+
+          // Generate sample transactions if user has none
+          try {
+            // Check if user has transactions
+            const txnModule = await import("@/lib/auth-service")
+            const txns = await txnModule.getUserTransactions(user.uid)
+            
+            if (txns.length === 0) {
+              // Generate 3 sample transactions
+              const now = Timestamp.now()
+              const sampleTransactions = [
+                {
+                  type: "buy" as const,
+                  amount: 250,
+                  currency: "USDT",
+                  status: "completed" as const,
+                  timestamp: new Timestamp(now.seconds - 86400, now.nanoseconds), // 1 day ago
+                  description: "Bitcoin purchase",
+                },
+                {
+                  type: "sell" as const,
+                  amount: 125,
+                  currency: "BTC",
+                  status: "completed" as const,
+                  timestamp: new Timestamp(now.seconds - 172800, now.nanoseconds), // 2 days ago
+                  description: "Ethereum sell",
+                },
+                {
+                  type: "deposit" as const,
+                  amount: 500,
+                  currency: "USD",
+                  status: "completed" as const,
+                  timestamp: new Timestamp(now.seconds - 259200, now.nanoseconds), // 3 days ago
+                  description: "Bank transfer deposit",
+                },
+              ]
+
+              for (const txn of sampleTransactions) {
+                await addTransaction(user.uid, txn)
+              }
+            }
+          } catch (err) {
+            console.log("[v0] Sample transaction generation skipped:", err)
+          }
         }
       } else {
         router.push("/auth/login")
@@ -119,7 +164,7 @@ export default function TradingDashboard() {
       case "support":
         return <SupportView />
       case "settings":
-        return <SettingsView userName={userName} />
+        return <SettingsView userName={userName} userProfile={userProfile || undefined} />
       case "license":
         return <LicenseView />
       case "terms":
