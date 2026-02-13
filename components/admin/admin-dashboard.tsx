@@ -4,6 +4,7 @@ import { useState } from "react"
 import { UsersManagement } from "./users-management"
 import { WalletSettings } from "./wallet-settings"
 import { WithdrawalRequests } from "./withdrawal-requests"
+import { DepositRequests } from "./deposit-requests"
 import { TransactionsManagement } from "./transactions-management"
 import { AdminStats } from "./admin-stats"
 import { signOutUser } from "@/lib/auth-service"
@@ -14,7 +15,7 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ adminId }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "wallets" | "withdrawals" | "transactions">(
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "wallets" | "deposits" | "withdrawals" | "transactions">(
     "overview",
   )
   const router = useRouter()
@@ -65,6 +66,7 @@ export function AdminDashboard({ adminId }: AdminDashboardProps) {
               { id: "overview", label: "Overview", icon: "📊" },
               { id: "users", label: "Users", icon: "👥" },
               { id: "wallets", label: "Wallet Settings", icon: "💳" },
+              { id: "deposits", label: "Deposits", icon: "💰" },
               { id: "withdrawals", label: "Withdrawals", icon: "💸" },
               { id: "transactions", label: "Transactions", icon: "📝" },
             ].map((tab) => (
@@ -90,6 +92,7 @@ export function AdminDashboard({ adminId }: AdminDashboardProps) {
         {activeTab === "overview" && <AdminStats />}
         {activeTab === "users" && <UsersManagement />}
         {activeTab === "wallets" && <WalletSettings adminId={adminId} />}
+        {activeTab === "deposits" && <DepositRequests adminId={adminId} />}
         {activeTab === "withdrawals" && <WithdrawalRequests adminId={adminId} />}
         {activeTab === "transactions" && <TransactionsManagement />}
       </main>

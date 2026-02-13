@@ -49,7 +49,7 @@ export interface DepositRequest {
   amount: number
   currency: "BTC" | "USDT" | "BANK"
   proofScreenshot: string
-  status: "pending" | "completed"
+  status: "pending" | "completed" | "rejected"
   requestedAt: Timestamp
   processedAt?: Timestamp
   processedBy?: string
@@ -301,6 +301,33 @@ export async function approveDeposit(
     return { success: true }
   } catch (error: any) {
     console.error("[v0] Approve deposit error:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+export async function rejectDeposit(
+  requestId: string,
+  adminId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const depRef = doc(db, "depositRequests", requestId)
+    const depSnap = await getDoc(depRef)
+    if (!depSnap.exists()) return { success: false, error: "Deposit request not found" }
+
+    const depData = depSnap.data() as DepositRequest
+    await updateDoc(depRef, { status: "rejected", processedAt: Timestamp.now(), processedBy: adminId })
+
+    // Update user transactions to rejected
+    const txnRef = collection(db, "users", depData.userId, "transactions")
+    const q = query(txnRef, where("description", "==", `Deposit request #${requestId}`))
+    const snapshot = await getDocs(q)
+    for (const docSnap of snapshot.docs) {
+      await updateDoc(doc(db, "users", depData.userId, "transactions", docSnap.id), { status: "rejected" })
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    console.error("[v0] Reject deposit error:", error)
     return { success: false, error: error.message }
   }
 }
