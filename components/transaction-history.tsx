@@ -26,6 +26,7 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [error, setError] = useState("")
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null)
 
   useEffect(() => {
     if (!userId) {
@@ -106,8 +107,8 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
       ) : (
         <div className="space-y-3">
           {filteredTransactions.map((transaction) => (
-            <div key={transaction.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
+            <div key={transaction.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -142,15 +143,46 @@ export function TransactionHistory({ userId }: TransactionHistoryProps) {
                   <p className="text-xs text-slate-400">{transaction.currency}</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-800">
-                <span>
-                  {transaction.timestamp instanceof Date
-                    ? transaction.timestamp.toLocaleString()
-                    : (transaction.timestamp as any)?.toDate?.()?.toLocaleString() ?? new Date().toLocaleString()}
-                </span>
+
+              {/* Receipt Image Display */}
+              {transaction.receiptUrl && selectedReceipt === transaction.id && (
+                <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
+                  <img
+                    src={transaction.receiptUrl}
+                    alt="Receipt"
+                    className="max-h-64 rounded max-w-full mx-auto"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%231e293b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='16'%3EReceipt unavailable%3C/text%3E%3C/svg%3E"
+                    }}
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">
+                    {transaction.timestamp instanceof Date
+                      ? transaction.timestamp.toLocaleString()
+                      : (transaction.timestamp as any)?.toDate?.()?.toLocaleString() ?? new Date().toLocaleString()}
+                  </span>
+                  {transaction.receiptUrl && (
+                    <button
+                      onClick={() => setSelectedReceipt(selectedReceipt === transaction.id ? null : transaction.id)}
+                      className="text-amber-500 hover:text-amber-400 font-medium"
+                    >
+                      {selectedReceipt === transaction.id ? "Hide" : "View"} Receipt
+                    </button>
+                  )}
+                </div>
                 <span
-                  className={`capitalize ${
-                    transaction.status === "completed" ? "text-emerald-400" : "text-yellow-400"
+                  className={`capitalize px-2 py-1 rounded text-xs font-semibold ${
+                    transaction.status === "completed"
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : transaction.status === "rejected"
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-yellow-500/20 text-yellow-400"
                   }`}
                 >
                   {transaction.status}

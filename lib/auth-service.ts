@@ -20,9 +20,21 @@ import {
   type Unsubscribe,
 } from "firebase/firestore"
 import { auth, db } from "./firebase"
-import type { Transaction } from "./admin-service"
 
 export { auth }
+
+export interface Transaction {
+  id: string
+  type: "buy" | "sell" | "deposit" | "withdraw" | "transfer"
+  amount: number
+  currency: string
+  status: "pending" | "completed" | "failed" | "rejected"
+  timestamp: any // Firestore Timestamp or Date
+  description: string
+  receiptUrl?: string
+  walletAddress?: string
+  proofScreenshot?: string
+}
 
 export interface UserProfile {
   uid: string
