@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Bitcoin, Copy, Check, Upload, AlertCircle } from "lucide-react"
+import { Bitcoin, Copy, Check, AlertCircle } from "lucide-react"
 import { getAdminWalletSettings, createDepositRequest, listenToBankDetails } from "@/lib/admin-service"
 import type { AdminWalletSettings, BankDetails } from "@/lib/admin-service"
 
@@ -77,7 +77,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
   const [bankDetails, setBankDetails] = useState<BankDetails | null>(null)
   const [copiedAddress, setCopiedAddress] = useState(false)
   const [copiedTag, setCopiedTag] = useState(false)
-  const [screenshot, setScreenshot] = useState<File | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -183,35 +182,22 @@ export function DepositView({ userId, username }: DepositViewProps) {
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0])
-    }
-  }
-
   const handleSubmit = async () => {
-    if (screenshot) {
-      setIsLoading(true)
-      const reader = new FileReader()
-      reader.onloadend = async () => {
-        const base64Screenshot = reader.result as string
-        const result = await createDepositRequest(
-          userId,
-          username,
-          Number.parseFloat(amount),
-          depositMethod === "crypto" ? selectedCrypto : "BANK",
-          base64Screenshot,
-        )
+    setIsLoading(true)
+    const result = await createDepositRequest(
+      userId,
+      username,
+      Number.parseFloat(amount),
+      depositMethod === "crypto" ? selectedCrypto : "BANK",
+      "", // Empty proof screenshot - admin will verify manually
+    )
 
-        if (result.success) {
-          setIsSubmitted(true)
-        } else {
-          alert("Failed to submit deposit request. Please try again.")
-        }
-        setIsLoading(false)
-      }
-      reader.readAsDataURL(screenshot)
+    if (result.success) {
+      setIsSubmitted(true)
+    } else {
+      alert("Failed to submit deposit request. Please try again.")
     }
+    setIsLoading(false)
   }
 
   const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
@@ -456,38 +442,13 @@ export function DepositView({ userId, username }: DepositViewProps) {
                 </div>
               ) : null}
 
-              {/* Upload Screenshot */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <label className="text-sm font-medium mb-3 block">Upload Payment Proof / Screenshot</label>
-                <div className="border-2 border-dashed border-slate-700 rounded-xl p-8 text-center hover:border-emerald-500 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    id="screenshot-upload"
-                  />
-                  <label htmlFor="screenshot-upload" className="cursor-pointer">
-                    <Upload className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-                    {screenshot ? (
-                      <p className="text-sm text-emerald-400 font-medium">{screenshot.name}</p>
-                    ) : (
-                      <>
-                        <p className="text-sm font-medium mb-1">Click to upload screenshot</p>
-                        <p className="text-xs text-slate-400">PNG, JPG up to 10MB</p>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
-
               {/* Submit Button */}
               <button
                 onClick={handleSubmit}
-                disabled={!screenshot || isLoading}
+                disabled={isLoading}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
               >
-                {isLoading ? "Submitting..." : "Submit Deposit"}
+                {isLoading ? "Submitting..." : "Send Deposit Request"}
               </button>
 
               {/* Info */}
@@ -507,8 +468,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
                         <li>• Use your username as transfer reference</li>
                       </>
                     )}
-                    <li>• Upload a clear screenshot of your payment</li>
-                    <li>• Your account will be credited after approval</li>
+                    <li>• Your deposit request will be reviewed by our team</li>
+                    <li>• Your account will be credited after admin approval</li>
                   </ul>
                 </div>
               </div>
@@ -530,7 +491,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
           <button
             onClick={() => {
               setIsSubmitted(false)
-              setScreenshot(null)
               setStep("amount")
               setAmount("")
             }}

@@ -17,10 +17,7 @@ export function OnboardingModal({ userProfile, isOpen, onClose }: OnboardingModa
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [formData, setFormData] = useState({
-    phone: userProfile.phone || "",
     address: userProfile.address || "",
-    country: userProfile.country || "",
-    currency: userProfile.currency || "",
   })
 
   const handleInputChange = (field: string, value: string) => {
@@ -32,33 +29,15 @@ export function OnboardingModal({ userProfile, isOpen, onClose }: OnboardingModa
     setError(null)
 
     // Validation
-    if (!formData.phone.trim()) {
-      setError("Phone number is required")
-      setLoading(false)
-      return
-    }
     if (!formData.address.trim()) {
       setError("Address is required")
-      setLoading(false)
-      return
-    }
-    if (!formData.country.trim()) {
-      setError("Country is required")
-      setLoading(false)
-      return
-    }
-    if (!formData.currency.trim()) {
-      setError("Currency is required")
       setLoading(false)
       return
     }
 
     try {
       const result = await updateUserProfile(userProfile.uid, {
-        phone: formData.phone,
         address: formData.address,
-        country: formData.country,
-        currency: formData.currency,
         onboardingCompleted: true,
       })
 
@@ -117,18 +96,6 @@ export function OnboardingModal({ userProfile, isOpen, onClose }: OnboardingModa
               )}
 
               <div>
-                <label className="text-sm font-medium text-slate-300 block mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  disabled={loading}
-                />
-              </div>
-
-              <div>
                 <label className="text-sm font-medium text-slate-300 block mb-2">Street Address</label>
                 <input
                   type="text"
@@ -137,35 +104,12 @@ export function OnboardingModal({ userProfile, isOpen, onClose }: OnboardingModa
                   placeholder="123 Main Street, Apt 4B"
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   disabled={loading}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-300 block mb-2">Country</label>
-                <input
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) => handleInputChange("country", e.target.value)}
-                  placeholder="United States"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  disabled={loading}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-300 block mb-2">Trading Currency</label>
-                <input
-                  type="text"
-                  value={formData.currency}
-                  onChange={(e) => handleInputChange("currency", e.target.value)}
-                  placeholder="USD, EUR, GBP"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  disabled={loading}
+                  required
                 />
               </div>
 
               <p className="text-xs text-slate-500 pt-2">
-                This information is required for compliance and to process your transactions securely.
+                Your email and phone number were verified during registration. Please add your street address to complete your profile.
               </p>
             </>
           )}
