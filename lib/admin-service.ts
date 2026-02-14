@@ -45,10 +45,11 @@ export interface WithdrawalRequest {
 
 export interface DepositRequest {
   id: string
+  transactionId: string
   userId: string
   username: string
   amount: number
-  currency: "BTC" | "USDT" | "BANK"
+  currency: "BTC" | "USDT" | "XRP" | "BANK"
   proofScreenshot: string
   status: "pending" | "completed" | "rejected"
   requestedAt: Timestamp
@@ -61,6 +62,8 @@ export interface AdminWalletSettings {
   btcTag: string
   usdtAddress: string
   usdtTag: string
+  xrpAddress: string
+  xrpTag: string
   bankDetails?: BankDetails
   lastUpdated: Timestamp
   updatedBy: string
@@ -234,13 +237,15 @@ export async function createDepositRequest(
   userId: string,
   username: string,
   amount: number,
-  currency: "BTC" | "USDT" | "BANK",
+  currency: "BTC" | "USDT" | "XRP" | "BANK",
   proofScreenshot: string
-): Promise<{ success: boolean; error?: string; requestId?: string }> {
+): Promise<{ success: boolean; error?: string; requestId?: string; transactionId?: string }> {
   try {
     const requestId = `DEPOSIT-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+    const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
     const deposit: DepositRequest = {
       id: requestId,
+      transactionId,
       userId,
       username,
       amount,
@@ -252,20 +257,19 @@ export async function createDepositRequest(
 
     await setDoc(doc(db, "depositRequests", requestId), deposit)
 
-  // Add transaction with receipt
-  const txnId = `TXN-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-  await setDoc(doc(db, "users", userId, "transactions", txnId), {
-  id: txnId,
-  type: "deposit",
-  amount,
-  currency,
-  status: "pending",
-  timestamp: Timestamp.now(),
-  description: `Deposit request #${requestId}`,
-  receiptUrl: proofScreenshot,
-  })
+    // Add transaction with transaction ID
+    await setDoc(doc(db, "users", userId, "transactions", transactionId), {
+      id: transactionId,
+      type: "deposit",
+      amount,
+      currency,
+      status: "pending",
+      timestamp: Timestamp.now(),
+      description: `Deposit request #${requestId}`,
+      receiptUrl: proofScreenshot,
+    })
 
-    return { success: true, requestId }
+    return { success: true, requestId, transactionId }
   } catch (error: any) {
     console.error("[v0] Create deposit request error:", error)
     return { success: false, error: error.message }

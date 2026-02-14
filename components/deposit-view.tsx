@@ -72,7 +72,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
   const [step, setStep] = useState<"amount" | "payment">("amount")
   const [amount, setAmount] = useState("")
   const [depositMethod, setDepositMethod] = useState<"crypto" | "bank">("crypto")
-  const [selectedCrypto, setSelectedCrypto] = useState<"BTC" | "USDT">("BTC")
+  const [selectedCrypto, setSelectedCrypto] = useState<"BTC" | "USDT" | "XRP">("BTC")
   const [walletSettings, setWalletSettings] = useState<AdminWalletSettings | null>(null)
   const [bankDetails, setBankDetails] = useState<BankDetails | null>(null)
   const [copiedAddress, setCopiedAddress] = useState(false)
@@ -117,6 +117,19 @@ export function DepositView({ userId, username }: DepositViewProps) {
               (settings as any).usdtMemo ||
               (settings as any).usdt_memo ||
               null,
+            xrpAddress:
+              (settings as any).xrpAddress ||
+              (settings as any).xrp_address ||
+              (settings as any).xrp?.address ||
+              (settings as any).xrp ||
+              null,
+            xrpTag:
+              (settings as any).xrpTag ||
+              (settings as any).xrp_tag ||
+              (settings as any).xrp?.tag ||
+              (settings as any).xrpTag ||
+              (settings as any).xrp_destination_tag ||
+              null,
           }
           setWalletSettings(normalized as AdminWalletSettings)
         } else {
@@ -140,7 +153,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
     return () => unsubscribe()
   }, [])
 
-  const handleCryptoChange = (crypto: "BTC" | "USDT") => {
+  const handleCryptoChange = (crypto: "BTC" | "USDT" | "XRP") => {
     setSelectedCrypto(crypto)
     setCopiedAddress(false)
     setCopiedTag(false)
@@ -150,7 +163,14 @@ export function DepositView({ userId, username }: DepositViewProps) {
     const parsed = Number.parseFloat(amount || "0")
 
     if (depositMethod === "crypto") {
-      const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
+      let walletAddress: string | undefined
+      if (selectedCrypto === "BTC") {
+        walletAddress = walletSettings?.btcAddress
+      } else if (selectedCrypto === "USDT") {
+        walletAddress = walletSettings?.usdtAddress
+      } else if (selectedCrypto === "XRP") {
+        walletAddress = walletSettings?.xrpAddress
+      }
       if (parsed >= 50 && walletAddress) {
         setStep("payment")
       } else {
@@ -200,8 +220,18 @@ export function DepositView({ userId, username }: DepositViewProps) {
     setIsLoading(false)
   }
 
-  const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : walletSettings?.usdtAddress
-  const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : walletSettings?.usdtTag
+  const walletAddress =
+    selectedCrypto === "BTC"
+      ? walletSettings?.btcAddress
+      : selectedCrypto === "USDT"
+        ? walletSettings?.usdtAddress
+        : walletSettings?.xrpAddress
+  const tag =
+    selectedCrypto === "BTC"
+      ? walletSettings?.btcTag
+      : selectedCrypto === "USDT"
+        ? walletSettings?.usdtTag
+        : walletSettings?.xrpTag
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -262,7 +292,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
                   {/* Crypto Selection */}
                   <div className="space-y-3">
                     <label className="text-sm font-medium">Select Cryptocurrency</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <button
                         onClick={() => handleCryptoChange("BTC")}
                         className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
@@ -295,6 +325,24 @@ export function DepositView({ userId, username }: DepositViewProps) {
                           <p className="text-xs text-slate-400">USDT</p>
                         </div>
                         {selectedCrypto === "USDT" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
+                      </button>
+
+                      <button
+                        onClick={() => handleCryptoChange("XRP")}
+                        className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                          selectedCrypto === "XRP"
+                            ? "border-emerald-500 bg-emerald-500/10"
+                            : "border-slate-800 bg-slate-900 hover:border-slate-700"
+                        }`}
+                      >
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                          ✕
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold">Ripple</p>
+                          <p className="text-xs text-slate-400">XRP</p>
+                        </div>
+                        {selectedCrypto === "XRP" && <Check className="w-5 h-5 text-emerald-400 ml-auto" />}
                       </button>
                     </div>
                   </div>
@@ -380,7 +428,9 @@ export function DepositView({ userId, username }: DepositViewProps) {
                   </div>
 
                   <div>
-                    <label className="text-sm text-slate-400 mb-2 block">Tag/Memo</label>
+                    <label className="text-sm text-slate-400 mb-2 block">
+                      {selectedCrypto === "XRP" ? "Destination Tag" : selectedCrypto === "BTC" ? "Tag/Memo" : "Memo"}
+                    </label>
                     <div className="bg-slate-950 border border-slate-700 rounded-xl p-4 flex items-center justify-between gap-3">
                       <p className="text-sm font-mono">{tag ?? "-"}</p>
                       <button

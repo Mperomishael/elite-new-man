@@ -19,6 +19,8 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
     btcTag: "",
     usdtAddress: "",
     usdtTag: "",
+    xrpAddress: "",
+    xrpTag: "",
     lastUpdated: "",
     updatedBy: "",
   })
@@ -172,6 +174,36 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
                 value={settings.usdtTag}
                 onChange={(e) => setSettings({ ...settings, usdtTag: e.target.value })}
                 placeholder="Enter USDT memo/tag if required"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800"></div>
+
+          {/* XRP Settings */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="text-2xl">✕</span>
+              Ripple (XRP)
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">XRP Wallet Address</label>
+              <input
+                type="text"
+                value={settings.xrpAddress}
+                onChange={(e) => setSettings({ ...settings, xrpAddress: e.target.value })}
+                placeholder="Enter XRP wallet address"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">XRP Destination Tag (Optional)</label>
+              <input
+                type="text"
+                value={settings.xrpTag}
+                onChange={(e) => setSettings({ ...settings, xrpTag: e.target.value })}
+                placeholder="Enter XRP destination tag if required"
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
