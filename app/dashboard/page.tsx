@@ -110,7 +110,7 @@ export default function TradingDashboard() {
       case "history":
         return <TransactionHistory userId={userProfile?.uid || ""} />
       case "deposit":
-        return <DepositView />
+        return <DepositView userId={userProfile?.uid || ""} username={userProfile?.username || ""} />
       case "withdraw":
         return (
           <WithdrawView userId={userProfile?.uid} username={userName} availableBalance={userProfile?.balance || 0} />
