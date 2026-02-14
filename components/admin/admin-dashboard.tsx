@@ -9,6 +9,7 @@ import { TransactionsManagement } from "./transactions-management"
 import { AdminStats } from "./admin-stats"
 import { SetupControls } from "./setup-controls"
 import { KYCCollection } from "./kyc-collection"
+import { AdminMessages } from "./admin-messages"
 import { signOutUser } from "@/lib/auth-service"
 import { useRouter } from "next/navigation"
 
@@ -17,7 +18,7 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ adminId }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "wallets" | "deposits" | "withdrawals" | "transactions" | "setup" | "kyc">(
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "wallets" | "deposits" | "withdrawals" | "transactions" | "setup" | "kyc" | "messages">(
     "overview",
   )
   const router = useRouter()
@@ -72,6 +73,7 @@ export function AdminDashboard({ adminId }: AdminDashboardProps) {
               { id: "deposits", label: "Deposits", icon: "💰" },
               { id: "withdrawals", label: "Withdrawals", icon: "💸" },
               { id: "kyc", label: "KYC Collection", icon: "📋" },
+              { id: "messages", label: "Messages", icon: "💬" },
               { id: "transactions", label: "Transactions", icon: "📝" },
             ].map((tab) => (
               <button
@@ -100,6 +102,7 @@ export function AdminDashboard({ adminId }: AdminDashboardProps) {
         {activeTab === "deposits" && <DepositRequests adminId={adminId} />}
         {activeTab === "withdrawals" && <WithdrawalRequests adminId={adminId} />}
         {activeTab === "kyc" && <KYCCollection adminId={adminId} />}
+        {activeTab === "messages" && <AdminMessages adminId={adminId} />}
         {activeTab === "transactions" && <TransactionsManagement />}
       </main>
     </div>

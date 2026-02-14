@@ -1,11 +1,100 @@
 "use client"
 
-import { Mail, Send, MessageSquare, Clock, MessageCircle } from "lucide-react"
-import { useState } from "react"
+import { Mail, Send, MessageSquare, Clock, MessageCircle, Loader } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { collection, query, where, onSnapshot, addDoc, Timestamp, type Unsubscribe } from "firebase/firestore"
+import { db } from "@/lib/firebase"
 
-export function SupportView() {
+interface Message {
+  id: string
+  userId: string
+  username: string
+  message: string
+  timestamp: number
+  isAdminReply: boolean
+}
+
+interface SupportViewProps {
+  userId?: string
+  username?: string
+}
+
+export function SupportView({ userId, username }: SupportViewProps) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [newMessage, setNewMessage] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const [subject, setSubject] = useState("")
-  const [message, setMessage] = useState("")
+
+  useEffect(() => {
+    let unsubscribe: Unsubscribe | null = null
+
+    if (userId) {
+      try {
+        const q = query(
+          collection(db, "supportMessages"),
+          where("userId", "==", userId)
+        )
+        unsubscribe = onSnapshot(q, (snapshot) => {
+          const msgs: Message[] = []
+          snapshot.forEach((doc) => {
+            const data = doc.data()
+            msgs.push({
+              id: doc.id,
+              userId: data.userId,
+              username: data.username,
+              message: data.message,
+              timestamp: data.timestamp?.toMillis?.() || data.timestamp || Date.now(),
+              isAdminReply: data.isAdminReply || false,
+            })
+          })
+          msgs.sort((a, b) => a.timestamp - b.timestamp)
+          setMessages(msgs)
+          setLoading(false)
+        })
+      } catch (err) {
+        console.error("[v0] Error loading messages:", err)
+        setLoading(false)
+      }
+    } else {
+      setLoading(false)
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [userId])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !userId || !username) {
+      alert("Please enter a message")
+      return
+    }
+
+    setSending(true)
+    try {
+      await addDoc(collection(db, "supportMessages"), {
+        userId,
+        username,
+        message: newMessage,
+        timestamp: Timestamp.now(),
+        isAdminReply: false,
+        subject: subject || "General Inquiry",
+      })
+      setNewMessage("")
+      setSubject("")
+    } catch (err) {
+      console.error("[v0] Error sending message:", err)
+      alert("Failed to send message")
+    } finally {
+      setSending(false)
+    }
+  }
 
   const whatsappNumber = "+27715403179"
   const whatsappMessage = "Hello, USTrader, I need help"
@@ -16,14 +105,91 @@ export function SupportView() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-6">
       <div className="flex items-center gap-3 mb-6">
         <Mail className="w-8 h-8 text-lime-400" />
         <div>
           <h2 className="text-2xl font-bold">Customer Support</h2>
-          <p className="text-sm text-slate-400">We're here to help you</p>
+          <p className="text-sm text-slate-400">Chat with our support team in real-time</p>
         </div>
       </div>
+
+      {/* Chat Interface */}
+      {userId ? (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 flex flex-col h-96">
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto space-y-4">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader className="w-6 h-6 text-amber-500 animate-spin" />
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-slate-400">
+                <div className="text-center">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No messages yet. Send a message to get started!</p>
+                </div>
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.isAdminReply ? "justify-start" : "justify-end"}`}
+                >
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-lg ${
+                      msg.isAdminReply
+                        ? "bg-slate-800 text-slate-100 border border-slate-700"
+                        : "bg-emerald-600 text-white"
+                    }`}
+                  >
+                    {msg.isAdminReply && (
+                      <p className="text-xs font-semibold text-lime-400 mb-1">Support Team</p>
+                    )}
+                    <p className="text-sm">{msg.message}</p>
+                    <p className="text-xs opacity-70 mt-1">
+                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="space-y-3 border-t border-slate-800 pt-4">
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Subject (optional)"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Type your message..."
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={sending || !newMessage.trim()}
+                className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
+              >
+                {sending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-slate-400">
+          <p>Please log in to access chat support</p>
+        </div>
+      )}
 
       {/* Contact Info */}
       <div className="grid grid-cols-1 gap-3">
@@ -60,60 +226,6 @@ export function SupportView() {
           </div>
         </div>
       </div>
-
-      {/* Contact Form */}
-      <div className="bg-slate-700/50 rounded-2xl p-6 space-y-4">
-        <h3 className="font-semibold text-lg">Send us a message</h3>
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm text-slate-400 mb-2 block">Subject</label>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="What can we help you with?"
-              className="w-full bg-slate-800/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-slate-400 mb-2 block">Message</label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe your issue or question..."
-              rows={6}
-              className="w-full bg-slate-800/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400 resize-none"
-            />
-          </div>
-
-          <button className="w-full bg-lime-400 text-slate-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
-            <Send className="w-5 h-5" />
-            Send Message
-          </button>
-        </div>
-      </div>
-
-      {/* FAQ Quick Links */}
-      <div className="bg-slate-700/50 rounded-2xl p-6 space-y-4">
-        <h3 className="font-semibold text-lg">Quick Help</h3>
-        <div className="space-y-2">
-          <QuickHelpButton icon={MessageSquare} title="How to deposit funds?" />
-          <QuickHelpButton icon={MessageSquare} title="How to withdraw earnings?" />
-          <QuickHelpButton icon={MessageSquare} title="KYC verification process" />
-          <QuickHelpButton icon={MessageSquare} title="Trading fees and charges" />
-        </div>
-      </div>
     </div>
-  )
-}
-
-function QuickHelpButton({ icon: Icon, title }: { icon: any; title: string }) {
-  return (
-    <button className="w-full bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600 rounded-xl p-4 flex items-center gap-3 transition-colors text-left">
-      <Icon className="w-5 h-5 text-lime-400" />
-      <span className="text-sm text-white">{title}</span>
-    </button>
   )
 }

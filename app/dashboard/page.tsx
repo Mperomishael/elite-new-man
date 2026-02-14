@@ -124,7 +124,7 @@ export default function TradingDashboard() {
       case "referrals":
         return <ReferralsView />
       case "support":
-        return <SupportView />
+        return <SupportView userId={userProfile?.uid || ""} username={userProfile?.username || ""} />
       case "settings":
         return <SettingsView userName={userName} userProfile={userProfile || undefined} />
       case "license":
