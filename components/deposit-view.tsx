@@ -204,20 +204,41 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
   const handleSubmit = async () => {
     setIsLoading(true)
-    const result = await createDepositRequest(
-      userId,
-      username,
-      Number.parseFloat(amount),
-      depositMethod === "crypto" ? selectedCrypto : "BANK",
-      "", // Empty proof screenshot - admin will verify manually
-    )
+    try {
+      const parsedAmount = Number.parseFloat(amount)
+      console.log("[v0] Submitting deposit:", {
+        userId,
+        username,
+        amount: parsedAmount,
+        currency: depositMethod === "crypto" ? selectedCrypto : "BANK",
+      })
 
-    if (result.success) {
-      setIsSubmitted(true)
-    } else {
-      alert("Failed to submit deposit request. Please try again.")
+      if (!userId || !username || !amount || isNaN(parsedAmount)) {
+        throw new Error("Missing required fields: userId, username, or amount")
+      }
+
+      const result = await createDepositRequest(
+        userId,
+        username,
+        parsedAmount,
+        depositMethod === "crypto" ? selectedCrypto : "BANK",
+        "", // Empty proof screenshot - admin will verify manually
+      )
+
+      console.log("[v0] Deposit request result:", result)
+
+      if (result.success) {
+        setIsSubmitted(true)
+        alert(`Deposit request submitted successfully! Transaction ID: ${result.transactionId}`)
+      } else {
+        alert(`Failed to submit deposit request: ${result.error || "Unknown error"}`)
+      }
+    } catch (err: any) {
+      console.error("[v0] Deposit submission error:", err)
+      alert(`Error: ${err.message}`)
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   const walletAddress =
