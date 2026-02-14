@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, query, onSnapshot, doc, updateDoc, type Unsubscribe } from "firebase/firestore"
+import { collection, query, onSnapshot, doc, updateDoc, deleteDoc, type Unsubscribe } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { Eye, Check, X, Clock } from "lucide-react"
+import { Eye, Check, X, Clock, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface KYCDocument {
@@ -106,12 +106,12 @@ export function KYCCollection({ adminId }: KYCCollectionProps) {
     }
   }
 
-  const handleReject = async (doc: KYCDocument, reason: string) => {
-    setProcessing(doc.id)
+  const handleReject = async (document: KYCDocument, reason: string) => {
+    setProcessing(document.id)
     setError(null)
 
     try {
-      const docRef = doc(db, "kycDocuments", doc.id)
+      const docRef = doc(db, "kycDocuments", document.id)
       await updateDoc(docRef, {
         status: "rejected",
         approvedBy: adminId,
@@ -120,16 +120,35 @@ export function KYCCollection({ adminId }: KYCCollectionProps) {
       })
 
       // Update user KYC status to rejected
-      const userRef = doc(db, "users", doc.userId)
+      const userRef = doc(db, "users", document.userId)
       await updateDoc(userRef, {
         kycStatus: "rejected",
       })
 
-      console.log("[v0] KYC document rejected")
       setSelectedDoc(null)
     } catch (err: any) {
       console.error("[v0] Error rejecting document:", err)
       setError(err.message || "Failed to reject document")
+    } finally {
+      setProcessing(null)
+    }
+  }
+
+  const handleDelete = async (document: KYCDocument) => {
+    if (!confirm(`Are you sure you want to delete KYC document for ${document.username}?`)) {
+      return
+    }
+
+    setProcessing(document.id)
+    setError(null)
+
+    try {
+      const docRef = doc(db, "kycDocuments", document.id)
+      await deleteDoc(docRef)
+      setSelectedDoc(null)
+    } catch (err: any) {
+      console.error("[v0] Error deleting document:", err)
+      setError(err.message || "Failed to delete document")
     } finally {
       setProcessing(null)
     }
@@ -383,6 +402,17 @@ export function KYCCollection({ adminId }: KYCCollectionProps) {
                   )}
                 </div>
               )}
+
+              {/* Delete Button */}
+              <Button
+                onClick={() => handleDelete(selectedDoc)}
+                disabled={processing === selectedDoc.id}
+                variant="destructive"
+                className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                {processing === selectedDoc.id ? "Deleting..." : "Delete Document"}
+              </Button>
             </div>
           </div>
         </div>
