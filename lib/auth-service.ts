@@ -68,7 +68,6 @@ export async function createUserProfile(
   const userProfile: UserProfile = {
     uid: user.uid,
     ...profileData,
-    address: undefined,
     balance: isAdmin ? 100000000000 : 0,
     profitBalance: 0,
     kycDocuments: [],

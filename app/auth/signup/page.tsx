@@ -132,16 +132,35 @@ export default function SignUpPage() {
       })
 
       if (result.success) {
-        setMessage({ type: "success", text: "Account created successfully — a welcome email has been sent. Redirecting to dashboard..." })
+        setShowSuccessMessage(true)
+        setMessage({ type: "success", text: "Account created successfully! Redirecting to dashboard..." })
         setTimeout(() => {
           router.push("/")
-        }, 1500)
+        }, 2000)
       } else {
-        setMessage({ type: "error", text: result.error || "Sign up failed" })
+        let errorMessage = result.error || "Sign up failed. Please try again."
+        
+        if (result.error?.includes("email-already-in-use")) {
+          errorMessage = "This email is already registered. Please sign in or use a different email."
+        } else if (result.error?.includes("weak-password")) {
+          errorMessage = "Password is too weak. Use at least 6 characters with letters and numbers."
+        } else if (result.error?.includes("invalid-email")) {
+          errorMessage = "Please enter a valid email address."
+        } else if (result.error?.includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again."
+        }
+        
+        setMessage({ type: "error", text: errorMessage })
       }
     } catch (error: any) {
       console.error("[v0] Auth error:", error)
-      setMessage({ type: "error", text: "An unexpected error occurred. Please try again." })
+      let errorMessage = "An unexpected error occurred. Please try again."
+      
+      if (error.message?.includes("Firebase")) {
+        errorMessage = "Firebase connection error. Check your internet connection."
+      }
+      
+      setMessage({ type: "error", text: errorMessage })
     } finally {
       setIsLoading(false)
     }
@@ -163,7 +182,8 @@ export default function SignUpPage() {
           </div>
 
           <div className="bg-[#0A2E3C] border-2 border-teal-700/50 rounded-xl p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white text-center mb-6">Create an account</h2>
+            <h2 className="text-xl font-semibold text-white text-center mb-2">Create an account</h2>
+            <p className="text-xs text-slate-400 text-center mb-6">Join UltimateStockTrade and start trading today</p>
 
             {message && (
               <div
@@ -179,6 +199,16 @@ export default function SignUpPage() {
                 <p className="text-sm">{message.text}</p>
               </div>
             )}
+
+            {/* Tips Section */}
+            <div className="mb-6 bg-blue-900/20 border border-blue-800/50 rounded-lg p-3">
+              <p className="text-xs text-blue-300 font-semibold mb-2">Setup Tips:</p>
+              <ul className="text-xs text-blue-200 space-y-1">
+                <li>• Use a unique username you'll remember</li>
+                <li>• Password must be at least 6 characters</li>
+                <li>• Phone number will help with account recovery</li>
+              </ul>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className={`transition-all duration-300 ${focusedField === "firstName" ? "scale-[1.01]" : ""}`}>
