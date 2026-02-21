@@ -47,6 +47,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
             usdtTag: (settings as any).usdtTag || (settings as any).usdt_tag || null,
             xrpAddress: (settings as any).xrpAddress || (settings as any).xrp_address || null,
             xrpTag: (settings as any).xrpTag || (settings as any).xrp_tag || null,
+            ethAddress: (settings as any).ethAddress || (settings as any).eth_address || null,
+            ethTag: (settings as any).ethTag || (settings as any).eth_tag || null,
           }
           setWalletSettings(normalized as AdminWalletSettings)
         }
