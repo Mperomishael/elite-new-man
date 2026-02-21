@@ -35,7 +35,7 @@ export interface WithdrawalRequest {
   userId: string
   username: string
   amount: number
-  crypto: "BTC" | "USDT" | "BANK" | string
+  crypto: "BTC" | "USDT" | "ETH" | "BANK" | string
   walletAddress: string
   status: "pending" | "approved" | "rejected" | "completed"
   requestedAt: Timestamp
@@ -49,7 +49,7 @@ export interface DepositRequest {
   userId: string
   username: string
   amount: number
-  currency: "BTC" | "USDT" | "XRP" | "BANK"
+  currency: "BTC" | "USDT" | "XRP" | "ETH" | "BANK"
   proofScreenshot: string
   status: "pending" | "completed" | "rejected"
   requestedAt: Timestamp
@@ -64,6 +64,8 @@ export interface AdminWalletSettings {
   usdtTag: string
   xrpAddress: string
   xrpTag: string
+  ethAddress: string
+  ethTag: string
   bankDetails?: BankDetails
   lastUpdated: Timestamp
   updatedBy: string
