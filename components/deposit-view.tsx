@@ -21,6 +21,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
   const [bankDetails, setBankDetails] = useState<BankDetails | null>(null)
   const [copiedAddress, setCopiedAddress] = useState(false)
   const [copiedTag, setCopiedTag] = useState(false)
+  const [copiedAccountNumber, setCopiedAccountNumber] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   
@@ -93,11 +94,19 @@ export function DepositView({ userId, username }: DepositViewProps) {
     }
   }
 
-  const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async (text: string, type: "address" | "tag" | "accountNumber" = "address") => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopiedAddress(true)
-      setTimeout(() => setCopiedAddress(false), 2000)
+      if (type === "address") {
+        setCopiedAddress(true)
+        setTimeout(() => setCopiedAddress(false), 2000)
+      } else if (type === "tag") {
+        setCopiedTag(true)
+        setTimeout(() => setCopiedTag(false), 2000)
+      } else if (type === "accountNumber") {
+        setCopiedAccountNumber(true)
+        setTimeout(() => setCopiedAccountNumber(false), 2000)
+      }
     } catch (err) {
       console.error("Failed to copy:", err)
     }
@@ -265,7 +274,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
                     <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2">
                       <p className="text-xs font-mono break-all flex-1">{walletAddress}</p>
                       <button
-                        onClick={() => copyToClipboard(walletAddress)}
+                        onClick={() => copyToClipboard(walletAddress, "address")}
                         className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded"
                       >
                         {copiedAddress ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -278,12 +287,81 @@ export function DepositView({ userId, username }: DepositViewProps) {
                       <label className="text-sm text-slate-400 block mb-2">{selectedCrypto === "XRP" ? "Destination Tag" : "Tag/Memo"}</label>
                       <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between">
                         <p className="text-sm font-mono">{tag}</p>
-                        <button onClick={() => copyToClipboard(tag)} className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded">
-                          <Copy className="w-4 h-4" />
+                        <button onClick={() => copyToClipboard(tag, "tag")} className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded">
+                          {copiedTag ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {depositMethod === "bank" && bankDetails && (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-2">
+                    <p className="text-xs text-blue-300">Bank Transfer Details</p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-slate-400 block mb-2">Bank Name</label>
+                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <p className="text-sm text-white">{bankDetails.bankName}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-slate-400 block mb-2">Account Holder Name</label>
+                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <p className="text-sm text-white">{bankDetails.accountHolderName}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-slate-400 block mb-2">Account Number</label>
+                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2">
+                      <p className="text-sm font-mono text-white break-all flex-1">{bankDetails.accountNumber}</p>
+                      <button
+                        onClick={() => copyToClipboard(bankDetails.accountNumber, "accountNumber")}
+                        className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded flex-shrink-0"
+                      >
+                        {copiedAccountNumber ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {bankDetails.routingNumber && (
+                    <div>
+                      <label className="text-sm text-slate-400 block mb-2">Routing Number</label>
+                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                        <p className="text-sm font-mono text-white">{bankDetails.routingNumber}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {bankDetails.swiftCode && (
+                    <div>
+                      <label className="text-sm text-slate-400 block mb-2">SWIFT/BIC Code</label>
+                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                        <p className="text-sm font-mono text-white">{bankDetails.swiftCode}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {bankDetails.iban && (
+                    <div>
+                      <label className="text-sm text-slate-400 block mb-2">IBAN</label>
+                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                        <p className="text-sm font-mono text-white">{bankDetails.iban}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-sm text-slate-400 block mb-2">Country</label>
+                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <p className="text-sm text-white">{bankDetails.country}</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
