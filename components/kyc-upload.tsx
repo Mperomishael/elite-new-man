@@ -5,9 +5,8 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Upload, X, Check, Clock, AlertCircle } from "lucide-react"
 import { addKYCDocument } from "@/lib/auth-service"
-import { auth, db, storage } from "@/lib/firebase"
+import { db } from "@/lib/firebase"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 interface KYCUploadProps {
   userId: string
@@ -72,6 +71,17 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
     setFiles(files.filter((_, i) => i !== index))
   }
 
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        resolve(dataUrl)
+      }
+      reader.onerror = () => reject(new Error("Failed to read file"))
+      reader.readAsDataURL(file)
+    })
+
   const handleUpload = async () => {
     if (files.length === 0) {
       setMessage("Please select at least one file")
@@ -81,18 +91,18 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
 
     setUploading(true)
     setMessage("")
+    setMessageType("info")
 
     try {
-      for (const file of files) {
-        const storageRef = ref(storage, `kyc/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${file.name}`)
-        const uploadSnapshot = await uploadBytes(storageRef, file)
-        const downloadUrl = await getDownloadURL(uploadSnapshot.ref)
-
-        const result = await addKYCDocument(userId, downloadUrl)
-        if (!result.success) {
-          throw new Error(result.error || "Failed to upload document")
-        }
-      }
+      await Promise.all(
+        files.map(async (file) => {
+          const dataUrl = await fileToDataUrl(file)
+          const result = await addKYCDocument(userId, dataUrl)
+          if (!result.success) {
+            throw new Error(result.error || "Failed to upload document")
+          }
+        })
+      )
 
       setUploadCount((prev) => prev + files.length)
       setMessage(`Successfully submitted ${files.length} document${files.length > 1 ? "s" : ""}! Awaiting admin review.`)
