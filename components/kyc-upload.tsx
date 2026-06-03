@@ -5,8 +5,9 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Upload, X, Check, Clock, AlertCircle } from "lucide-react"
 import { addKYCDocument } from "@/lib/auth-service"
-import { auth, db } from "@/lib/firebase"
+import { auth, db, storage } from "@/lib/firebase"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 interface KYCUploadProps {
   userId: string
@@ -82,36 +83,26 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
     setMessage("")
 
     try {
-      let successCount = 0
       for (const file of files) {
-        // Create a data URL for the file (in production, use cloud storage like Firebase Storage)
-        const reader = new FileReader()
-        reader.onload = async (e) => {
-          const dataUrl = e.target?.result as string
-          const result = await addKYCDocument(userId, dataUrl)
+        const storageRef = ref(storage, `kyc/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${file.name}`)
+        const uploadSnapshot = await uploadBytes(storageRef, file)
+        const downloadUrl = await getDownloadURL(uploadSnapshot.ref)
 
-          if (result.success) {
-            successCount++
-            if (successCount === files.length) {
-              setUploadCount((prev) => prev + files.length)
-              setMessage(`Successfully submitted ${files.length} document(s)! Awaiting admin review.`)
-              setMessageType("success")
-              setFiles([])
-              setTimeout(() => {
-                onUploadSuccess?.()
-              }, 2000)
-            }
-          } else {
-            setMessage("Failed to upload one or more documents")
-            setMessageType("error")
-          }
+        const result = await addKYCDocument(userId, downloadUrl)
+        if (!result.success) {
+          throw new Error(result.error || "Failed to upload document")
         }
-        reader.readAsDataURL(file)
       }
-    } catch (error) {
-      setMessage("Error uploading documents")
-      setMessageType("error")
+
+      setUploadCount((prev) => prev + files.length)
+      setMessage(`Successfully submitted ${files.length} document${files.length > 1 ? "s" : ""}! Awaiting admin review.`)
+      setMessageType("success")
+      setFiles([])
+      setTimeout(() => onUploadSuccess?.(), 2000)
+    } catch (error: any) {
       console.error("[v0] Upload error:", error)
+      setMessage(error?.message || "Error uploading documents")
+      setMessageType("error")
     } finally {
       setUploading(false)
     }
