@@ -145,21 +145,6 @@ export default function AdminLoginPage() {
                 </>
               )}
             </Button>
-
-            {/* Approved Emails Info */}
-            <div className="mt-8 pt-6 border-t border-slate-700/50">
-              <p className="text-xs text-slate-500 mb-3 font-semibold uppercase">Approved Admin Emails:</p>
-              <div className="space-y-2">
-                {APPROVED_ADMIN_EMAILS.map((email) => (
-                  <div key={email} className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                    <span className="text-slate-400">{email}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Back Link */}
             <div className="mt-6 text-center">
               <a href="/" className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
                 Back to Login
