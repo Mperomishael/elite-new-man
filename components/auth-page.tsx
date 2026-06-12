@@ -215,7 +215,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           </div>
 
           <div className="bg-[#0A2E3C] border-2 border-teal-700/50 rounded-xl p-8 shadow-2xl text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <div className="w-20 h-20 bg-gradient-to-br from-lime-400 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
               <Mail className="w-10 h-10 text-white" />
             </div>
 
@@ -293,7 +293,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
             {message && (
               <div
                 className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${
-                  message.type === "success" ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
+                  message.type === "success" ? "bg-lime-400/20 text-lime-400" : "bg-red-500/20 text-red-400"
                 }`}
               >
                 {message.type === "success" ? (
@@ -318,7 +318,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     onFocus={() => setFocusedField("firstName")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
+                    className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
                       focusedField === "firstName" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                     } ${errors.firstName ? "ring-2 ring-red-500" : ""}`}
                     placeholder="First name"
@@ -340,7 +340,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
                     onFocus={() => setFocusedField("lastName")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
+                    className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
                       focusedField === "lastName" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                     } ${errors.lastName ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Last name"
@@ -362,7 +362,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     onChange={(e) => handleInputChange("username", e.target.value)}
                     onFocus={() => setFocusedField("username")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
+                    className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
                       focusedField === "username" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                     } ${errors.username ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Username"
@@ -384,7 +384,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     onFocus={() => setFocusedField("phone")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
+                    className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
                       focusedField === "phone" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                     } ${errors.phone ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Phone"
@@ -405,7 +405,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
-                  className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
+                  className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
                     focusedField === "email" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                   } ${errors.email ? "ring-2 ring-red-500" : ""}`}
                   placeholder="Email"
@@ -426,15 +426,15 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     disabled={isLoading}
                   >
                     <SelectTrigger
-                      className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 ${
+                      className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 ${
                         focusedField === "currency" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                       } ${errors.currency ? "ring-2 ring-red-500" : ""}`}
                     >
                       <SelectValue placeholder="US Dollar" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white border-slate-200 text-slate-900 max-h-60">
+                    <SelectContent className="bg-white border-neutral-200 text-neutral-900 max-h-60">
                       {currencies.map((currency) => (
-                        <SelectItem key={currency} value={currency} className="hover:bg-slate-100">
+                        <SelectItem key={currency} value={currency} className="hover:bg-neutral-100">
                           {currency}
                         </SelectItem>
                       ))}
@@ -456,15 +456,15 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     disabled={isLoading}
                   >
                     <SelectTrigger
-                      className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 ${
+                      className={`bg-white border-0 text-neutral-900 h-11 rounded-lg transition-all duration-300 ${
                         focusedField === "country" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                       } ${errors.country ? "ring-2 ring-red-500" : ""}`}
                     >
                       <SelectValue placeholder="Afghanistan" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white border-slate-200 text-slate-900 max-h-60">
+                    <SelectContent className="bg-white border-neutral-200 text-neutral-900 max-h-60">
                       {countries.map((country) => (
-                        <SelectItem key={country} value={country} className="hover:bg-slate-100">
+                        <SelectItem key={country} value={country} className="hover:bg-neutral-100">
                           {country}
                         </SelectItem>
                       ))}
@@ -486,7 +486,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-slate-400 ${
+                    className={`bg-white border-0 text-neutral-900 h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-neutral-400 ${
                       focusedField === "password" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                     } ${errors.password ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Password"
@@ -495,7 +495,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                    className="absolute right-3 top-1/2 -tranneutral-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -519,7 +519,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                       onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                       onFocus={() => setFocusedField("confirmPassword")}
                       onBlur={() => setFocusedField(null)}
-                      className={`bg-white border-0 text-slate-900 h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-slate-400 ${
+                      className={`bg-white border-0 text-neutral-900 h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-neutral-400 ${
                         focusedField === "confirmPassword" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
                       } ${errors.confirmPassword ? "ring-2 ring-red-500" : ""}`}
                       placeholder="Confirm password"
@@ -528,7 +528,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                      className="absolute right-3 top-1/2 -tranneutral-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
                       disabled={isLoading}
                     >
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -676,7 +676,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               <Input
                 type="email"
                 placeholder="Email Address"
-                className="bg-white border-0 text-slate-900 h-11 rounded-lg flex-1 placeholder:text-slate-400"
+                className="bg-white border-0 text-neutral-900 h-11 rounded-lg flex-1 placeholder:text-neutral-400"
               />
               <Button className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 h-11 px-4 rounded-lg">
                 <Send className="w-5 h-5" />

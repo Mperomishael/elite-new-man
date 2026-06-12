@@ -26,17 +26,17 @@ export function LicenseView() {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-emerald-400" />
+          <Shield className="w-6 h-6 text-lime-400" />
           <h1 className="text-3xl font-bold">Company License</h1>
         </div>
-        <p className="text-slate-400">View our official company license. This document is for viewing only.</p>
+        <p className="text-neutral-400">View our official company license. This document is for viewing only.</p>
       </div>
 
       {/* Security Notice */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex gap-3">
-        <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+      <div className="bg-lime-400/10 border border-lime-400/30 rounded-lg p-4 flex gap-3">
+        <AlertCircle className="w-5 h-5 text-lime-400 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-blue-300 mb-1">Protected Document</p>
+          <p className="text-sm font-semibold text-lime-400 mb-1">Protected Document</p>
           <p className="text-xs text-blue-200">
             This license is protected and cannot be downloaded, screenshotted, or copied. It is for viewing purposes only.
           </p>
@@ -47,17 +47,17 @@ export function LicenseView() {
       <div className="relative group">
         {/* Loading State */}
         {isLoading && (
-          <div className="absolute inset-0 bg-slate-900 rounded-2xl flex items-center justify-center z-20">
+          <div className="absolute inset-0 bg-neutral-900 rounded-2xl flex items-center justify-center z-20">
             <div className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-slate-400 text-sm">Loading license...</p>
+              <div className="w-12 h-12 border-4 border-lime-400 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-neutral-400 text-sm">Loading license...</p>
             </div>
           </div>
         )}
 
         {/* Protected Image Container */}
         <div
-          className="bg-slate-900 rounded-2xl p-4 md:p-6 border border-slate-800 overflow-hidden relative"
+          className="bg-neutral-900 rounded-2xl p-4 md:p-6 border border-neutral-800 overflow-hidden relative"
           onContextMenu={handleContextMenu}
           onCopy={handleCopy}
           style={{
@@ -118,26 +118,26 @@ export function LicenseView() {
       </div>
 
       {/* Information Box */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 space-y-3">
+      <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-4 space-y-3">
         <h3 className="font-semibold text-sm">License Document Information</h3>
-        <div className="space-y-2 text-xs text-slate-400">
+        <div className="space-y-2 text-xs text-neutral-400">
           <div className="flex justify-between">
             <span>License Type:</span>
             <span className="text-white font-medium">Business Operating License</span>
           </div>
           <div className="flex justify-between">
             <span>Status:</span>
-            <span className="text-emerald-400 font-medium">Active</span>
+            <span className="text-lime-400 font-medium">Active</span>
           </div>
           <div className="flex justify-between">
             <span>Protection:</span>
-            <span className="text-blue-400 font-medium">View Only - Secured</span>
+            <span className="text-lime-400 font-medium">View Only - Secured</span>
           </div>
         </div>
       </div>
 
       {/* Footer Note */}
-      <div className="text-center text-xs text-slate-500 bg-slate-900/30 rounded-lg p-3">
+      <div className="text-center text-xs text-neutral-500 bg-neutral-900/30 rounded-lg p-3">
         <p>
           This license document is confidential and proprietary. Unauthorized reproduction or distribution is
           prohibited.

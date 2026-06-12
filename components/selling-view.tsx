@@ -141,7 +141,7 @@ export function SellingView() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-1">Sell Assets</h2>
-        <p className="text-slate-400 text-sm">Sell your holdings</p>
+        <p className="text-neutral-400 text-sm">Sell your holdings</p>
       </div>
 
       {/* Asset Type Toggle */}
@@ -152,7 +152,7 @@ export function SellingView() {
             setSelectedAsset(null)
           }}
           className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-            assetType === "crypto" ? "bg-red-500 text-white" : "bg-slate-800 text-slate-400"
+            assetType === "crypto" ? "bg-red-500 text-white" : "bg-neutral-800 text-neutral-400"
           }`}
         >
           Crypto
@@ -163,7 +163,7 @@ export function SellingView() {
             setSelectedAsset(null)
           }}
           className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-            assetType === "forex" ? "bg-red-500 text-white" : "bg-slate-800 text-slate-400"
+            assetType === "forex" ? "bg-red-500 text-white" : "bg-neutral-800 text-neutral-400"
           }`}
         >
           Forex
@@ -173,7 +173,7 @@ export function SellingView() {
       {!selectedAsset && (
         <div className="space-y-3">
           <h3 className="text-lg font-bold">Live {assetType === "crypto" ? "Crypto" : "Forex"} Markets Worldwide</h3>
-          <div className="bg-slate-900/50 rounded-2xl overflow-hidden border border-slate-800">
+          <div className="bg-neutral-900/50 rounded-2xl overflow-hidden border border-neutral-800">
             <div id="tradingview-screener-sell" className="tradingview-widget-container">
               <div className="tradingview-widget-container__widget"></div>
             </div>
@@ -188,7 +188,7 @@ export function SellingView() {
             <button
               key={holding.symbol}
               onClick={() => setSelectedAsset(holding.symbol)}
-              className="w-full bg-slate-900 border border-slate-800 hover:border-red-500 rounded-xl p-4 transition-all text-left"
+              className="w-full bg-neutral-900 border border-neutral-800 hover:border-red-500 rounded-xl p-4 transition-all text-left"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
@@ -197,19 +197,19 @@ export function SellingView() {
                   </div>
                   <div>
                     <p className="font-semibold">{holding.symbol}</p>
-                    <p className="text-xs text-slate-400">{holding.name}</p>
+                    <p className="text-xs text-neutral-400">{holding.name}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">${holding.totalValue.toLocaleString()}</p>
-                  <p className={`text-xs ${holding.profit >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <p className={`text-xs ${holding.profit >= 0 ? "text-lime-400" : "text-red-400"}`}>
                     {holding.profit >= 0 ? "+" : ""}${holding.profit.toFixed(2)} (
                     {holding.profitPercent >= 0 ? "+" : ""}
                     {holding.profitPercent}%)
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between text-xs text-neutral-400 pt-2 border-t border-neutral-800">
                 <span>Quantity: {holding.quantity}</span>
                 <span>Price: ${holding.currentPrice.toLocaleString()}</span>
               </div>
@@ -224,16 +224,16 @@ export function SellingView() {
           </button>
 
           {/* TradingView Chart */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
             <div id="tradingview_chart_sell" style={{ height: "500px" }} />
           </div>
 
           {/* Selected Asset Info */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="font-bold text-lg">{selectedAsset}</p>
-                <p className="text-sm text-slate-400">{holdings.find((h) => h.symbol === selectedAsset)?.name}</p>
+                <p className="text-sm text-neutral-400">{holdings.find((h) => h.symbol === selectedAsset)?.name}</p>
               </div>
               <div className="text-right">
                 <p className="font-bold text-xl">
@@ -242,8 +242,8 @@ export function SellingView() {
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Wallet className="w-4 h-4 text-slate-400" />
-              <span className="text-slate-400">Available:</span>
+              <Wallet className="w-4 h-4 text-neutral-400" />
+              <span className="text-neutral-400">Available:</span>
               <span className="font-semibold">
                 {holdings.find((h) => h.symbol === selectedAsset)?.quantity} {selectedAsset?.split("/")[0]}
               </span>
@@ -255,7 +255,7 @@ export function SellingView() {
             <button
               onClick={() => setOrderType("market")}
               className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-                orderType === "market" ? "bg-red-500 text-white" : "bg-slate-800 text-slate-400"
+                orderType === "market" ? "bg-red-500 text-white" : "bg-neutral-800 text-neutral-400"
               }`}
             >
               Market Order
@@ -263,7 +263,7 @@ export function SellingView() {
             <button
               onClick={() => setOrderType("limit")}
               className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-                orderType === "limit" ? "bg-red-500 text-white" : "bg-slate-800 text-slate-400"
+                orderType === "limit" ? "bg-red-500 text-white" : "bg-neutral-800 text-neutral-400"
               }`}
             >
               Limit Order
@@ -271,18 +271,18 @@ export function SellingView() {
           </div>
 
           {/* Amount Input */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <label className="text-sm text-slate-400 mb-2 block">Quantity to Sell</label>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+            <label className="text-sm text-neutral-400 mb-2 block">Quantity to Sell</label>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
               max={holdings.find((h) => h.symbol === selectedAsset)?.quantity}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full bg-black border border-neutral-700 rounded-lg px-4 py-3 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             {amount && (
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-neutral-400 mt-2">
                 ≈ $
                 {(
                   Number.parseFloat(amount) * (holdings.find((h) => h.symbol === selectedAsset)?.currentPrice || 0)
@@ -301,7 +301,7 @@ export function SellingView() {
                   const maxQuantity = holdings.find((h) => h.symbol === selectedAsset)?.quantity || 0
                   setAmount(((maxQuantity * percentage) / 100).toString())
                 }}
-                className="bg-slate-800 hover:bg-slate-700 rounded-lg py-2 text-sm font-medium transition-colors"
+                className="bg-neutral-800 hover:bg-neutral-700 rounded-lg py-2 text-sm font-medium transition-colors"
               >
                 {percentage}%
               </button>
@@ -342,7 +342,7 @@ export function SellingView() {
               setSelectedAsset(null)
               alert("Sale successful! Check transaction history for details.")
             }}
-            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
+            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
           >
             Sell {selectedAsset}
           </button>

@@ -7,13 +7,13 @@ import "./globals.css"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "LLC - your trading starts here..your profits continues",
-  description: "Trade stocks and cryptocurrencies with confidence on UltimateStckTrader",
+  title: "Elite Block Market - Trade Crypto & Forex",
+  description: "Elite Block Market - Your Gateway to Crypto and Forex Trading. Trade with confidence and earn passive income.",
   generator: "v0.app",
   icons: {
-    icon: "https://i.ibb.co/pBSBnW9y/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png",
-    shortcut: "https://i.ibb.co/pBSBnW9y/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png",
-    apple: "https://i.ibb.co/pBSBnW9y/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png",
+    icon: "https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png",
+    shortcut: "https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png",
+    apple: "https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png",
   },
 }
 
@@ -23,12 +23,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-background dark">
       <head>
         <script src="//code.jivosite.com/widget/58f9qTOD4U" async></script>
 
       </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased bg-black text-white`}>
         <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         <Analytics />
       </body>

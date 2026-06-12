@@ -32,7 +32,7 @@ export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#0D3A4D] border-t border-slate-700 z-40 safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-neutral-800 z-40 safe-area-inset-bottom">
       <div className="flex items-center justify-around max-w-2xl mx-auto px-1 sm:px-2">
         {navItems.map((item) => {
           const Icon = item.icon
@@ -45,8 +45,8 @@ export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
                 onClick={() => onNavigate(item.id as any)}
                 className="flex flex-col items-center gap-0.5 py-2 px-2 sm:px-3 -mt-6 active:scale-95 transition-transform"
               >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50">
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-lime-400 rounded-full flex items-center justify-center shadow-lg shadow-lime-400/50">
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-black" />
                 </div>
                 <span className="text-[10px] sm:text-xs font-medium text-white mt-1">{item.label}</span>
               </button>
@@ -58,7 +58,7 @@ export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
               key={item.id}
               onClick={() => onNavigate(item.id as any)}
               className={`flex flex-col items-center gap-0.5 py-2.5 sm:py-3 px-2 sm:px-3 transition-all active:scale-95 ${
-                isActive ? "text-lime-400" : "text-slate-300"
+                isActive ? "text-lime-400" : "text-neutral-400"
               }`}
             >
               <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? "scale-110" : ""} transition-transform`} />

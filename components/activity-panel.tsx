@@ -36,55 +36,55 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
   const getActivityIcon = (type: Activity["type"]) => {
     switch (type) {
       case "login":
-        return <LogIn className="w-4 h-4 text-blue-400" />
+        return <LogIn className="w-4 h-4 text-lime-400" />
       case "deposit_approved":
-        return <TrendingUp className="w-4 h-4 text-emerald-400" />
+        return <TrendingUp className="w-4 h-4 text-lime-400" />
       case "withdrawal_approved":
         return <TrendingDown className="w-4 h-4 text-red-400" />
       case "kyc_approved":
-        return <Check className="w-4 h-4 text-emerald-400" />
+        return <Check className="w-4 h-4 text-lime-400" />
       case "balance_change":
         return <TrendingUp className="w-4 h-4 text-amber-400" />
       case "profile_update":
-        return <AlertCircle className="w-4 h-4 text-slate-400" />
+        return <AlertCircle className="w-4 h-4 text-neutral-400" />
       default:
-        return <Clock className="w-4 h-4 text-slate-400" />
+        return <Clock className="w-4 h-4 text-neutral-400" />
     }
   }
 
   const getActivityBgColor = (type: Activity["type"]) => {
     switch (type) {
       case "login":
-        return "bg-blue-500/10"
+        return "bg-lime-400/10"
       case "deposit_approved":
       case "kyc_approved":
-        return "bg-emerald-500/10"
+        return "bg-lime-400/10"
       case "withdrawal_approved":
         return "bg-red-500/10"
       case "balance_change":
         return "bg-amber-500/10"
       case "profile_update":
-        return "bg-slate-800/50"
+        return "bg-neutral-800/50"
       default:
-        return "bg-slate-800/50"
+        return "bg-neutral-800/50"
     }
   }
 
   const getActivityBdColor = (type: Activity["type"]) => {
     switch (type) {
       case "login":
-        return "border-blue-500/20"
+        return "border-lime-400/20"
       case "deposit_approved":
       case "kyc_approved":
-        return "border-emerald-500/20"
+        return "border-lime-400/20"
       case "withdrawal_approved":
         return "border-red-500/20"
       case "balance_change":
         return "border-amber-500/20"
       case "profile_update":
-        return "border-slate-700"
+        return "border-neutral-700"
       default:
-        return "border-slate-700"
+        return "border-neutral-700"
     }
   }
 
@@ -100,7 +100,7 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
     <div className="space-y-4 pb-6">
       <div>
         <h2 className="text-2xl font-bold text-white">Activity Panel</h2>
-        <p className="text-sm text-slate-400 mt-1">Your account activity and important events</p>
+        <p className="text-sm text-neutral-400 mt-1">Your account activity and important events</p>
       </div>
 
       {/* Filter Tabs */}
@@ -110,7 +110,7 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
           className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
             filter === "all"
               ? "bg-amber-500 text-white"
-              : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
           }`}
         >
           All
@@ -119,8 +119,8 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
           onClick={() => setFilter("login")}
           className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
             filter === "login"
-              ? "bg-blue-500 text-white"
-              : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+              ? "bg-lime-400 text-white"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
           }`}
         >
           Logins
@@ -129,8 +129,8 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
           onClick={() => setFilter("deposit_approved")}
           className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
             filter === "deposit_approved"
-              ? "bg-emerald-500 text-white"
-              : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+              ? "bg-lime-400 text-white"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
           }`}
         >
           Deposits
@@ -140,7 +140,7 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
           className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
             filter === "balance_change"
               ? "bg-amber-500 text-white"
-              : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
           }`}
         >
           Balance
@@ -149,10 +149,10 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
 
       {/* Activities List */}
       {filteredActivities.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
-          <Clock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-lg">No activities yet</p>
-          <p className="text-slate-500 text-sm mt-1">Your account events will appear here</p>
+        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-12 text-center">
+          <Clock className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+          <p className="text-neutral-400 text-lg">No activities yet</p>
+          <p className="text-neutral-500 text-sm mt-1">Your account events will appear here</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -170,31 +170,31 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
 
                   {/* Display value changes if applicable */}
                   {activity.amount && (
-                    <p className="text-sm font-semibold text-emerald-400 mt-1">
+                    <p className="text-sm font-semibold text-lime-400 mt-1">
                       ${activity.amount.toFixed(2)}
                     </p>
                   )}
 
                   {activity.previousValue !== undefined && activity.newValue !== undefined && (
-                    <div className="text-xs text-slate-400 mt-1 space-y-1">
+                    <div className="text-xs text-neutral-400 mt-1 space-y-1">
                       <p>
-                        Previous: <span className="text-slate-300 font-medium">{String(activity.previousValue)}</span>
+                        Previous: <span className="text-neutral-300 font-medium">{String(activity.previousValue)}</span>
                       </p>
                       <p>
                         Current:{" "}
-                        <span className="text-emerald-400 font-medium">{String(activity.newValue)}</span>
+                        <span className="text-lime-400 font-medium">{String(activity.newValue)}</span>
                       </p>
                     </div>
                   )}
 
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs text-neutral-500 mt-2">
                     {activity.timestamp?.toDate?.()?.toLocaleString?.() ?? new Date().toLocaleString()}
                   </p>
                 </div>
 
                 {/* Activity Type Badge */}
                 <div className="flex-shrink-0">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize bg-slate-800 text-slate-300">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize bg-neutral-800 text-neutral-300">
                     {activity.type.replace(/_/g, " ")}
                   </span>
                 </div>
@@ -207,7 +207,7 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
       {/* Show more indicator */}
       {activities.length > maxItems && (
         <div className="text-center pt-4">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-neutral-400">
             Showing {filteredActivities.length} of {activities.length} activities
           </p>
         </div>

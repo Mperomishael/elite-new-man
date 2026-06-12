@@ -78,18 +78,18 @@ export function TermsView() {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-blue-400" />
+          <BookOpen className="w-6 h-6 text-lime-400" />
           <h1 className="text-3xl font-bold">Terms & Conditions</h1>
         </div>
-        <p className="text-slate-400">
+        <p className="text-neutral-400">
           Please read these terms carefully. Your access to and use of our platform constitutes your agreement to be
           bound by these terms.
         </p>
       </div>
 
       {/* Last Updated */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
-        <p className="text-xs text-slate-400">
+      <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-3">
+        <p className="text-xs text-neutral-400">
           <span className="font-semibold">Last Updated:</span> November 27, 2025
         </p>
       </div>
@@ -97,10 +97,10 @@ export function TermsView() {
       {/* Terms Accordion */}
       <div className="space-y-3">
         {termsData.map((section) => (
-          <div key={section.id} className="border border-slate-800 rounded-lg overflow-hidden">
+          <div key={section.id} className="border border-neutral-800 rounded-lg overflow-hidden">
             <button
               onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between p-4 bg-slate-900/50 hover:bg-slate-900 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-neutral-900/50 hover:bg-neutral-900 transition-colors"
             >
               <h3 className="font-semibold text-left">{section.title}</h3>
               <div
@@ -109,7 +109,7 @@ export function TermsView() {
                 }`}
               >
                 <svg
-                  className="w-5 h-5 text-slate-400"
+                  className="w-5 h-5 text-neutral-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -121,8 +121,8 @@ export function TermsView() {
             </button>
 
             {expandedSections.includes(section.id) && (
-              <div className="px-4 py-3 bg-slate-950 border-t border-slate-800">
-                <p className="text-sm text-slate-300 leading-relaxed">{section.content}</p>
+              <div className="px-4 py-3 bg-black border-t border-neutral-800">
+                <p className="text-sm text-neutral-300 leading-relaxed">{section.content}</p>
               </div>
             )}
           </div>
@@ -130,30 +130,30 @@ export function TermsView() {
       </div>
 
       {/* Acceptance Checkbox */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 space-y-3">
+      <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-4 space-y-3">
         <label className="flex items-start gap-3 cursor-pointer group">
           <input
             type="checkbox"
-            className="w-5 h-5 rounded bg-slate-800 border border-slate-600 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer mt-0.5 accent-emerald-500"
+            className="w-5 h-5 rounded bg-neutral-800 border border-neutral-600 checked:bg-lime-400 checked:border-lime-400 cursor-pointer mt-0.5 accent-lime-400"
           />
-          <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+          <span className="text-sm text-neutral-300 group-hover:text-white transition-colors">
             I have read and agree to the Terms & Conditions
           </span>
         </label>
       </div>
 
       {/* Support Contact */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 space-y-2">
-        <p className="text-sm font-semibold text-blue-300">Questions or Concerns?</p>
+      <div className="bg-lime-400/10 border border-lime-400/30 rounded-lg p-4 space-y-2">
+        <p className="text-sm font-semibold text-lime-400">Questions or Concerns?</p>
         <p className="text-xs text-blue-200 mb-2">If you have any questions about our Terms & Conditions, please contact us.</p>
-        <button className="inline-flex items-center gap-2 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">
+        <button className="inline-flex items-center gap-2 text-xs font-semibold text-lime-400 hover:text-lime-400 transition-colors">
           <ExternalLink className="w-3 h-3" />
           Contact Support
         </button>
       </div>
 
       {/* Footer Note */}
-      <div className="text-center text-xs text-slate-500 bg-slate-900/30 rounded-lg p-3">
+      <div className="text-center text-xs text-neutral-500 bg-neutral-900/30 rounded-lg p-3">
         <p>These Terms & Conditions are subject to change without notice. Continued use of the platform implies acceptance of any changes.</p>
       </div>
     </div>

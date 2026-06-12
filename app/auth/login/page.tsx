@@ -99,25 +99,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A2E3C] flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 py-8 overflow-y-auto">
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-white">UltimateStockTrade</h1>
+              <img
+                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+                alt="Elite Block Market"
+                className="w-10 h-10"
+              />
+              <h1 className="text-2xl font-bold text-white">Elite Block Market</h1>
             </div>
           </div>
 
-          <div className="bg-[#0A2E3C] border-2 border-teal-700/50 rounded-xl p-6 shadow-2xl">
+          <div className="bg-neutral-900 border-2 border-lime-400/30 rounded-xl p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-white text-center mb-6">Welcome Back</h2>
 
             {message && (
               <div
                 className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${
-                  message.type === "success" ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
+                  message.type === "success" ? "bg-lime-400/20 text-lime-400" : "bg-red-500/20 text-red-400"
                 }`}
               >
                 {message.type === "success" ? (
@@ -141,8 +143,8 @@ export default function LoginPage() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("email", e.target.value)}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
-                  className={`bg-white border-0 text-slate-900 h-11 rounded-lg transition-all duration-300 placeholder:text-slate-400 ${
-                    focusedField === "email" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
+                  className={`bg-neutral-800 border-0 text-white h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
+                    focusedField === "email" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/20" : ""
                   } ${errors.email ? "ring-2 ring-red-500" : ""}`}
                   placeholder="Email"
                   disabled={isLoading}
@@ -162,8 +164,8 @@ export default function LoginPage() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("password", e.target.value)}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
-                    className={`bg-white border-0 text-slate-900 h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-slate-400 ${
-                      focusedField === "password" ? "ring-2 ring-amber-500 shadow-lg shadow-amber-500/20" : ""
+                    className={`bg-neutral-800 border-0 text-white h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-neutral-400 ${
+                      focusedField === "password" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/20" : ""
                     } ${errors.password ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Password"
                     disabled={isLoading}
@@ -171,7 +173,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-300 transition-colors"
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -183,7 +185,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleForgotPassword}
                     disabled={isLoading}
-                    className="text-sm text-amber-400 hover:underline"
+                    className="text-sm text-lime-400 hover:underline"
                   >
                     Forgot password?
                   </button>
@@ -193,7 +195,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-lime-400 hover:bg-lime-500 text-black font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -210,7 +212,7 @@ export default function LoginPage() {
               <span className="text-white text-sm">Don't have an account? </span>
               <Link
                 href="/auth/signup"
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105 text-sm ml-2 inline-block"
+                className="bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105 text-sm ml-2 inline-block"
               >
                 Sign Up
               </Link>

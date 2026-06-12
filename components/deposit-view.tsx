@@ -188,9 +188,9 @@ export function DepositView({ userId, username }: DepositViewProps) {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-1">Deposit Funds</h2>
-        <p className="text-slate-400 text-sm">Add money to your trading account</p>
-        <div className="mt-3 p-3 bg-slate-900 rounded-lg text-xs text-slate-400">
+        <h2 className="text-2xl font-bold mb-1">Fund Wallet</h2>
+        <p className="text-neutral-400 text-sm">Add money to your trading account</p>
+        <div className="mt-3 p-3 bg-neutral-900 rounded-lg text-xs text-neutral-400 border border-neutral-800">
           <p>User ID: <span className="text-white font-mono">{userId}</span></p>
           <p>Username: <span className="text-white font-mono">{username}</span></p>
         </div>
@@ -205,20 +205,20 @@ export function DepositView({ userId, username }: DepositViewProps) {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setDepositMethod("crypto")}
-                    className={`p-4 rounded-xl border-2 transition ${depositMethod === "crypto" ? "border-emerald-500 bg-emerald-500/10" : "border-slate-800"}`}
+                    className={`p-4 rounded-xl border-2 transition ${depositMethod === "crypto" ? "border-lime-400 bg-lime-400/10" : "border-neutral-800"}`}
                   >
                     Crypto
                   </button>
                   <button
                     onClick={() => setDepositMethod("bank")}
-                    className={`p-4 rounded-xl border-2 transition ${depositMethod === "bank" ? "border-emerald-500 bg-emerald-500/10" : "border-slate-800"}`}
+                    className={`p-4 rounded-xl border-2 transition ${depositMethod === "bank" ? "border-lime-400 bg-lime-400/10" : "border-neutral-800"}`}
                   >
                     Bank
                   </button>
                 </div>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 space-y-4">
                 <label className="text-sm font-medium">Amount (USD)</label>
                 <input
                   type="number"
@@ -226,9 +226,9 @@ export function DepositView({ userId, username }: DepositViewProps) {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
                   min="50"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-lime-400 text-white"
                 />
-                <p className="text-xs text-slate-400">Minimum: $50</p>
+                <p className="text-xs text-neutral-400">Minimum: $50</p>
               </div>
 
               {depositMethod === "crypto" && (
@@ -239,7 +239,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
                       <button
                         key={crypto}
                         onClick={() => handleCryptoChange(crypto as any)}
-                        className={`p-3 rounded-xl border-2 text-sm ${selectedCrypto === crypto ? "border-emerald-500 bg-emerald-500/10" : "border-slate-800"}`}
+                        className={`p-3 rounded-xl border-2 text-sm ${selectedCrypto === crypto ? "border-lime-400 bg-lime-400/10" : "border-neutral-800"}`}
                       >
                         {crypto}
                       </button>
@@ -251,31 +251,31 @@ export function DepositView({ userId, username }: DepositViewProps) {
               <button
                 onClick={handleProceedToPayment}
                 disabled={!amount || Number.parseFloat(amount || "0") < 50 || isLoadingWallet}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl"
+                className="w-full bg-lime-400 hover:bg-lime-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-black font-bold py-4 rounded-xl"
               >
                 Proceed to Payment
               </button>
             </>
           ) : (
             <>
-              <button onClick={() => setStep("amount")} className="text-sm text-emerald-400">
+              <button onClick={() => setStep("amount")} className="text-sm text-lime-400">
                 ← Change amount
               </button>
 
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
-                <p className="text-sm text-slate-400">Amount</p>
-                <p className="text-3xl font-bold text-emerald-400">${amount}</p>
+              <div className="bg-lime-400/10 border border-lime-400/20 rounded-xl p-4">
+                <p className="text-sm text-neutral-400">Amount</p>
+                <p className="text-3xl font-bold text-lime-400">${amount}</p>
               </div>
 
               {depositMethod === "crypto" && walletAddress && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 space-y-4">
                   <div>
-                    <label className="text-sm text-slate-400 block mb-2">Wallet Address</label>
-                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2">
+                    <label className="text-sm text-neutral-400 block mb-2">Wallet Address</label>
+                    <div className="bg-black border border-neutral-700 rounded-xl p-3 flex items-center justify-between gap-2">
                       <p className="text-xs font-mono break-all flex-1">{walletAddress}</p>
                       <button
                         onClick={() => copyToClipboard(walletAddress, "address")}
-                        className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded"
+                        className="p-2 bg-lime-400 hover:bg-lime-500 rounded"
                       >
                         {copiedAddress ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
@@ -284,10 +284,10 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
                   {tag && (
                     <div>
-                      <label className="text-sm text-slate-400 block mb-2">{selectedCrypto === "XRP" ? "Destination Tag" : "Tag/Memo"}</label>
-                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between">
+                      <label className="text-sm text-neutral-400 block mb-2">{selectedCrypto === "XRP" ? "Destination Tag" : "Tag/Memo"}</label>
+                      <div className="bg-black border border-neutral-700 rounded-xl p-3 flex items-center justify-between">
                         <p className="text-sm font-mono">{tag}</p>
-                        <button onClick={() => copyToClipboard(tag, "tag")} className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded">
+                        <button onClick={() => copyToClipboard(tag, "tag")} className="p-2 bg-lime-400 hover:bg-lime-500 rounded">
                           {copiedTag ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
@@ -297,32 +297,32 @@ export function DepositView({ userId, username }: DepositViewProps) {
               )}
 
               {depositMethod === "bank" && bankDetails && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-2">
-                    <p className="text-xs text-blue-300">Bank Transfer Details</p>
+                <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 space-y-4">
+                  <div className="bg-lime-400/10 border border-lime-400/20 rounded-lg p-3 mb-2">
+                    <p className="text-xs text-lime-400">Bank Transfer Details</p>
                   </div>
 
                   <div>
-                    <label className="text-sm text-slate-400 block mb-2">Bank Name</label>
-                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                    <label className="text-sm text-neutral-400 block mb-2">Bank Name</label>
+                    <div className="bg-black border border-neutral-700 rounded-xl p-3">
                       <p className="text-sm text-white">{bankDetails.bankName}</p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm text-slate-400 block mb-2">Account Holder Name</label>
-                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                    <label className="text-sm text-neutral-400 block mb-2">Account Holder Name</label>
+                    <div className="bg-black border border-neutral-700 rounded-xl p-3">
                       <p className="text-sm text-white">{bankDetails.accountHolderName}</p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm text-slate-400 block mb-2">Account Number</label>
-                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-2">
+                    <label className="text-sm text-neutral-400 block mb-2">Account Number</label>
+                    <div className="bg-black border border-neutral-700 rounded-xl p-3 flex items-center justify-between gap-2">
                       <p className="text-sm font-mono text-white break-all flex-1">{bankDetails.accountNumber}</p>
                       <button
                         onClick={() => copyToClipboard(bankDetails.accountNumber, "accountNumber")}
-                        className="p-2 bg-emerald-500 hover:bg-emerald-600 rounded flex-shrink-0"
+                        className="p-2 bg-lime-400 hover:bg-lime-500 rounded flex-shrink-0"
                       >
                         {copiedAccountNumber ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
@@ -331,8 +331,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
                   {bankDetails.routingNumber && (
                     <div>
-                      <label className="text-sm text-slate-400 block mb-2">Routing Number</label>
-                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <label className="text-sm text-neutral-400 block mb-2">Routing Number</label>
+                      <div className="bg-black border border-neutral-700 rounded-xl p-3">
                         <p className="text-sm font-mono text-white">{bankDetails.routingNumber}</p>
                       </div>
                     </div>
@@ -340,8 +340,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
                   {bankDetails.swiftCode && (
                     <div>
-                      <label className="text-sm text-slate-400 block mb-2">SWIFT/BIC Code</label>
-                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <label className="text-sm text-neutral-400 block mb-2">SWIFT/BIC Code</label>
+                      <div className="bg-black border border-neutral-700 rounded-xl p-3">
                         <p className="text-sm font-mono text-white">{bankDetails.swiftCode}</p>
                       </div>
                     </div>
@@ -349,25 +349,25 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
                   {bankDetails.iban && (
                     <div>
-                      <label className="text-sm text-slate-400 block mb-2">IBAN</label>
-                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                      <label className="text-sm text-neutral-400 block mb-2">IBAN</label>
+                      <div className="bg-black border border-neutral-700 rounded-xl p-3">
                         <p className="text-sm font-mono text-white">{bankDetails.iban}</p>
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <label className="text-sm text-slate-400 block mb-2">Country</label>
-                    <div className="bg-slate-950 border border-slate-700 rounded-xl p-3">
+                    <label className="text-sm text-neutral-400 block mb-2">Country</label>
+                    <div className="bg-black border border-neutral-700 rounded-xl p-3">
                       <p className="text-sm text-white">{bankDetails.country}</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 space-y-4">
                 <label className="text-sm font-medium">Upload Payment Proof</label>
-                <div className="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center hover:border-emerald-500 transition cursor-pointer">
+                <div className="border-2 border-dashed border-neutral-700 rounded-xl p-6 text-center hover:border-lime-400 transition cursor-pointer">
                   <input
                     type="file"
                     accept="image/*,application/pdf"
@@ -378,14 +378,14 @@ export function DepositView({ userId, username }: DepositViewProps) {
                   <label htmlFor="proof-upload" className="cursor-pointer">
                     {proofFile ? (
                       <>
-                        <Check className="w-8 h-8 mx-auto mb-2 text-emerald-400" />
-                        <p className="text-sm text-emerald-400">{proofFile.name}</p>
+                        <Check className="w-8 h-8 mx-auto mb-2 text-lime-400" />
+                        <p className="text-sm text-lime-400">{proofFile.name}</p>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-neutral-400" />
                         <p className="text-sm font-medium">Click to upload proof</p>
-                        <p className="text-xs text-slate-400">PNG, JPG, PDF</p>
+                        <p className="text-xs text-neutral-400">PNG, JPG, PDF</p>
                       </>
                     )}
                   </label>
@@ -393,11 +393,11 @@ export function DepositView({ userId, username }: DepositViewProps) {
 
                 {proofPreview && (
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-400">Preview</label>
+                    <label className="text-sm text-neutral-400">Preview</label>
                     {proofFile?.type.startsWith("image/") ? (
                       <img src={proofPreview} alt="Proof preview" className="max-h-48 rounded-lg mx-auto" />
                     ) : (
-                      <div className="bg-slate-950 p-4 rounded-lg text-center text-slate-400 text-sm">
+                      <div className="bg-black p-4 rounded-lg text-center text-neutral-400 text-sm">
                         PDF File Selected
                       </div>
                     )}
@@ -417,7 +417,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 text-white font-bold py-4 rounded-xl"
+                className="w-full bg-lime-400 hover:bg-lime-500 disabled:bg-neutral-800 text-white font-bold py-4 rounded-xl"
               >
                 {isLoading ? "Submitting..." : "Submit Deposit Request"}
               </button>
@@ -426,23 +426,23 @@ export function DepositView({ userId, username }: DepositViewProps) {
         </>
       ) : (
         <div className="space-y-6 text-center">
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 space-y-4">
-            <Check className="w-16 h-16 mx-auto text-emerald-400" />
+          <div className="bg-lime-400/10 border border-lime-400/20 rounded-2xl p-8 space-y-4">
+            <Check className="w-16 h-16 mx-auto text-lime-400" />
             <div>
               <h3 className="text-2xl font-bold text-white mb-2">Deposit Submitted</h3>
-              <p className="text-slate-400">Your deposit request has been submitted for approval</p>
+              <p className="text-neutral-400">Your deposit request has been submitted for approval</p>
             </div>
 
             {transactionId && (
               <div className="space-y-3">
-                <div className="bg-slate-900 rounded-xl p-4">
-                  <p className="text-xs text-slate-400 mb-1">Transaction ID</p>
+                <div className="bg-neutral-900 rounded-xl p-4">
+                  <p className="text-xs text-neutral-400 mb-1">Transaction ID</p>
                   <p className="text-sm font-mono text-white break-all">{transactionId}</p>
                 </div>
 
                 {qrCode && (
-                  <div className="bg-slate-900 rounded-xl p-4 space-y-3">
-                    <p className="text-xs text-slate-400">Scan to Track</p>
+                  <div className="bg-neutral-900 rounded-xl p-4 space-y-3">
+                    <p className="text-xs text-neutral-400">Scan to Track</p>
                     <img src={qrCode} alt="QR Code" className="w-48 h-48 mx-auto bg-white p-2 rounded" />
                     <button
                       onClick={() => {
@@ -451,7 +451,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
                         link.download = `deposit-qr-${transactionId}.png`
                         link.click()
                       }}
-                      className="text-emerald-400 hover:text-emerald-300 text-xs flex items-center gap-1 justify-center mx-auto"
+                      className="text-lime-400 hover:text-lime-300 text-xs flex items-center gap-1 justify-center mx-auto"
                     >
                       <Download className="w-3 h-3" /> Download QR
                     </button>
@@ -471,7 +471,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
               setTransactionId(null)
               setIsSubmitted(false)
             }}
-            className="text-emerald-400 hover:text-emerald-300"
+            className="text-lime-400 hover:text-lime-300"
           >
             Make Another Deposit
           </button>

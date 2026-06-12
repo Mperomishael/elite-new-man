@@ -93,7 +93,7 @@ export function ReferralsView() {
         <Users className="w-8 h-8 text-lime-400" />
         <div>
           <h2 className="text-2xl font-bold">Referral Program</h2>
-          <p className="text-sm text-slate-400">Invite friends and earn rewards</p>
+          <p className="text-sm text-neutral-400">Invite friends and earn rewards</p>
         </div>
       </div>
 
@@ -108,28 +108,28 @@ export function ReferralsView() {
       </div>
 
       {/* Referral Code */}
-      <div className="bg-slate-700/50 rounded-2xl p-6 space-y-4">
+      <div className="bg-neutral-700/50 rounded-2xl p-6 space-y-4">
         <h3 className="font-semibold text-lg">Your Referral Code</h3>
-        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-600">
-          <p className="text-xs text-slate-400 mb-2">Referral Code</p>
+        <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-600">
+          <p className="text-xs text-neutral-400 mb-2">Referral Code</p>
           <div className="flex items-center justify-between">
             <p className="text-2xl font-bold text-lime-400">{referralCode}</p>
             <button
               onClick={handleCopyCode}
-              className="bg-lime-400 text-slate-900 p-3 rounded-lg active:scale-95 transition-transform hover:bg-lime-300"
+              className="bg-lime-400 text-neutral-900 p-3 rounded-lg active:scale-95 transition-transform hover:bg-lime-300"
             >
               <Copy className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-600">
-          <p className="text-xs text-slate-400 mb-2">Referral Link</p>
+        <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-600">
+          <p className="text-xs text-neutral-400 mb-2">Referral Link</p>
           <div className="flex items-center gap-2">
             <p className="text-sm text-white flex-1 truncate">{referralLink}</p>
             <button
               onClick={handleCopyLink}
-              className="bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg transition-colors"
+              className="bg-neutral-700 hover:bg-neutral-600 text-white p-2 rounded-lg transition-colors"
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -138,7 +138,7 @@ export function ReferralsView() {
 
         <button
           onClick={handleShareLink}
-          className="w-full bg-lime-400 text-slate-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-lime-300"
+          className="w-full bg-lime-400 text-neutral-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-lime-300"
         >
           <Share2 className="w-5 h-5" />
           Share Referral Link
@@ -148,7 +148,7 @@ export function ReferralsView() {
       </div>
 
       {/* Referral List */}
-      <div className="bg-slate-700/50 rounded-2xl p-6 space-y-4">
+      <div className="bg-neutral-700/50 rounded-2xl p-6 space-y-4">
         <h3 className="font-semibold text-lg">Your Referrals</h3>
         {referrals.length > 0 ? (
           <div className="space-y-3">
@@ -163,7 +163,7 @@ export function ReferralsView() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-neutral-400">
             <p>No referrals yet. Share your referral link to get started!</p>
           </div>
         )}
@@ -184,7 +184,7 @@ function ReferralItem({
   status: string
 }) {
   return (
-    <div className="bg-slate-800/50 rounded-xl p-4 flex items-center justify-between">
+    <div className="bg-neutral-800/50 rounded-xl p-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-sm">
@@ -197,12 +197,12 @@ function ReferralItem({
         </div>
         <div>
           <p className="font-medium text-sm">{name}</p>
-          <p className="text-xs text-slate-400">{date}</p>
+          <p className="text-xs text-neutral-400">{date}</p>
         </div>
       </div>
       <div className="text-right">
         <p className="font-bold text-lime-400">{earnings}</p>
-        <p className="text-xs text-slate-400 capitalize">{status}</p>
+        <p className="text-xs text-neutral-400 capitalize">{status}</p>
       </div>
     </div>
   )

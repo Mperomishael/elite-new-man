@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-500 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-7 h-7 text-white" />
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
@@ -146,7 +146,7 @@ export default function AdminLoginPage() {
               )}
             </Button>
             <div className="mt-6 text-center">
-              <a href="/" className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
+              <a href="/" className="text-sm text-lime-400 hover:text-amber-300 transition-colors">
                 Back to Login
               </a>
             </div>

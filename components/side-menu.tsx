@@ -68,25 +68,25 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
 
       {/* Menu */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-[#0D3A4D] z-50 transform transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-black border-r border-neutral-800 z-50 transform transition-transform duration-300 ease-out ${
+          isOpen ? "tranneutral-x-0" : "-tranneutral-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-700">
+          <div className="flex items-center justify-between p-4 border-b border-neutral-800">
             <div className="flex items-center gap-3">
               <img
-                src="/images/design-mode/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png"
-                alt="UltimateStckTrader Logo"
+                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+                alt="Elite Block Market Logo"
                 className="w-10 h-10 object-contain"
               />
               <div>
-                <h2 className="font-bold text-sm text-white">UltimateStckTrader</h2>
-                <p className="text-xs text-slate-300">Professional Trading</p>
+                <h2 className="font-bold text-sm text-white">Elite Block Market</h2>
+                <p className="text-xs text-lime-400">Secure Trading</p>
               </div>
             </div>
-            <button onClick={onClose} className="text-slate-300 hover:text-white transition-colors p-2">
+            <button onClick={onClose} className="text-neutral-400 hover:text-white transition-colors p-2">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -103,7 +103,7 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
                   className={`w-full flex items-center gap-3 px-6 py-3 transition-colors ${
                     isActive
                       ? "bg-lime-400/10 text-lime-400 border-r-2 border-lime-400"
-                      : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                      : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -114,19 +114,19 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-slate-700 p-4 space-y-2">
+          <div className="border-t border-neutral-800 p-4 space-y-2">
             <button
               onClick={() => onNavigate("settings")}
               className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                 activeView === "settings"
                   ? "bg-lime-400/10 text-lime-400"
-                  : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                  : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
               }`}
             >
               <Settings className="w-5 h-5" />
               <span>Settings</span>
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-2 text-slate-300 hover:bg-slate-700/50 hover:text-white rounded-lg transition-colors">
+            <button className="w-full flex items-center gap-3 px-4 py-2 text-neutral-400 hover:bg-neutral-900 hover:text-white rounded-lg transition-colors">
               <HelpCircle className="w-5 h-5" />
               <span>Help & Support</span>
             </button>

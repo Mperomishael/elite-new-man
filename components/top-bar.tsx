@@ -28,39 +28,39 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
   }, [userId])
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950 border-b border-slate-900 backdrop-blur-sm px-4 py-3 md:py-4">
+    <header className="sticky top-0 z-40 bg-black border-b border-neutral-800 backdrop-blur-sm px-4 py-3 md:py-4">
       <div className="flex items-center justify-between max-w-2xl mx-auto">
         <button
           onClick={onMenuClick}
-          className="text-white hover:text-cyan-400 transition-colors p-2 -ml-2 active:scale-95"
+          className="text-white hover:text-lime-400 transition-colors p-2 -ml-2 active:scale-95"
           aria-label="Open menu"
         >
           <Menu className="w-5 h-5 md:w-6 md:h-6" />
         </button>
-        <h1 className="text-base md:text-lg font-bold tracking-wide">DASHBOARD</h1>
+        <h1 className="text-base md:text-lg font-bold tracking-wide text-lime-400">DASHBOARD</h1>
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative text-white hover:text-cyan-400 transition-colors p-2 -mr-2 active:scale-95"
+            className="relative text-white hover:text-lime-400 transition-colors p-2 -mr-2 active:scale-95"
           >
             <Bell className="w-5 h-5 md:w-6 md:h-6" />
             {messageCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 flex items-center justify-center bg-amber-500 text-white text-xs font-bold w-5 h-5 rounded-full">
+              <span className="absolute top-0.5 right-0.5 flex items-center justify-center bg-lime-400 text-black text-xs font-bold w-5 h-5 rounded-full">
                 {messageCount > 99 ? "99+" : messageCount}
               </span>
             )}
             {messageCount === 0 && (
-              <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-cyan-400 ring-2 ring-slate-950"></span>
+              <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-lime-400 ring-2 ring-black"></span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50">
-              <div className="p-4 border-b border-slate-800">
+            <div className="absolute right-0 top-full mt-2 w-80 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50">
+              <div className="p-4 border-b border-neutral-800">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-sm">Notifications</h3>
                   {messageCount > 0 && (
-                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full font-semibold">
+                    <span className="text-xs bg-lime-400/20 text-lime-400 px-2 py-1 rounded-full font-semibold">
                       {messageCount} new
                     </span>
                   )}
@@ -68,30 +68,30 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
               </div>
               <div className="max-h-96 overflow-y-auto">
                 {/* Welcome Message */}
-                <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xl">👋</span>
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-sm mb-1">Welcome, {userName}!</p>
-                      <p className="text-xs text-slate-400">
-                        Welcome to UltimateStckTrader. Start trading crypto and forex today!
+                      <p className="text-xs text-neutral-400">
+                        Welcome to Elite Block Market. Start trading crypto and forex today!
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">Just now</p>
+                      <p className="text-xs text-neutral-500 mt-1">Just now</p>
                     </div>
                   </div>
                 </div>
 
                 {userProfile?.kycStatus !== "approved" && (
-                  <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                  <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="text-xl">🔐</span>
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-sm mb-1">Complete KYC Verification</p>
-                        <p className="text-xs text-slate-400 mb-2">
+                        <p className="text-xs text-neutral-400 mb-2">
                           Verify your identity to unlock higher trading limits and withdrawal amounts.
                         </p>
                         <button
@@ -99,36 +99,36 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
                             setShowNotifications(false)
                             onNavigateToKyc()
                           }}
-                          className="text-xs bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg transition-colors"
+                          className="text-xs bg-lime-400 hover:bg-lime-500 text-black px-3 py-1.5 rounded-lg transition-colors font-semibold"
                         >
                           Verify Now
                         </button>
-                        <p className="text-xs text-slate-500 mt-2">2 hours ago</p>
+                        <p className="text-xs text-neutral-500 mt-2">2 hours ago</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Trading Activity */}
-                <div className="p-4 border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xl">📈</span>
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-sm mb-1">Market Update</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-neutral-400">
                         Bitcoin is up 5.2% today. Great time to review your portfolio!
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">5 hours ago</p>
+                      <p className="text-xs text-neutral-500 mt-1">5 hours ago</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="p-3 border-t border-slate-800 text-center">
+              <div className="p-3 border-t border-neutral-800 text-center">
                 <button
                   onClick={() => setShowNotifications(false)}
-                  className="text-xs text-cyan-400 hover:text-cyan-300 font-medium"
+                  className="text-xs text-lime-400 hover:text-lime-300 font-medium"
                 >
                   Close
                 </button>

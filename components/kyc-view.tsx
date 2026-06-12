@@ -57,38 +57,38 @@ export function KycView() {
     <div className="max-w-3xl mx-auto space-y-6 pb-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isVerified ? "bg-emerald-500/20" : "bg-amber-500/20"}`}>
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isVerified ? "bg-lime-400/20" : "bg-amber-500/20"}`}>
           {isVerified ? (
-            <Unlock className="w-6 h-6 text-emerald-400" />
+            <Unlock className="w-6 h-6 text-lime-400" />
           ) : (
             <Lock className="w-6 h-6 text-amber-400" />
           )}
         </div>
         <div>
           <h2 className="text-2xl font-bold text-white">Account Upgrade</h2>
-          <p className="text-sm text-slate-400">Unlock higher balance limits by completing verification</p>
+          <p className="text-sm text-neutral-400">Unlock higher balance limits by completing verification</p>
         </div>
       </div>
 
       {/* Status Overview */}
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
-          <p className="text-xs text-slate-400 mb-1">Current Balance</p>
-          <p className="text-2xl font-bold text-emerald-400">${(userProfile?.balance || 0).toLocaleString()}</p>
+        <div className="bg-neutral-900/50 rounded-xl p-4 border border-neutral-800">
+          <p className="text-xs text-neutral-400 mb-1">Current Balance</p>
+          <p className="text-2xl font-bold text-lime-400">${(userProfile?.balance || 0).toLocaleString()}</p>
         </div>
-        <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
-          <p className="text-xs text-slate-400 mb-1">Balance Limit</p>
-          <p className={`text-2xl font-bold ${isVerified ? "text-emerald-400" : "text-red-400"}`}>
+        <div className="bg-neutral-900/50 rounded-xl p-4 border border-neutral-800">
+          <p className="text-xs text-neutral-400 mb-1">Balance Limit</p>
+          <p className={`text-2xl font-bold ${isVerified ? "text-lime-400" : "text-red-400"}`}>
             ${isVerified ? balanceLimit.toLocaleString() : "500,000"}
           </p>
         </div>
-        <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-800">
-          <p className="text-xs text-slate-400 mb-1">Status</p>
+        <div className="bg-neutral-900/50 rounded-xl p-4 border border-neutral-800">
+          <p className="text-xs text-neutral-400 mb-1">Status</p>
           <div className="flex items-center gap-2 mt-2">
             {isVerified ? (
               <>
-                <Check className="w-5 h-5 text-emerald-400" />
-                <span className="text-lg font-bold text-emerald-400">Approved</span>
+                <Check className="w-5 h-5 text-lime-400" />
+                <span className="text-lg font-bold text-lime-400">Approved</span>
               </>
             ) : isPending ? (
               <>
@@ -102,13 +102,13 @@ export function KycView() {
               </>
             ) : isNotStarted ? (
               <>
-                <Lock className="w-5 h-5 text-slate-400" />
-                <span className="text-lg font-bold text-slate-400">Not Started</span>
+                <Lock className="w-5 h-5 text-neutral-400" />
+                <span className="text-lg font-bold text-neutral-400">Not Started</span>
               </>
             ) : (
               <>
-                <Lock className="w-5 h-5 text-slate-400" />
-                <span className="text-lg font-bold text-slate-400">Not Started</span>
+                <Lock className="w-5 h-5 text-neutral-400" />
+                <span className="text-lg font-bold text-neutral-400">Not Started</span>
               </>
             )}
           </div>
@@ -123,24 +123,24 @@ export function KycView() {
         </h3>
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
-            <Check className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <Check className="w-5 h-5 text-lime-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-white font-medium">Increase Balance Limit</p>
-              <p className="text-sm text-slate-300">Up to $1,000,000 from current $500,000</p>
+              <p className="text-sm text-neutral-300">Up to $1,000,000 from current $500,000</p>
             </div>
           </li>
           <li className="flex items-start gap-3">
-            <Check className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <Check className="w-5 h-5 text-lime-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-white font-medium">Higher Trading Limits</p>
-              <p className="text-sm text-slate-300">Increase your daily transaction limits</p>
+              <p className="text-sm text-neutral-300">Increase your daily transaction limits</p>
             </div>
           </li>
           <li className="flex items-start gap-3">
-            <Check className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <Check className="w-5 h-5 text-lime-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-white font-medium">Priority Support</p>
-              <p className="text-sm text-slate-300">Get faster responses to your inquiries</p>
+              <p className="text-sm text-neutral-300">Get faster responses to your inquiries</p>
             </div>
           </li>
         </ul>
@@ -148,12 +148,12 @@ export function KycView() {
 
       {/* Status Message */}
       {isVerified && (
-        <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
+        <div className="bg-lime-400/10 rounded-xl p-4 border border-lime-400/20">
           <div className="flex gap-3">
-            <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <Check className="w-5 h-5 text-lime-400 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-white font-semibold mb-1">Account Verified!</p>
-              <p className="text-sm text-slate-300">You can now access higher balance limits and premium features.</p>
+              <p className="text-sm text-neutral-300">You can now access higher balance limits and premium features.</p>
             </div>
           </div>
         </div>
@@ -165,7 +165,7 @@ export function KycView() {
             <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-white font-semibold mb-1">Verification Rejected</p>
-              <p className="text-sm text-slate-300">Please review the requirements and resubmit your documents.</p>
+              <p className="text-sm text-neutral-300">Please review the requirements and resubmit your documents.</p>
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@ export function KycView() {
             <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-white font-semibold mb-1">Under Review</p>
-              <p className="text-sm text-slate-300">Your documents are being reviewed by our team. This typically takes 24-48 hours.</p>
+              <p className="text-sm text-neutral-300">Your documents are being reviewed by our team. This typically takes 24-48 hours.</p>
             </div>
           </div>
         </div>
@@ -216,12 +216,12 @@ export function KycView() {
               Upload Documents Now
             </button>
           ) : (
-            <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+            <div className="bg-neutral-900/50 rounded-xl p-6 border border-neutral-800">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold text-white">Submit Your Documents</h3>
                 <button
                   onClick={() => setShowUpload(false)}
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-neutral-400 hover:text-white transition-colors"
                 >
                   ✕
                 </button>
@@ -234,10 +234,10 @@ export function KycView() {
 
       {/* Already Verified Info */}
       {isVerified && (
-        <div className="bg-emerald-500/5 rounded-xl p-6 border border-emerald-500/20 text-center">
-          <Unlock className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+        <div className="bg-lime-400/5 rounded-xl p-6 border border-lime-400/20 text-center">
+          <Unlock className="w-12 h-12 text-lime-400 mx-auto mb-3" />
           <p className="text-white font-semibold mb-2">Your account is fully upgraded</p>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-neutral-300">
             You now have access to all features and maximum balance limits. Enjoy trading with confidence!
           </p>
         </div>
@@ -248,9 +248,9 @@ export function KycView() {
 
 function DocumentRequirement({ title, description }: { title: string; description: string }) {
   return (
-    <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-800">
+    <div className="bg-neutral-900/50 rounded-lg p-4 border border-neutral-800">
       <p className="font-medium text-white mb-1">{title}</p>
-      <p className="text-sm text-slate-400">{description}</p>
+      <p className="text-sm text-neutral-400">{description}</p>
     </div>
   )
 }

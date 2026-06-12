@@ -123,12 +123,12 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
       {/* Upload Area */}
       <div>
         <label className="block">
-          <div className="border-2 border-dashed border-slate-700 rounded-lg p-8 text-center hover:border-amber-500 transition-colors cursor-pointer bg-slate-800/50">
+          <div className="border-2 border-dashed border-neutral-700 rounded-lg p-8 text-center hover:border-amber-500 transition-colors cursor-pointer bg-neutral-800/50">
             <div className="flex flex-col items-center gap-2">
-              <Upload className="w-8 h-8 text-slate-400" />
+              <Upload className="w-8 h-8 text-neutral-400" />
               <div>
                 <p className="text-white font-medium">Click to upload or drag and drop</p>
-                <p className="text-xs text-slate-400 mt-1">PNG, JPG, PDF up to 5MB per file</p>
+                <p className="text-xs text-neutral-400 mt-1">PNG, JPG, PDF up to 5MB per file</p>
               </div>
             </div>
             <input type="file" multiple accept=".png,.jpg,.jpeg,.pdf" onChange={handleFileSelect} className="hidden" />
@@ -139,20 +139,20 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
       {/* Selected Files */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm text-slate-400 font-medium">Selected files ({files.length})</p>
+          <p className="text-sm text-neutral-400 font-medium">Selected files ({files.length})</p>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-slate-800 p-3 rounded-lg border border-slate-700"
+                className="flex items-center justify-between bg-neutral-800 p-3 rounded-lg border border-neutral-700"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-white truncate font-medium">{file.name}</p>
-                  <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(2)} KB</p>
+                  <p className="text-xs text-neutral-400">{(file.size / 1024).toFixed(2)} KB</p>
                 </div>
                 <button
                   onClick={() => handleRemoveFile(index)}
-                  className="text-slate-400 hover:text-red-400 transition-colors ml-2"
+                  className="text-neutral-400 hover:text-red-400 transition-colors ml-2"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -167,7 +167,7 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
         <button
           onClick={handleUpload}
           disabled={uploading}
-          className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-neutral-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           {uploading ? (
             <>
@@ -188,10 +188,10 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
         <div
           className={`p-3 rounded-lg text-sm flex items-center gap-2 ${
             messageType === "success"
-              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+              ? "bg-lime-400/10 text-lime-400 border border-lime-400/20"
               : messageType === "error"
                 ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                : "bg-lime-400/10 text-lime-400 border border-lime-400/20"
           }`}
         >
           {messageType === "success" && <Check className="w-4 h-4 flex-shrink-0" />}
@@ -203,17 +203,17 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
 
       {/* Submitted Documents Status */}
       {submittedDocs.length > 0 && (
-        <div className="space-y-3 pt-4 border-t border-slate-800">
-          <h4 className="text-sm font-medium text-slate-400">Submission History</h4>
+        <div className="space-y-3 pt-4 border-t border-neutral-800">
+          <h4 className="text-sm font-medium text-neutral-400">Submission History</h4>
           {submittedDocs.map((doc, index) => (
-            <div key={doc.id || index} className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
+            <div key={doc.id || index} className="bg-neutral-800/50 rounded-lg p-3 border border-neutral-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-1">
                   {doc.status === "approved" && (
                     <>
-                      <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-lime-400 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-400">Submitted {new Date(doc.uploadedAt).toLocaleString()}</p>
+                        <p className="text-xs text-neutral-400">Submitted {new Date(doc.uploadedAt).toLocaleString()}</p>
                       </div>
                     </>
                   )}
@@ -221,7 +221,7 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
                     <>
                       <Clock className="w-4 h-4 text-yellow-400 flex-shrink-0 animate-pulse" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-400">Under review since {new Date(doc.uploadedAt).toLocaleString()}</p>
+                        <p className="text-xs text-neutral-400">Under review since {new Date(doc.uploadedAt).toLocaleString()}</p>
                       </div>
                     </>
                   )}
@@ -229,7 +229,7 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
                     <>
                       <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-400">Rejected on {new Date(doc.uploadedAt).toLocaleString()}</p>
+                        <p className="text-xs text-neutral-400">Rejected on {new Date(doc.uploadedAt).toLocaleString()}</p>
                       </div>
                     </>
                   )}
@@ -237,7 +237,7 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
                 <span
                   className={`px-2 py-1 rounded text-xs font-semibold flex-shrink-0 ${
                     doc.status === "approved"
-                      ? "bg-emerald-500/20 text-emerald-400"
+                      ? "bg-lime-400/20 text-lime-400"
                       : doc.status === "pending"
                         ? "bg-yellow-500/20 text-yellow-400"
                         : "bg-red-500/20 text-red-400"
@@ -252,12 +252,12 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
       )}
 
       {/* Info Box */}
-      <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 space-y-2">
-        <p className="text-xs font-medium text-slate-300 flex items-center gap-2">
+      <div className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700 space-y-2">
+        <p className="text-xs font-medium text-neutral-300 flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
           Important Information
         </p>
-        <ul className="text-xs text-slate-400 space-y-1">
+        <ul className="text-xs text-neutral-400 space-y-1">
           <li>• All documents must be clear and readable</li>
           <li>• Files must be PNG, JPG, or PDF format</li>
           <li>• Maximum file size: 5MB per document</li>

@@ -123,7 +123,7 @@ export function BuyingView() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-1">Buy Assets</h2>
-        <p className="text-slate-400 text-sm">Purchase cryptocurrencies and forex</p>
+        <p className="text-neutral-400 text-sm">Purchase cryptocurrencies and forex</p>
       </div>
 
       {/* Asset Type Toggle */}
@@ -134,7 +134,7 @@ export function BuyingView() {
             setSelectedAsset(null)
           }}
           className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-            assetType === "crypto" ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-400"
+            assetType === "crypto" ? "bg-lime-400 text-white" : "bg-neutral-800 text-neutral-400"
           }`}
         >
           Crypto
@@ -145,7 +145,7 @@ export function BuyingView() {
             setSelectedAsset(null)
           }}
           className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-            assetType === "forex" ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-400"
+            assetType === "forex" ? "bg-lime-400 text-white" : "bg-neutral-800 text-neutral-400"
           }`}
         >
           Forex
@@ -155,7 +155,7 @@ export function BuyingView() {
       {!selectedAsset && (
         <div className="space-y-3">
           <h3 className="text-lg font-bold">Live {assetType === "crypto" ? "Crypto" : "Forex"} Markets Worldwide</h3>
-          <div className="bg-slate-900/50 rounded-2xl overflow-hidden border border-slate-800">
+          <div className="bg-neutral-900/50 rounded-2xl overflow-hidden border border-neutral-800">
             <div id="tradingview-screener" className="tradingview-widget-container">
               <div className="tradingview-widget-container__widget"></div>
             </div>
@@ -165,13 +165,13 @@ export function BuyingView() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -tranneutral-y-1/2 w-4 h-4 text-neutral-400" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search assets..."
-          className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
         />
       </div>
 
@@ -182,24 +182,24 @@ export function BuyingView() {
             <button
               key={asset.symbol}
               onClick={() => setSelectedAsset(asset.symbol)}
-              className="w-full bg-slate-900 border border-slate-800 hover:border-emerald-500 rounded-xl p-4 transition-all text-left"
+              className="w-full bg-neutral-900 border border-neutral-800 hover:border-lime-400 rounded-xl p-4 transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  <div className="w-10 h-10 bg-lime-400/10 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-lime-400" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-semibold">{asset.symbol}</p>
                       {asset.favorite && <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />}
                     </div>
-                    <p className="text-xs text-slate-400">{asset.name}</p>
+                    <p className="text-xs text-neutral-400">{asset.name}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">${asset.price.toLocaleString()}</p>
-                  <p className={`text-xs ${asset.change >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <p className={`text-xs ${asset.change >= 0 ? "text-lime-400" : "text-red-400"}`}>
                     {asset.change >= 0 ? "+" : ""}
                     {asset.change}%
                   </p>
@@ -211,21 +211,21 @@ export function BuyingView() {
       ) : (
         /* Buy Form with TradingView Chart */
         <div className="space-y-4">
-          <button onClick={() => setSelectedAsset(null)} className="text-sm text-emerald-400 hover:text-emerald-300">
+          <button onClick={() => setSelectedAsset(null)} className="text-sm text-lime-400 hover:text-lime-300">
             ← Back to assets
           </button>
 
           {/* TradingView Chart */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
             <div id="tradingview_chart" style={{ height: "500px" }} />
           </div>
 
           {/* Selected Asset Info */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-bold text-lg">{selectedAsset}</p>
-                <p className="text-sm text-slate-400">{assets.find((a) => a.symbol === selectedAsset)?.name}</p>
+                <p className="text-sm text-neutral-400">{assets.find((a) => a.symbol === selectedAsset)?.name}</p>
               </div>
               <div className="text-right">
                 <p className="font-bold text-xl">
@@ -240,7 +240,7 @@ export function BuyingView() {
             <button
               onClick={() => setOrderType("market")}
               className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-                orderType === "market" ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-400"
+                orderType === "market" ? "bg-lime-400 text-white" : "bg-neutral-800 text-neutral-400"
               }`}
             >
               Market Order
@@ -248,7 +248,7 @@ export function BuyingView() {
             <button
               onClick={() => setOrderType("limit")}
               className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-                orderType === "limit" ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-400"
+                orderType === "limit" ? "bg-lime-400 text-white" : "bg-neutral-800 text-neutral-400"
               }`}
             >
               Limit Order
@@ -256,20 +256,20 @@ export function BuyingView() {
           </div>
 
           {/* Amount Input */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <label className="text-sm text-slate-400 mb-2 block">Amount (USD)</label>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+            <label className="text-sm text-neutral-400 mb-2 block">Amount (USD)</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl font-bold text-slate-400">$</span>
+              <span className="absolute left-3 top-1/2 -tranneutral-y-1/2 text-xl font-bold text-neutral-400">$</span>
               <input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-4 py-3 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full bg-black border border-neutral-700 rounded-lg pl-9 pr-4 py-3 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-lime-400"
               />
             </div>
             {amount && (
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-neutral-400 mt-2">
                 ≈{" "}
                 {(Number.parseFloat(amount) / (assets.find((a) => a.symbol === selectedAsset)?.price || 1)).toFixed(6)}{" "}
                 {selectedAsset?.split("/")[0]}
@@ -280,7 +280,7 @@ export function BuyingView() {
           {/* Buy Button */}
           <button
             disabled={!amount || Number.parseFloat(amount) <= 0}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
+            className="w-full bg-lime-400 hover:bg-lime-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-bold py-4 rounded-xl transition-all duration-300 transform active:scale-95"
             onClick={async () => {
               if (!selectedAsset || !amount || Number.parseFloat(amount) <= 0) return
 

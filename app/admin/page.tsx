@@ -51,7 +51,7 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading Admin Panel...</p>
@@ -62,9 +62,9 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-red-500/20 rounded-lg p-8 max-w-md text-center">
-          <p className="text-slate-400 mb-6">{error}</p>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="bg-neutral-900 border border-red-500/20 rounded-lg p-8 max-w-md text-center">
+          <p className="text-neutral-400 mb-6">{error}</p>
         </div>
       </div>
     )

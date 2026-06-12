@@ -53,38 +53,38 @@ www.ultimatestcktrader.online
   }
 
   return (
-    <div className="bg-gradient-to-br from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-8 space-y-6">
+    <div className="bg-gradient-to-br from-lime-400/10 to-blue-500/10 border border-lime-400/20 rounded-2xl p-8 space-y-6">
       <div className="flex items-center justify-center">
-        <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center">
+        <div className="w-16 h-16 bg-lime-400 rounded-full flex items-center justify-center">
           <Check className="w-8 h-8 text-white" />
         </div>
       </div>
 
       <div className="text-center space-y-2">
-        <h3 className="text-2xl font-bold text-emerald-400">Deposit Approved!</h3>
-        <p className="text-slate-400">Your funds have been credited to your account</p>
+        <h3 className="text-2xl font-bold text-lime-400">Deposit Approved!</h3>
+        <p className="text-neutral-400">Your funds have been credited to your account</p>
       </div>
 
-      <div className="bg-slate-900/50 rounded-lg p-4 space-y-3 text-sm">
+      <div className="bg-neutral-900/50 rounded-lg p-4 space-y-3 text-sm">
         <div className="flex justify-between">
-          <span className="text-slate-400">Receipt ID:</span>
+          <span className="text-neutral-400">Receipt ID:</span>
           <span className="text-white font-mono">{depositId}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Amount:</span>
-          <span className="text-emerald-400 font-semibold">${amount.toLocaleString()}</span>
+          <span className="text-neutral-400">Amount:</span>
+          <span className="text-lime-400 font-semibold">${amount.toLocaleString()}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Cryptocurrency:</span>
+          <span className="text-neutral-400">Cryptocurrency:</span>
           <span className="text-white font-semibold">{crypto}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Approved At:</span>
+          <span className="text-neutral-400">Approved At:</span>
           <span className="text-white">{new Date(approvedAt).toLocaleString()}</span>
         </div>
         {transactionHash && (
           <div className="flex justify-between">
-            <span className="text-slate-400">Transaction:</span>
+            <span className="text-neutral-400">Transaction:</span>
             <span className="text-white font-mono text-xs truncate">{transactionHash}</span>
           </div>
         )}

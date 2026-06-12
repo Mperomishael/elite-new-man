@@ -110,13 +110,13 @@ export function SupportView({ userId, username }: SupportViewProps) {
         <Mail className="w-8 h-8 text-lime-400" />
         <div>
           <h2 className="text-2xl font-bold">Customer Support</h2>
-          <p className="text-sm text-slate-400">Chat with our support team in real-time</p>
+          <p className="text-sm text-neutral-400">Chat with our support team in real-time</p>
         </div>
       </div>
 
       {/* Chat Interface */}
       {userId ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 flex flex-col h-96">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 space-y-4 flex flex-col h-96">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto space-y-4">
             {loading ? (
@@ -124,7 +124,7 @@ export function SupportView({ userId, username }: SupportViewProps) {
                 <Loader className="w-6 h-6 text-amber-500 animate-spin" />
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-slate-400">
+              <div className="flex items-center justify-center h-full text-neutral-400">
                 <div className="text-center">
                   <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>No messages yet. Send a message to get started!</p>
@@ -139,8 +139,8 @@ export function SupportView({ userId, username }: SupportViewProps) {
                   <div
                     className={`max-w-xs px-4 py-2 rounded-lg ${
                       msg.isAdminReply
-                        ? "bg-slate-800 text-slate-100 border border-slate-700"
-                        : "bg-emerald-600 text-white"
+                        ? "bg-neutral-800 text-neutral-100 border border-neutral-700"
+                        : "bg-lime-500 text-white"
                     }`}
                   >
                     {msg.isAdminReply && (
@@ -158,13 +158,13 @@ export function SupportView({ userId, username }: SupportViewProps) {
           </div>
 
           {/* Input */}
-          <div className="space-y-3 border-t border-slate-800 pt-4">
+          <div className="space-y-3 border-t border-neutral-800 pt-4">
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Subject (optional)"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-400 text-sm"
             />
             <div className="flex gap-2">
               <input
@@ -173,12 +173,12 @@ export function SupportView({ userId, username }: SupportViewProps) {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder="Type your message..."
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-400"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={sending || !newMessage.trim()}
-                className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                className="bg-lime-400 hover:bg-lime-500 disabled:bg-neutral-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
               >
                 {sending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>
@@ -186,7 +186,7 @@ export function SupportView({ userId, username }: SupportViewProps) {
           </div>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-slate-400">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 text-center text-neutral-400">
           <p>Please log in to access chat support</p>
         </div>
       )}
@@ -195,7 +195,7 @@ export function SupportView({ userId, username }: SupportViewProps) {
       <div className="grid grid-cols-1 gap-3">
         <button
           onClick={handleWhatsAppClick}
-          className="bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-95"
+          className="bg-gradient-to-br from-green-600 to-lime-500 hover:from-green-700 hover:to-lime-700 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-95"
         >
           <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
             <MessageCircle className="w-6 h-6 text-white" />
@@ -216,12 +216,12 @@ export function SupportView({ userId, username }: SupportViewProps) {
           </div>
         </div>
 
-        <div className="bg-slate-700/50 rounded-2xl p-5 flex items-center gap-4">
+        <div className="bg-neutral-700/50 rounded-2xl p-5 flex items-center gap-4">
           <div className="w-12 h-12 bg-lime-400/20 rounded-lg flex items-center justify-center">
             <Clock className="w-6 h-6 text-lime-400" />
           </div>
           <div>
-            <p className="text-xs text-slate-400">Response Time</p>
+            <p className="text-xs text-neutral-400">Response Time</p>
             <p className="font-semibold text-white">Within 24 hours</p>
           </div>
         </div>

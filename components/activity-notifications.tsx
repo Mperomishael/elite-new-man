@@ -126,12 +126,12 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
   if (!isVisible) return null
 
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300 max-w-md w-full px-4">
+    <div className="fixed top-20 left-1/2 -tranneutral-x-1/2 z-50 animate-in slide-in-from-top duration-300 max-w-md w-full px-4">
       {notificationType === "news" ? (
         <div className="bg-gradient-to-r from-amber-900 to-orange-900 border border-amber-500/50 rounded-xl shadow-2xl p-4 pr-12">
           <button
             onClick={() => setIsVisible(false)}
-            className="absolute top-2 right-2 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-2 right-2 text-neutral-400 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -146,17 +146,17 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
                   <span className="text-xs bg-amber-600 text-white px-2 py-0.5 rounded-full">{currentNews.symbol}</span>
                 )}
               </div>
-              <p className="text-xs text-slate-200 mb-2">{currentNews.description}</p>
+              <p className="text-xs text-neutral-200 mb-2">{currentNews.description}</p>
               {currentNews.changePercent && (
                 <p
-                  className={`text-xs font-semibold mb-1 ${currentNews.changePercent > 0 ? "text-emerald-400" : "text-red-400"}`}
+                  className={`text-xs font-semibold mb-1 ${currentNews.changePercent > 0 ? "text-lime-400" : "text-red-400"}`}
                 >
                   {currentNews.changePercent > 0 ? "+" : ""}
                   {currentNews.changePercent}%
                 </p>
               )}
               <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-400">{currentNews.source}</p>
+                <p className="text-xs text-neutral-400">{currentNews.source}</p>
                 <span className="text-xs bg-amber-600/50 text-amber-200 px-2 py-0.5 rounded-full font-semibold">
                   Message #{messageCount}
                 </span>
@@ -165,23 +165,23 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
           </div>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4 pr-12">
+        <div className="bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl p-4 pr-12">
           <button
             onClick={() => setIsVisible(false)}
-            className="absolute top-2 right-2 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-2 right-2 text-neutral-400 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
           <p className="text-sm">
-            Someone from <span className="text-emerald-400 font-semibold">{currentActivity.country}</span>{" "}
-            {currentActivity.action} <span className="text-emerald-400 font-semibold">${currentActivity.amount}</span>
+            Someone from <span className="text-lime-400 font-semibold">{currentActivity.country}</span>{" "}
+            {currentActivity.action} <span className="text-lime-400 font-semibold">${currentActivity.amount}</span>
             {currentActivity.type === "profit" && " profit"}
           </p>
         </div>
       )}
 
       {notificationType !== "news" && (
-        <div className="mt-4 bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+        <div className="mt-4 bg-neutral-900 rounded-xl overflow-hidden border border-neutral-800">
           <div id="tradingview-news-ticker" className="tradingview-widget-container">
             <div className="tradingview-widget-container__widget"></div>
           </div>

@@ -138,9 +138,9 @@ export default function TradingDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-lime-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading...</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function TradingDashboard() {
   }
 
   return (
-    <div className="bg-slate-950 min-h-screen font-sans text-white pb-20">
+    <div className="bg-black min-h-screen font-sans text-white pb-20">
       <TopBar
         onMenuClick={() => setIsMenuOpen(true)}
         userName={userName}
