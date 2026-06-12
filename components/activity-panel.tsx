@@ -91,7 +91,7 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-3 lime-400 border-t-transparent rounded-full animate-pulse"></div>
       </div>
     )
   }

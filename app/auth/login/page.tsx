@@ -102,18 +102,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-black flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 py-8 overflow-y-auto">
         <div className="w-full max-w-md">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 mb-6">
-              <img
-                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
-                alt="Elite Block Market"
-                className="w-10 h-10"
-              />
-              <h1 className="text-2xl font-bold text-white">Elite Block Market</h1>
-            </div>
+          <div className="text-center mb-8 animate-logo-bounce-in">
+            <img
+              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+              alt="Elite Block Market"
+              className="w-20 h-20 mx-auto"
+            />
           </div>
 
-          <div className="bg-neutral-900 border-2 border-lime-400/30 rounded-xl p-6 shadow-2xl">
+          <div className="bg-neutral-900 border-2 border-lime-400/30 rounded-xl p-6 shadow-2xl animate-form-scale-in">
             <h2 className="text-xl font-semibold text-white text-center mb-6">Welcome Back</h2>
 
             {message && (
@@ -132,19 +129,21 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className={`transition-all duration-300 ${focusedField === "email" ? "scale-[1.01]" : ""}`}>
-                <Label htmlFor="email" className="text-white text-sm mb-1.5 block font-medium">
+              <div className={`transition-all duration-300 ${focusedField === "email" ? "scale-[1.02]" : ""}`}>
+                <Label htmlFor="email" className={`text-white text-sm mb-1.5 block font-medium transition-all duration-300 ${focusedField === "email" ? "text-lime-400" : ""}`}>
                   Email
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("email", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleInputChange("email", e.target.value)
+                  }}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                   className={`bg-neutral-800 border-0 text-white h-11 rounded-lg transition-all duration-300 placeholder:text-neutral-400 ${
-                    focusedField === "email" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/20" : ""
+                    focusedField === "email" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/30 scale-105" : ""
                   } ${errors.email ? "ring-2 ring-red-500" : ""}`}
                   placeholder="Email"
                   disabled={isLoading}
@@ -152,8 +151,8 @@ export default function LoginPage() {
                 {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
               </div>
 
-              <div className={`transition-all duration-300 ${focusedField === "password" ? "scale-[1.01]" : ""}`}>
-                <Label htmlFor="password" className="text-white text-sm mb-1.5 block font-medium">
+              <div className={`transition-all duration-300 ${focusedField === "password" ? "scale-[1.02]" : ""}`}>
+                <Label htmlFor="password" className={`text-white text-sm mb-1.5 block font-medium transition-all duration-300 ${focusedField === "password" ? "text-lime-400" : ""}`}>
                   Password
                 </Label>
                 <div className="relative">
@@ -161,11 +160,13 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("password", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      handleInputChange("password", e.target.value)
+                    }}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     className={`bg-neutral-800 border-0 text-white h-11 rounded-lg pr-10 transition-all duration-300 placeholder:text-neutral-400 ${
-                      focusedField === "password" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/20" : ""
+                      focusedField === "password" ? "ring-2 ring-lime-400 shadow-lg shadow-lime-400/30 scale-105" : ""
                     } ${errors.password ? "ring-2 ring-red-500" : ""}`}
                     placeholder="Password"
                     disabled={isLoading}

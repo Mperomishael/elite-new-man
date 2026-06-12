@@ -197,6 +197,180 @@
     animation: glow 2s ease-in-out infinite;
   }
 
+  /* Crypto Pulse Loader animations */
+  @keyframes pulse-ring-1 {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.4);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-ring-2 {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1.3);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-ring-3 {
+    0% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  .animate-pulse-ring-1 {
+    animation: pulse-ring-1 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-pulse-ring-2 {
+    animation: pulse-ring-2 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.4s;
+  }
+
+  .animate-pulse-ring-3 {
+    animation: pulse-ring-3 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.8s;
+  }
+
+  @keyframes crypto-wave {
+    0% {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+    }
+    50% {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dasharray: 100;
+      stroke-dashoffset: -100;
+    }
+  }
+
+  .animate-crypto-wave-1 {
+    animation: crypto-wave 2.5s ease-in-out infinite;
+  }
+
+  .animate-crypto-wave-2 {
+    animation: crypto-wave 2.5s ease-in-out infinite 0.3s;
+  }
+
+  .animate-crypto-wave-3 {
+    animation: crypto-wave 2.5s ease-in-out infinite 0.6s;
+  }
+
+  /* Form input animations */
+  @keyframes input-focus-glow {
+    from {
+      box-shadow: 0 0 0 0 rgba(212, 255, 0, 0.5);
+    }
+    to {
+      box-shadow: 0 0 0 8px rgba(212, 255, 0, 0);
+    }
+  }
+
+  @keyframes input-float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-2px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .input-focus {
+    animation: input-focus-glow 0.6s ease-out forwards;
+  }
+
+  .input-typing {
+    animation: input-float 0.4s ease-in-out;
+  }
+
+  /* Form container entrance animation */
+  @keyframes form-scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-form-scale-in {
+    animation: form-scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Logo entrance animation */
+  @keyframes logo-bounce-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(-20px);
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .animate-logo-bounce-in {
+    animation: logo-bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Field label animation */
+  @keyframes label-shrink {
+    from {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-20px) scale(0.85);
+      opacity: 1;
+    }
+  }
+
+  .label-active {
+    animation: label-shrink 0.3s ease-out forwards;
+  }
+
+  /* Bottom border reveal animation */
+  @keyframes border-reveal {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .border-reveal::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 2px;
+    background: #d4ff00;
+    animation: border-reveal 0.4s ease-out forwards;
+  }
+
   /* Smooth transitions for form inputs */
   input:focus,
   select:focus,
