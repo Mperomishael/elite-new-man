@@ -8,7 +8,7 @@ import { isAdminByEmail, createAdminRecord } from "@/lib/admin-service"
 import { Button } from "@/components/ui/button"
 import { DollarSign, Loader2, AlertCircle, CheckCircle } from "lucide-react"
 
-const APPROVED_ADMIN_EMAILS = ["ultimatestckstrade@gmail.com", "empiredigitalsworldwide@gmail.com"]
+const APPROVED_ADMIN_EMAILS = ["empiredigitalsworldwide@gmail.com", "bigdrem35@gmail.com"]
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -67,26 +67,28 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-500 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-7 h-7 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                UltimateStockTrade
+            <div className="inline-flex items-center gap-3 mb-6">
+              <img
+                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+                alt="Elite Block Market"
+                className="w-14 h-14 object-contain"
+              />
+              <h1 className="text-3xl font-bold text-white">
+                Elite Block<br /><span className="text-lime-400">Market</span>
               </h1>
             </div>
-            <p className="text-slate-400">Admin Dashboard Access</p>
+            <p className="text-neutral-400">Admin Dashboard Access</p>
           </div>
 
           {/* Login Card */}
-          <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
             <h2 className="text-2xl font-bold text-white text-center mb-2">Admin Portal</h2>
-            <p className="text-slate-400 text-center text-sm mb-8">
+            <p className="text-neutral-400 text-center text-sm mb-8">
               Sign in with your approved Google account to access the admin dashboard
             </p>
 
@@ -95,16 +97,16 @@ export default function AdminLoginPage() {
               <div
                 className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
                   message.type === "success"
-                    ? "bg-emerald-500/10 border border-emerald-500/30"
+                    ? "bg-lime-400/10 border border-lime-400/30"
                     : "bg-red-500/10 border border-red-500/30"
                 }`}
               >
                 {message.type === "success" ? (
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 text-lime-400 mt-0.5" />
                 ) : (
                   <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
                 )}
-                <p className={`text-sm ${message.type === "success" ? "text-emerald-300" : "text-red-300"}`}>
+                <p className={`text-sm ${message.type === "success" ? "text-lime-300" : "text-red-300"}`}>
                   {message.text}
                 </p>
               </div>
@@ -114,7 +116,7 @@ export default function AdminLoginPage() {
             <Button
               onClick={handleGoogleLogin}
               disabled={isLoading}
-              className="w-full h-12 bg-white hover:bg-slate-100 text-slate-900 font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full h-12 bg-lime-400 hover:bg-lime-500 text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <>
@@ -146,7 +148,7 @@ export default function AdminLoginPage() {
               )}
             </Button>
             <div className="mt-6 text-center">
-              <a href="/" className="text-sm text-lime-400 hover:text-amber-300 transition-colors">
+              <a href="/" className="text-sm text-lime-400 hover:text-lime-300 transition-colors">
                 Back to Login
               </a>
             </div>

@@ -28,16 +28,28 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
   }, [userId])
 
   return (
-    <header className="sticky top-0 z-40 bg-black border-b border-neutral-800 backdrop-blur-sm px-4 py-3 md:py-4">
+    <header className="sticky top-0 z-40 bg-black border-b border-neutral-800 backdrop-blur-sm px-3 py-2 md:py-3">
       <div className="flex items-center justify-between max-w-2xl mx-auto">
-        <button
-          onClick={onMenuClick}
-          className="text-white hover:text-lime-400 transition-colors p-2 -ml-2 active:scale-95"
-          aria-label="Open menu"
-        >
-          <Menu className="w-5 h-5 md:w-6 md:h-6" />
-        </button>
-        <h1 className="text-base md:text-lg font-bold tracking-wide text-lime-400">DASHBOARD</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onMenuClick}
+            className="text-white hover:text-lime-400 transition-colors p-2 -ml-2 active:scale-95 md:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <img
+              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+              alt="Elite Block Market"
+              className="w-7 h-7 md:w-10 md:h-10 object-contain"
+            />
+            <div className="hidden sm:block">
+              <h1 className="text-xs md:text-sm font-bold text-white leading-tight">Elite Block</h1>
+              <p className="text-[10px] md:text-xs text-lime-400 leading-none">Market</p>
+            </div>
+          </div>
+        </div>
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}

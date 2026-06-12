@@ -207,11 +207,11 @@ export function AuthPage({ onLogin }: AuthPageProps) {
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
             <img
-              src="/images/design-mode/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png"
-              alt="UltimateStckTrader Logo"
+              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+              alt="Elite Block Market Logo"
               className="w-24 h-24 mx-auto mb-4 object-contain"
             />
-            <h1 className="text-2xl font-bold text-white">UltimateStckTrader</h1>
+            <h1 className="text-2xl font-bold text-white">Elite Block Market</h1>
           </div>
 
           <div className="bg-[#0A2E3C] border-2 border-teal-700/50 rounded-xl p-8 shadow-2xl text-center">
@@ -281,7 +281,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <DollarSign className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">UltimateStockTrade</h1>
+              <h1 className="text-2xl font-bold text-white">Elite Block Market</h1>
             </div>
           </div>
 
@@ -585,7 +585,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               </p>
               <div className="flex items-center gap-2 text-teal-200 text-sm">
                 <Mail className="w-4 h-4" />
-                <span>support@ultimatestocktrade.com</span>
+                <span>support@Elite Block Market.com</span>
               </div>
             </div>
           </div>
@@ -595,7 +595,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-white">UltimateStockTrade</h2>
+              <h2 className="text-xl font-bold text-white">Elite Block Market</h2>
             </div>
             <p className="text-teal-200 text-sm leading-relaxed">
               From exceptional customer service to excellent trading experience, we have it all. Our goal is to deliver

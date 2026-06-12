@@ -79,11 +79,11 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
               <img
                 src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
                 alt="Elite Block Market Logo"
-                className="w-10 h-10 object-contain"
+                className="w-12 h-12 object-contain"
               />
               <div>
-                <h2 className="font-bold text-sm text-white">Elite Block Market</h2>
-                <p className="text-xs text-lime-400">Secure Trading</p>
+                <h2 className="font-bold text-sm text-white">Elite Block</h2>
+                <p className="text-xs text-lime-400">Market</p>
               </div>
             </div>
             <button onClick={onClose} className="text-neutral-400 hover:text-white transition-colors p-2">

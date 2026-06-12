@@ -177,13 +177,13 @@ export default function SignUpPage() {
               <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-lime-500 rounded-lg flex items-center justify-center flex-shrink-0">
                 <DollarSign className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">UltimateStockTrade</h1>
+              <h1 className="text-2xl font-bold text-white">Elite Block Market</h1>
             </div>
           </div>
 
           <div className="bg-[black] border-2 border-lime-400/50 rounded-xl p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-white text-center mb-2">Create an account</h2>
-            <p className="text-xs text-slate-400 text-center mb-6">Join UltimateStockTrade and start trading today</p>
+            <p className="text-xs text-slate-400 text-center mb-6">Join Elite Block Market and start trading today</p>
 
             {message && (
               <div

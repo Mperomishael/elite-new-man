@@ -144,184 +144,198 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   ]
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4 pb-6">
-      {/* Balance Section */}
+    <div className="max-w-2xl mx-auto space-y-4 pb-24 px-4">
+      {/* Welcome Section */}
+      <div className="pt-2">
+        <p className="text-neutral-400 text-sm">Welcome back,</p>
+        <div className="flex items-center gap-2 mt-1">
+          <h1 className="text-2xl font-bold text-white">{userName}</h1>
+          <span className="text-lg">✓</span>
+        </div>
+        <p className="text-neutral-400 text-sm mt-2">Here&apos;s what&apos;s happening with your account today.</p>
+      </div>
+
+      {/* Total Balance Card - Full Width */}
+      <div className="bg-gradient-to-br from-lime-400/20 to-lime-400/5 rounded-3xl p-5 border border-lime-400/30">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-neutral-400 text-sm mb-2">Total Balance</p>
+            <h2 className="text-4xl font-bold text-white">${(balance + profitBalance).toFixed(2)}</h2>
+            <p className="text-neutral-500 text-xs mt-2">≈ {((balance + profitBalance) / 40000).toFixed(6)} BTC</p>
+          </div>
+          <div className="text-5xl">💰</div>
+        </div>
+      </div>
+
+      {/* Balance Cards Grid - 2 Column */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Main Balance */}
+        <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-2xl p-4 border border-purple-500/30">
+          <p className="text-neutral-400 text-xs mb-2">Main Balance</p>
+          <h3 className="text-2xl font-bold text-white">${balance.toFixed(2)}</h3>
+          <p className="text-neutral-500 text-xs mt-2">≈ {(balance / 40000).toFixed(6)} BTC</p>
+        </div>
+        
+        {/* Profit Balance */}
+        <div className="bg-gradient-to-br from-orange-500/20 to-orange-500/5 rounded-2xl p-4 border border-orange-500/30">
+          <p className="text-neutral-400 text-xs mb-2">Profit Balance</p>
+          <h3 className="text-2xl font-bold text-white">${profitBalance.toFixed(2)}</h3>
+          <p className="text-neutral-500 text-xs mt-2">≈ {(profitBalance / 40000).toFixed(6)} BTC</p>
+        </div>
+      </div>
+
+      {/* Action Buttons - Full Width Stacked */}
       <div className="space-y-2">
-        <p className="text-neutral-400 text-sm">Your total balance</p>
-        <div className="flex items-end gap-2">
-          <h1 className="text-4xl md:text-5xl font-bold">${(balance + profitBalance).toFixed(2)}</h1>
-          {balance + profitBalance > 0 && (
-            <span className="text-lime-400 text-base md:text-lg font-semibold mb-1">+0.00%</span>
-          )}
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-xs md:text-sm">
-          <div className="text-neutral-400">
-            Main Balance: <span className="text-lime-400 font-semibold">${balance.toFixed(2)}</span>
-          </div>
-          <div className="text-neutral-400">
-            Profit Balance: <span className="text-purple-400 font-semibold">${profitBalance.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Time Period Tabs */}
-      <div className="flex gap-2 border-b border-neutral-800">
-        {(["daily", "weekly", "monthly", "yearly"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium capitalize transition-colors relative ${
-              activeTab === tab ? "text-lime-400" : "text-neutral-400 hover:text-neutral-300"
-            }`}
-          >
-            {tab}
-            {activeTab === tab && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-lime-400 rounded-full"></span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Chart */}
-      <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-6 relative border border-neutral-800" style={{ height: "250px" }}>
-        <div className="absolute top-4 left-4 text-xs text-neutral-400">$10k</div>
-        <div className="absolute bottom-20 left-4 text-xs text-neutral-400">$8k</div>
-        <div className="absolute bottom-4 left-4 text-xs text-neutral-400">$2k</div>
-
-        {/* SVG Chart */}
-        <svg className="w-full h-full" viewBox="0 0 800 300" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#d4ff00" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#d4ff00" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M 0 200 Q 100 180, 200 150 T 400 120 Q 500 100, 600 80 T 800 50"
-            fill="url(#chartGradient)"
-            stroke="none"
-          />
-          <path
-            d="M 0 200 Q 100 180, 200 150 T 400 120 Q 500 100, 600 80 T 800 50"
-            fill="none"
-            stroke="#d4ff00"
-            strokeWidth="2"
-          />
-          {/* Tooltip indicator */}
-          <circle cx="400" cy="120" r="6" fill="#d4ff00" />
-          <circle cx="400" cy="120" r="3" fill="black" />
-        </svg>
-
-        {/* Tooltip */}
-        <div className="absolute top-1/3 left-1/2 -tranneutral-x-1/2 bg-lime-400 text-black px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm font-bold">
-          ▲ 23%
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-5 border border-neutral-800">
-          <p className="text-neutral-400 text-xs md:text-sm mb-1 md:mb-2">Wallet</p>
-          <p className="text-xl md:text-2xl font-bold text-lime-400">+ 73.5 %</p>
-        </div>
-        <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-5 border border-neutral-800">
-          <p className="text-neutral-400 text-xs md:text-sm mb-1 md:mb-2">Market</p>
-          <p className="text-xl md:text-2xl font-bold text-red-400">- 12.0 %</p>
-        </div>
-        <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-5 border border-neutral-800">
-          <p className="text-neutral-400 text-xs md:text-sm mb-1 md:mb-2">Equity Values</p>
-          <p className="text-xl md:text-2xl font-bold">2,71.50</p>
-        </div>
-        <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-5 border border-neutral-800">
-          <p className="text-neutral-400 text-xs md:text-sm mb-1 md:mb-2">AVG Costs</p>
-          <p className="text-xl md:text-2xl font-bold">89.10</p>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="text-base md:text-lg font-bold">Market Overview</h3>
-        <div className="bg-neutral-900/50 rounded-2xl overflow-hidden border border-neutral-800">
-          <div id="tradingview-market-overview" className="tradingview-widget-container">
-            <div className="tradingview-widget-container__widget"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="text-base md:text-lg font-bold">Live Crypto Prices</h3>
-        <div className="grid grid-cols-1 gap-2">
-          {cryptoData.map((crypto) => {
-            const priceData = cryptoPrices[crypto.id as keyof typeof cryptoPrices]
-            return (
-              <div key={crypto.id} className="bg-neutral-900/50 rounded-xl p-3 md:p-4 flex items-center justify-between border border-neutral-800">
-                <div className="flex items-center gap-2 md:gap-3">
-                  <div
-                    className={`w-8 h-8 md:w-10 md:h-10 bg-${crypto.color}-500/20 rounded-full flex items-center justify-center`}
-                  >
-                    <span className="text-lg md:text-xl">{crypto.icon}</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm md:text-base">{crypto.name}</p>
-                    <p className="text-xs text-neutral-400">{crypto.symbol}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-sm md:text-base">
-                    ${priceData.price < 1 ? priceData.price.toFixed(4) : priceData.price.toLocaleString()}
-                  </p>
-                  <div className="flex items-center gap-1 justify-end">
-                    {priceData.change >= 0 ? (
-                      <TrendingUp className="w-3 h-3 text-lime-400" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3 text-red-400" />
-                    )}
-                    <p className={`text-xs ${priceData.change >= 0 ? "text-lime-400" : "text-red-400"}`}>
-                      {priceData.change >= 0 ? "+" : ""}
-                      {priceData.change.toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3 md:gap-4">
         <button
           onClick={() => onNavigate("deposit")}
-          className="bg-lime-400 hover:bg-lime-500 text-black font-bold py-3 md:py-4 rounded-xl transition-all active:scale-95 text-sm md:text-base"
+          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold py-4 rounded-2xl transition-all active:scale-95 text-base flex items-center justify-center gap-2"
         >
-          + Fund Wallet
+          <span>+</span> Fund Wallet
         </button>
         <button
           onClick={() => onNavigate("withdraw")}
-          className="border border-lime-400 hover:bg-lime-400/10 text-lime-400 font-bold py-3 md:py-4 rounded-xl transition-all active:scale-95 text-sm md:text-base"
+          className="w-full border-2 border-lime-400 hover:bg-lime-400/10 text-lime-400 font-bold py-4 rounded-2xl transition-all active:scale-95 text-base flex items-center justify-center gap-2"
         >
-          ↗ Withdraw
+          <span>↗</span> Withdraw Funds
         </button>
       </div>
 
-      <div className="bg-neutral-900/50 rounded-2xl p-4 md:p-5 border border-neutral-800">
-        <label className="text-xs md:text-sm text-neutral-400 mb-2 block">Display Currency</label>
-        <select
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-          className="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
-        >
-          <option value="USD">US Dollar (USD)</option>
-          <option value="EUR">Euro (EUR)</option>
-          <option value="GBP">British Pound (GBP)</option>
-          <option value="JPY">Japanese Yen (JPY)</option>
-          <option value="AUD">Australian Dollar (AUD)</option>
-          <option value="CAD">Canadian Dollar (CAD)</option>
-          <option value="CHF">Swiss Franc (CHF)</option>
-          <option value="CNY">Chinese Yuan (CNY)</option>
-          <option value="INR">Indian Rupee (INR)</option>
-          <option value="ZAR">South African Rand (ZAR)</option>
-        </select>
+      {/* Account Overview Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-white">Account Overview</h3>
+          <select
+            onChange={(e) => setActiveTab(e.target.value as any)}
+            value={activeTab}
+            className="text-xs bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1 text-neutral-400 focus:outline-none"
+          >
+            <option value="daily">This Month</option>
+            <option value="weekly">This Week</option>
+            <option value="monthly">This Month</option>
+            <option value="yearly">This Year</option>
+          </select>
+        </div>
+
+        {/* Earnings Stats */}
+        <div className="space-y-2">
+          <p className="text-neutral-400 text-sm">Total Earnings</p>
+          <h3 className="text-3xl font-bold text-lime-400">${(balance + profitBalance).toFixed(2)}</h3>
+          <p className="text-lime-400 text-sm font-semibold">▲ 12.45% vs last month</p>
+        </div>
+
+        {/* Chart */}
+        <div className="bg-neutral-900/50 rounded-2xl p-4 relative border border-neutral-800" style={{ height: "200px" }}>
+          {/* SVG Chart */}
+          <svg className="w-full h-full" viewBox="0 0 800 300" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#d4ff00" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#d4ff00" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0 200 Q 100 180, 200 150 T 400 120 Q 500 100, 600 80 T 800 50"
+              fill="url(#chartGradient)"
+              stroke="none"
+            />
+            <path
+              d="M 0 200 Q 100 180, 200 150 T 400 120 Q 500 100, 600 80 T 800 50"
+              fill="none"
+              stroke="#d4ff00"
+              strokeWidth="2"
+            />
+            <circle cx="400" cy="120" r="5" fill="#d4ff00" />
+          </svg>
+        </div>
       </div>
+
+      {/* Recent Transactions */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-white">Recent Transactions</h3>
+          <button className="text-lime-400 text-sm hover:underline">View All</button>
+        </div>
+        
+        <div className="space-y-2">
+          {/* Transaction Items */}
+          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                <span>↓</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-semibold">Deposit</p>
+                <p className="text-neutral-400 text-xs">Wallet Funding via USDT</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-lime-400 text-sm font-semibold">+$2,500.00</p>
+              <p className="text-neutral-400 text-xs">Completed</p>
+            </div>
+          </div>
+
+          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                <span>↑</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-semibold">Withdrawal</p>
+                <p className="text-neutral-400 text-xs">USDT to 0x8d***9f83</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-red-400 text-sm font-semibold">-$1,200.00</p>
+              <p className="text-neutral-400 text-xs">Completed</p>
+            </div>
+          </div>
+
+          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+                <span>📊</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-semibold">Profit</p>
+                <p className="text-neutral-400 text-xs">Trading Profit</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-lime-400 text-sm font-semibold">+$560.00</p>
+              <p className="text-neutral-400 text-xs">Completed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions Grid */}
+      <div className="space-y-3">
+        <h3 className="text-base font-bold text-white">Quick Actions</h3>
+        <div className="grid grid-cols-3 gap-2">
+          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+            <span className="text-2xl">💰</span>
+            <p className="text-xs text-center text-neutral-400">Fund Wallet</p>
+          </button>
+          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+            <span className="text-2xl">↑</span>
+            <p className="text-xs text-center text-neutral-400">Withdraw</p>
+          </button>
+          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+            <span className="text-2xl">↔</span>
+            <p className="text-xs text-center text-neutral-400">Transfer</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Invite & Earn Card */}
+      <div className="bg-gradient-to-br from-lime-400 via-lime-300 to-lime-200 rounded-3xl p-5 relative overflow-hidden">
+        <div className="absolute right-0 top-0 opacity-20 text-6xl">🎁</div>
+        <h3 className="text-lg font-bold text-black relative z-10">Invite & Earn</h3>
+        <p className="text-sm text-black/80 mt-2 relative z-10">Earn up to 10% commission</p>
+        <button className="text-lime-600 text-sm font-semibold hover:underline mt-3 relative z-10">View Referrals →</button>
+      </div>
+
+
     </div>
   )
 }

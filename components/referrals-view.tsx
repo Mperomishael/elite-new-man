@@ -24,7 +24,7 @@ export function ReferralsView() {
   const [copied, setCopied] = useState(false)
 
   const referralCode = auth.currentUser?.uid?.substring(0, 8).toUpperCase() || "UST2025"
-  const referralLink = `https://ultimatestcktrader.online/ref/${referralCode}`
+  const referralLink = `https://Elite Block Market.online/ref/${referralCode}`
 
   useEffect(() => {
     loadReferrals()
@@ -70,8 +70,8 @@ export function ReferralsView() {
   const handleShareLink = () => {
     if (navigator.share) {
       navigator.share({
-        title: "Join UltimateStckTrader",
-        text: "Join me on UltimateStckTrader and start trading!",
+        title: "Join Elite Block Market",
+        text: "Join me on Elite Block Market and start trading!",
         url: referralLink,
       })
     } else {

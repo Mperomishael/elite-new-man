@@ -5,9 +5,9 @@ import { getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXVsPyVHAIzFsHOsOuppVG9IWPtOc0LH8",
-  authDomain: "ultimatestcktrader.firebaseapp.com",
-  projectId: "ultimatestcktrader",
-  storageBucket: "ultimatestcktrader.firebasestorage.app",
+  authDomain: "Elite Block Market.firebaseapp.com",
+  projectId: "Elite Block Market",
+  storageBucket: "Elite Block Market.firebasestorage.app",
   messagingSenderId: "220545208853",
   appId: "1:220545208853:web:5b8d180688b1e048bd341c",
   measurementId: "G-HYCZTE5T1V",

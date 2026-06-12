@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     // 📨 Create FormData payload (Zoho Mail requires form submission)
     const formData = new FormData();
-    formData.append("fromAddress", "ustrader@ultimatestcktrader.online");
+    formData.append("fromAddress", "ustrader@Elite Block Market.online");
     formData.append("toAddress", email);
     formData.append("subject", "Welcome to USTrade 🎉");
     formData.append(

@@ -36,13 +36,13 @@ export function AdminDashboard({ adminId }: AdminDashboardProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
-                src="/images/design-mode/Whats-App-Image-2025-10-10-at-8-45-37-AM-1-removebg-preview-1.png"
-                alt="UltimateStckTrader Logo"
+                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+                alt="Elite Block Market Logo"
                 className="w-10 h-10 object-contain"
               />
               <div>
                 <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-                <p className="text-xs text-slate-400">UltimateStckTrader</p>
+                <p className="text-xs text-slate-400">Elite Block Market</p>
               </div>
             </div>
             <button

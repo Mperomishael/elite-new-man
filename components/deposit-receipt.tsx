@@ -21,7 +21,7 @@ export function DepositReceipt({
 }: DepositReceiptProps) {
   const handleDownload = () => {
     const receiptContent = `
-ULTIMATESTCKTRADER - DEPOSIT RECEIPT
+Elite Block Market - DEPOSIT RECEIPT
 =====================================
 
 Receipt ID: ${depositId}
@@ -39,8 +39,8 @@ This receipt confirms that your deposit has been successfully processed
 and credited to your trading account.
 
 =====================================
-UltimateStckTrader Trading Platform
-www.ultimatestcktrader.online
+Elite Block Market Trading Platform
+www.Elite Block Market.online
     `.trim()
 
     const element = document.createElement("a")

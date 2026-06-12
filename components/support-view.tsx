@@ -212,7 +212,7 @@ export function SupportView({ userId, username }: SupportViewProps) {
           </div>
           <div>
             <p className="text-xs text-blue-100">Email Us</p>
-            <p className="font-semibold text-white">support@ultimatestcktrader.online</p>
+            <p className="font-semibold text-white">support@Elite Block Market.online</p>
           </div>
         </div>
 
