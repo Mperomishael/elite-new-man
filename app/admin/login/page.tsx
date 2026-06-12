@@ -71,22 +71,16 @@ export default function AdminLoginPage() {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 mb-6">
-              <img
-                src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
-                alt="Elite Block Market"
-                className="w-14 h-14 object-contain"
-              />
-              <h1 className="text-3xl font-bold text-white">
-                Elite Block<br /><span className="text-lime-400">Market</span>
-              </h1>
-            </div>
-            <p className="text-neutral-400">Admin Dashboard Access</p>
+          <div className="text-center mb-8 animate-logo-bounce-in">
+            <img
+              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+              alt="Elite Block Market"
+              className="w-20 h-20 mx-auto"
+            />
           </div>
 
           {/* Login Card */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl backdrop-blur-sm animate-form-scale-in">
             <h2 className="text-2xl font-bold text-white text-center mb-2">Admin Portal</h2>
             <p className="text-neutral-400 text-center text-sm mb-8">
               Sign in with your approved Google account to access the admin dashboard
