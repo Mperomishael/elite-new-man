@@ -19,4 +19,12 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
 // Export core instances
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+
+// Configure Google Provider
 export const googleProvider = new GoogleAuthProvider()
+googleProvider.addScope("profile")
+googleProvider.addScope("email")
+// Set custom parameters for Google Sign-In popup
+googleProvider.setCustomParameters({
+  prompt: "select_account",
+})
