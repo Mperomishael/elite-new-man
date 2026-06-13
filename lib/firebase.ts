@@ -4,13 +4,14 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCXVsPyVHAIzFsHOsOuppVG9IWPtOc0LH8",
-  authDomain: "Elite Block Market.firebaseapp.com",
-  projectId: "Elite Block Market",
-  storageBucket: "Elite Block Market.firebasestorage.app",
-  messagingSenderId: "220545208853",
-  appId: "1:220545208853:web:5b8d180688b1e048bd341c",
-  measurementId: "G-HYCZTE5T1V",
+  apiKey: "AIzaSyAW5H7A7cN3sohPipz4rPmd2rJZe9NCvzU",
+  authDomain: "eliteblockmarket.firebaseapp.com",
+  databaseURL: "https://eliteblockmarket-default-rtdb.firebaseio.com",
+  projectId: "eliteblockmarket",
+  storageBucket: "eliteblockmarket.firebasestorage.app",
+  messagingSenderId: "946756766507",
+  appId: "1:946756766507:web:a307e50d1d6503ce58d36e",
+  measurementId: "G-3H80LVSN3W",
 }
 
 // Ensure single app instance
