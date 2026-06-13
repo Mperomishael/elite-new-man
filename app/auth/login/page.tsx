@@ -85,7 +85,7 @@ export default function LoginPage() {
       if (result.success && result.userProfile) {
         setMessage({ type: "success", text: "Login successful!" })
         setTimeout(() => {
-          router.push("/")
+          router.push("/dashboard")
         }, 1000)
       } else {
         setMessage({ type: "error", text: result.error || "Login failed" })
