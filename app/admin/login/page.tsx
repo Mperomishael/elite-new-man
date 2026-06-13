@@ -18,41 +18,60 @@ export default function AdminLoginPage() {
 
   // Check for redirect result on page load
   useEffect(() => {
+    let isMounted = true
+
     const checkRedirectResult = async () => {
       try {
+        console.log("[v0] Checking redirect result...")
         const result = await getRedirectResult(auth)
+        console.log("[v0] Redirect result:", result?.user?.email || "No user")
+        
+        if (!isMounted) return
+        
         if (result && result.user) {
+          console.log("[v0] User authenticated:", result.user.email)
           setIsLoading(true)
           await handleAuthSuccess(result.user)
+        } else {
+          console.log("[v0] No redirect result, user not authenticated yet")
         }
       } catch (error: any) {
-        console.error("[v0] Redirect result error:", error)
-        if (error.message) {
-          setMessage({ type: "error", text: `Error: ${error.message}` })
+        console.error("[v0] Redirect result error:", error.message || error)
+        if (isMounted) {
+          setMessage({ type: "error", text: `Error: ${error.message || "Authentication failed"}` })
         }
       } finally {
-        setIsCheckingAuth(false)
+        if (isMounted) {
+          setIsCheckingAuth(false)
+        }
       }
     }
 
     checkRedirectResult()
-  }, [])
+
+    return () => {
+      isMounted = false
+    }
+  }, [router])
 
   const handleAuthSuccess = async (user: any) => {
     try {
       if (!user.email) {
+        console.error("[v0] No email in user object")
         setMessage({ type: "error", text: "Could not retrieve email from Google account" })
         setIsLoading(false)
         return
       }
 
-      console.log("[v0] Google user email:", user.email)
+      console.log("[v0] Google user authenticated:", user.email)
 
       // Check if email is in approved admin list
+      console.log("[v0] Checking if user is admin...")
       const isAdmin = await isAdminByEmail(user.email)
+      console.log("[v0] isAdmin result:", isAdmin)
 
       if (!isAdmin) {
-        console.log("[v0] User not admin:", user.email)
+        console.log("[v0] User not authorized as admin:", user.email)
         setMessage({
           type: "error",
           text: `Access denied. Email ${user.email} is not authorized as an admin.`,
@@ -63,16 +82,22 @@ export default function AdminLoginPage() {
         return
       }
 
-      console.log("[v0] Creating admin record for:", user.email)
+      console.log("[v0] User is admin, creating admin record...")
       // Create/update admin record
-      await createAdminRecord(user.uid, user.email, user.displayName || user.email)
+      const result = await createAdminRecord(user.uid, user.email, user.displayName || user.email)
+      console.log("[v0] Admin record creation result:", result)
 
+      if (!result.success) {
+        throw new Error(result.error || "Failed to create admin record")
+      }
+
+      console.log("[v0] Admin record created successfully, redirecting to dashboard...")
       setMessage({ type: "success", text: "Admin authentication successful! Redirecting..." })
-      setTimeout(() => {
-        router.push("/admin")
-      }, 1000)
+      
+      // Use router.push without timeout for immediate redirect
+      router.push("/admin")
     } catch (error: any) {
-      console.error("[v0] Auth success error:", error)
+      console.error("[v0] Auth success error:", error.message || error)
       setMessage({ type: "error", text: error.message || "An error occurred" })
       setIsLoading(false)
     }
