@@ -20,6 +20,18 @@ export default function AdminLoginPage() {
     setMessage(null)
 
     try {
+      // Check for popup blockers before attempting to open popup
+      const testWindow = window.open("", "", "width=1,height=1")
+      if (!testWindow || testWindow.closed) {
+        setMessage({
+          type: "error",
+          text: "Popup blocker detected. Please allow popups for this site and try again.",
+        })
+        setIsLoading(false)
+        return
+      }
+      testWindow.close()
+
       const result = await signInWithPopup(auth, googleProvider)
       const user = result.user
 
@@ -29,10 +41,13 @@ export default function AdminLoginPage() {
         return
       }
 
+      console.log("[v0] Google user email:", user.email)
+
       // Check if email is in approved admin list
       const isAdmin = await isAdminByEmail(user.email)
 
       if (!isAdmin) {
+        console.log("[v0] User not admin:", user.email)
         setMessage({
           type: "error",
           text: `Access denied. Email ${user.email} is not authorized as an admin.`,
@@ -43,8 +58,9 @@ export default function AdminLoginPage() {
         return
       }
 
+      console.log("[v0] Creating admin record for:", user.email)
       // Create/update admin record
-      await createAdminRecord(user.uid, user.email)
+      await createAdminRecord(user.uid, user.email, user.displayName || user.email)
 
       setMessage({ type: "success", text: "Admin authentication successful! Redirecting..." })
       setTimeout(() => {
@@ -55,9 +71,15 @@ export default function AdminLoginPage() {
       let errorMessage = "Failed to sign in with Google"
 
       if (error.code === "auth/popup-closed-by-user") {
-        errorMessage = "Sign-in popup was closed"
+        errorMessage = "Sign-in popup was closed. Please try again."
       } else if (error.code === "auth/cancelled-popup-request") {
-        errorMessage = "Sign-in request was cancelled"
+        errorMessage = "Sign-in request was cancelled. Please try again."
+      } else if (error.code === "auth/network-request-failed") {
+        errorMessage = "Network error. Please check your connection and try again."
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "Google Sign-In is not enabled. Contact support."
+      } else if (error.message) {
+        errorMessage = `Error: ${error.message}`
       }
 
       setMessage({ type: "error", text: errorMessage })
