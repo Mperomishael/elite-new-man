@@ -42,7 +42,7 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
             <img
               src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
               alt="Elite Block Market"
-              className="w-7 h-7 md:w-10 md:h-10 object-contain"
+              className="w-12 h-12 md:w-16 md:h-16 object-contain"
             />
             <div className="hidden sm:block">
               <h1 className="text-xs md:text-sm font-bold text-white leading-tight">Elite Block</h1>
