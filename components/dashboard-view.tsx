@@ -144,92 +144,98 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   ]
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4 pb-24 px-4">
-      {/* Welcome Section */}
-      <div className="pt-2">
-        <p className="text-neutral-400 text-sm">Welcome back,</p>
-        <div className="flex items-center gap-2 mt-1">
-          <h1 className="text-2xl font-bold text-white">{userName}</h1>
-          <span className="text-lg">✓</span>
-        </div>
-        <p className="text-neutral-400 text-sm mt-2">Here&apos;s what&apos;s happening with your account today.</p>
+    <div className="max-w-2xl mx-auto space-y-5 pb-24 px-4">
+      {/* Welcome Section - Compact */}
+      <div className="pt-3">
+        <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold">Welcome back</p>
+        <h1 className="text-3xl font-bold text-white mt-1">{userName}</h1>
       </div>
 
-      {/* Total Balance Card - Full Width */}
-      <div className="bg-gradient-to-br from-lime-400/20 to-lime-400/5 rounded-3xl p-5 border border-lime-400/30">
+      {/* Portfolio Value Card - Premium */}
+      <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800">
         <div className="flex items-start justify-between">
-          <div>
-            <p className="text-neutral-400 text-sm mb-2">Total Balance</p>
+          <div className="flex-1">
+            <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold mb-2">Portfolio Value</p>
             <h2 className="text-4xl font-bold text-white">${(balance + profitBalance).toFixed(2)}</h2>
-            <p className="text-neutral-500 text-xs mt-2">≈ {((balance + profitBalance) / 40000).toFixed(6)} BTC</p>
+            <div className="flex items-center gap-4 mt-3">
+              <div>
+                <p className="text-neutral-500 text-xs">≈ {((balance + profitBalance) / 40000).toFixed(6)} BTC</p>
+              </div>
+              <div className="flex items-center gap-1 bg-lime-400/10 px-2 py-1 rounded">
+                <span className="text-lime-400 text-xs font-semibold">+12.45%</span>
+              </div>
+            </div>
           </div>
-          <div className="text-5xl">💰</div>
         </div>
       </div>
 
       {/* Balance Cards Grid - 2 Column */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Main Balance */}
-        <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-2xl p-4 border border-purple-500/30">
-          <p className="text-neutral-400 text-xs mb-2">Main Balance</p>
+        {/* Available Balance */}
+        <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800">
+          <p className="text-neutral-500 text-xs uppercase tracking-wide font-semibold mb-3">Available</p>
           <h3 className="text-2xl font-bold text-white">${balance.toFixed(2)}</h3>
-          <p className="text-neutral-500 text-xs mt-2">≈ {(balance / 40000).toFixed(6)} BTC</p>
+          <p className="text-neutral-500 text-xs mt-2">{(balance / 40000).toFixed(6)} BTC</p>
         </div>
         
         {/* Profit Balance */}
-        <div className="bg-gradient-to-br from-orange-500/20 to-orange-500/5 rounded-2xl p-4 border border-orange-500/30">
-          <p className="text-neutral-400 text-xs mb-2">Profit Balance</p>
-          <h3 className="text-2xl font-bold text-white">${profitBalance.toFixed(2)}</h3>
-          <p className="text-neutral-500 text-xs mt-2">≈ {(profitBalance / 40000).toFixed(6)} BTC</p>
+        <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800">
+          <p className="text-neutral-500 text-xs uppercase tracking-wide font-semibold mb-3">Earnings</p>
+          <h3 className="text-2xl font-bold text-lime-400">${profitBalance.toFixed(2)}</h3>
+          <p className="text-neutral-500 text-xs mt-2">{(profitBalance / 40000).toFixed(6)} BTC</p>
         </div>
       </div>
 
-      {/* Action Buttons - Full Width Stacked */}
-      <div className="space-y-2">
+      {/* Action Buttons - Compact */}
+      <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => onNavigate("deposit")}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold py-4 rounded-2xl transition-all active:scale-95 text-base flex items-center justify-center gap-2"
+          className="bg-lime-400 hover:bg-lime-500 text-black font-bold py-3 rounded-xl transition-all active:scale-95 text-sm flex items-center justify-center gap-2"
         >
-          <span>+</span> Fund Wallet
+          <span>+</span> Deposit
         </button>
         <button
           onClick={() => onNavigate("withdraw")}
-          className="w-full border-2 border-lime-400 hover:bg-lime-400/10 text-lime-400 font-bold py-4 rounded-2xl transition-all active:scale-95 text-base flex items-center justify-center gap-2"
+          className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-3 rounded-xl transition-all active:scale-95 text-sm flex items-center justify-center gap-2 border border-neutral-700"
         >
-          <span>↗</span> Withdraw Funds
+          <span>↗</span> Withdraw
         </button>
       </div>
 
-      {/* Account Overview Section */}
-      <div className="space-y-3">
+      {/* Portfolio Performance Section */}
+      <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white">Account Overview</h3>
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Portfolio Performance</h3>
           <select
             onChange={(e) => setActiveTab(e.target.value as any)}
             value={activeTab}
-            className="text-xs bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1 text-neutral-400 focus:outline-none"
+            className="text-xs bg-neutral-800 border border-neutral-700 rounded px-2 py-1 text-neutral-300 focus:outline-none hover:border-neutral-600"
           >
-            <option value="daily">This Month</option>
-            <option value="weekly">This Week</option>
-            <option value="monthly">This Month</option>
-            <option value="yearly">This Year</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
           </select>
         </div>
 
-        {/* Earnings Stats */}
-        <div className="space-y-2">
-          <p className="text-neutral-400 text-sm">Total Earnings</p>
-          <h3 className="text-3xl font-bold text-lime-400">${(balance + profitBalance).toFixed(2)}</h3>
-          <p className="text-lime-400 text-sm font-semibold">▲ 12.45% vs last month</p>
+        {/* Earnings Stats - Horizontal */}
+        <div className="flex items-center justify-between py-2 border-t border-neutral-800">
+          <div>
+            <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold">Earnings</p>
+            <p className="text-2xl font-bold text-lime-400 mt-1">${(balance + profitBalance).toFixed(2)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold">Change</p>
+            <p className="text-lg font-bold text-lime-400 mt-1">+12.45%</p>
+          </div>
         </div>
 
         {/* Chart */}
-        <div className="bg-neutral-900/50 rounded-2xl p-4 relative border border-neutral-800" style={{ height: "200px" }}>
-          {/* SVG Chart */}
+        <div className="pt-2" style={{ height: "180px" }}>
           <svg className="w-full h-full" viewBox="0 0 800 300" preserveAspectRatio="none">
             <defs>
               <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#d4ff00" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#d4ff00" stopOpacity="0.15" />
                 <stop offset="100%" stopColor="#d4ff00" stopOpacity="0" />
               </linearGradient>
             </defs>
@@ -244,95 +250,98 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
               stroke="#d4ff00"
               strokeWidth="2"
             />
-            <circle cx="400" cy="120" r="5" fill="#d4ff00" />
+            <circle cx="400" cy="120" r="4" fill="#d4ff00" />
           </svg>
         </div>
       </div>
 
       {/* Recent Transactions */}
-      <div className="space-y-3">
+      <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white">Recent Transactions</h3>
-          <button className="text-lime-400 text-sm hover:underline">View All</button>
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Recent Transactions</h3>
+          <button className="text-lime-400 text-xs hover:text-lime-300 font-semibold">View All</button>
         </div>
         
-        <div className="space-y-2">
-          {/* Transaction Items */}
-          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+        <div className="space-y-3">
+          {/* Deposit Transaction */}
+          <div className="flex items-center justify-between py-3 border-b border-neutral-800 last:border-b-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                <span>↓</span>
+              <div className="w-9 h-9 bg-lime-400/20 rounded-lg flex items-center justify-center text-xs">
+                <span className="text-lime-400">↓</span>
               </div>
-              <div>
-                <p className="text-white text-sm font-semibold">Deposit</p>
-                <p className="text-neutral-400 text-xs">Wallet Funding via USDT</p>
+              <div className="flex-1">
+                <p className="text-white text-sm font-medium">Deposit</p>
+                <p className="text-neutral-500 text-xs">Wallet Funding via USDT</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-lime-400 text-sm font-semibold">+$2,500.00</p>
-              <p className="text-neutral-400 text-xs">Completed</p>
+              <p className="text-lime-400 text-sm font-semibold">+$2,500</p>
             </div>
           </div>
 
-          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+          {/* Withdrawal Transaction */}
+          <div className="flex items-center justify-between py-3 border-b border-neutral-800 last:border-b-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
-                <span>↑</span>
+              <div className="w-9 h-9 bg-red-500/20 rounded-lg flex items-center justify-center text-xs">
+                <span className="text-red-400">↑</span>
               </div>
-              <div>
-                <p className="text-white text-sm font-semibold">Withdrawal</p>
-                <p className="text-neutral-400 text-xs">USDT to 0x8d***9f83</p>
+              <div className="flex-1">
+                <p className="text-white text-sm font-medium">Withdrawal</p>
+                <p className="text-neutral-500 text-xs">USDT to 0x8d***9f83</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-red-400 text-sm font-semibold">-$1,200.00</p>
-              <p className="text-neutral-400 text-xs">Completed</p>
+              <p className="text-red-400 text-sm font-semibold">-$1,200</p>
             </div>
           </div>
 
-          <div className="bg-neutral-900/50 rounded-xl p-3 border border-neutral-800 flex items-center justify-between">
+          {/* Profit Transaction */}
+          <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
-                <span>📊</span>
+              <div className="w-9 h-9 bg-lime-400/20 rounded-lg flex items-center justify-center text-xs">
+                <span className="text-lime-400">+</span>
               </div>
-              <div>
-                <p className="text-white text-sm font-semibold">Profit</p>
-                <p className="text-neutral-400 text-xs">Trading Profit</p>
+              <div className="flex-1">
+                <p className="text-white text-sm font-medium">Trading Profit</p>
+                <p className="text-neutral-500 text-xs">Realized gain from trade</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-lime-400 text-sm font-semibold">+$560.00</p>
-              <p className="text-neutral-400 text-xs">Completed</p>
+              <p className="text-lime-400 text-sm font-semibold">+$560</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions Grid */}
-      <div className="space-y-3">
-        <h3 className="text-base font-bold text-white">Quick Actions</h3>
-        <div className="grid grid-cols-3 gap-2">
-          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
-            <span className="text-2xl">💰</span>
-            <p className="text-xs text-center text-neutral-400">Fund Wallet</p>
-          </button>
-          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
-            <span className="text-2xl">↑</span>
-            <p className="text-xs text-center text-neutral-400">Withdraw</p>
-          </button>
-          <button className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
-            <span className="text-2xl">↔</span>
-            <p className="text-xs text-center text-neutral-400">Transfer</p>
-          </button>
-        </div>
+      {/* Quick Access */}
+      <div className="grid grid-cols-3 gap-3">
+        <button className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+          <span className="text-xl">💰</span>
+          <p className="text-xs text-center text-neutral-400 font-medium">Deposit</p>
+        </button>
+        <button className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+          <span className="text-xl">📤</span>
+          <p className="text-xs text-center text-neutral-400 font-medium">Withdraw</p>
+        </button>
+        <button className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-neutral-800 transition-colors">
+          <span className="text-xl">↔</span>
+          <p className="text-xs text-center text-neutral-400 font-medium">Transfer</p>
+        </button>
       </div>
 
-      {/* Invite & Earn Card */}
-      <div className="bg-gradient-to-br from-lime-400 via-lime-300 to-lime-200 rounded-3xl p-5 relative overflow-hidden">
-        <div className="absolute right-0 top-0 opacity-20 text-6xl">🎁</div>
-        <h3 className="text-lg font-bold text-black relative z-10">Invite & Earn</h3>
-        <p className="text-sm text-black/80 mt-2 relative z-10">Earn up to 10% commission</p>
-        <button className="text-lime-600 text-sm font-semibold hover:underline mt-3 relative z-10">View Referrals →</button>
+      {/* Referral Earnings Card */}
+      <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 overflow-hidden relative">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold">Referral Earnings</p>
+            <h3 className="text-2xl font-bold text-white mt-2">Invite & Earn</h3>
+            <p className="text-neutral-400 text-sm mt-1">Get up to 10% commission on referrals</p>
+            <button className="text-lime-400 text-xs font-semibold hover:text-lime-300 mt-3 uppercase tracking-wider">
+              View Referrals →
+            </button>
+          </div>
+          <div className="text-4xl opacity-20">🎁</div>
+        </div>
       </div>
 
 
