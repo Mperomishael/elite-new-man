@@ -108,12 +108,13 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
     <div className="relative max-w-2xl mx-auto space-y-5 pb-24 px-4">
       {/* Faint background image */}
       <div
-        className="fixed inset-0 -z-10 pointer-events-none opacity-[0.06]"
+        className="fixed inset-0 -z-10 pointer-events-none opacity-[0.08]"
         style={{
           backgroundImage: "url('https://i.ibb.co/xKZFTHJW/hero-image.jpg')",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center top",
           backgroundRepeat: "no-repeat",
+          filter: "blur(1px) saturate(0.6)",
         }}
       />
 
