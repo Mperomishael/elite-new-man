@@ -67,6 +67,8 @@ export interface AdminWalletSettings {
   ethAddress: string
   ethTag: string
   bankDetails?: BankDetails
+  whatsappNumber?: string
+  supportPhone?: string
   lastUpdated: Timestamp
   updatedBy: string
 }
@@ -75,9 +77,16 @@ export interface AdminWalletSettings {
 // ADMIN CHECK
 // -------------------------
 
+// Centralized list of approved admin emails (verified Google accounts only)
+export const ADMIN_EMAILS = [
+  "empiredigitalsworldwide@gmail.com",
+  "bigdrem35@gmail.com",
+]
+
 export async function isAdminByEmail(email: string): Promise<boolean> {
-  const adminEmails = ["Elite Block Marketstrade@gmail.com", "empiredigitalsworldwide@gmail.com"]
-  return adminEmails.includes(email)
+  if (!email) return false
+  const normalized = email.trim().toLowerCase()
+  return ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === normalized)
 }
 
 // -------------------------
@@ -87,13 +96,13 @@ export async function isAdminByEmail(email: string): Promise<boolean> {
 export async function createAdminRecord(
   userId: string,
   email: string,
-  displayName: string
+  displayName?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const adminRecord = {
       userId,
       email,
-      displayName,
+      displayName: displayName || email,
       createdAt: Timestamp.now(),
       role: "admin",
     }
