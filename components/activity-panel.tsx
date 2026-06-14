@@ -1,16 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { LogIn, Check, AlertCircle, TrendingUp, TrendingDown, Clock } from "lucide-react"
+import { LogIn, LogOut, Check, AlertCircle, TrendingUp, TrendingDown, Clock, ArrowDownToLine, ArrowUpFromLine, FileCheck, Repeat } from "lucide-react"
 import { listenToUserActivities } from "@/lib/auth-service"
 import type { Activity } from "@/lib/auth-service"
 
 interface ActivityPanelProps {
   userId?: string
   maxItems?: number
+  onSignOut?: () => void
 }
 
-export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
+export function ActivityPanel({ userId, maxItems = 10, onSignOut }: ActivityPanelProps) {
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | Activity["type"]>("all")
@@ -31,16 +32,32 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
     return () => unsubscribe()
   }, [userId, maxItems])
 
-  const filteredActivities = filter === "all" ? activities : activities.filter((a) => a.type === filter)
+  const filteredActivities =
+    filter === "all"
+      ? activities
+      : filter === "deposit"
+        ? activities.filter((a) => a.type === "deposit" || a.type === "deposit_approved")
+        : filter === "withdraw"
+          ? activities.filter((a) => a.type === "withdraw" || a.type === "withdrawal_approved")
+          : activities.filter((a) => a.type === filter)
 
   const getActivityIcon = (type: Activity["type"]) => {
     switch (type) {
       case "login":
         return <LogIn className="w-4 h-4 text-lime-400" />
+      case "logout":
+        return <LogOut className="w-4 h-4 text-neutral-400" />
+      case "deposit":
       case "deposit_approved":
-        return <TrendingUp className="w-4 h-4 text-lime-400" />
+        return <ArrowDownToLine className="w-4 h-4 text-lime-400" />
+      case "withdraw":
+        return <ArrowUpFromLine className="w-4 h-4 text-orange-400" />
       case "withdrawal_approved":
         return <TrendingDown className="w-4 h-4 text-red-400" />
+      case "trade":
+        return <Repeat className="w-4 h-4 text-purple-400" />
+      case "kyc_submission":
+        return <FileCheck className="w-4 h-4 text-amber-400" />
       case "kyc_approved":
         return <Check className="w-4 h-4 text-lime-400" />
       case "balance_change":
@@ -55,12 +72,20 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
   const getActivityBgColor = (type: Activity["type"]) => {
     switch (type) {
       case "login":
-        return "bg-lime-400/10"
+      case "deposit":
       case "deposit_approved":
       case "kyc_approved":
         return "bg-lime-400/10"
+      case "logout":
+        return "bg-neutral-800/50"
+      case "withdraw":
+        return "bg-orange-500/10"
       case "withdrawal_approved":
         return "bg-red-500/10"
+      case "trade":
+        return "bg-purple-500/10"
+      case "kyc_submission":
+        return "bg-amber-500/10"
       case "balance_change":
         return "bg-amber-500/10"
       case "profile_update":
@@ -73,12 +98,20 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
   const getActivityBdColor = (type: Activity["type"]) => {
     switch (type) {
       case "login":
-        return "border-lime-400/20"
+      case "deposit":
       case "deposit_approved":
       case "kyc_approved":
         return "border-lime-400/20"
+      case "logout":
+        return "border-neutral-700"
+      case "withdraw":
+        return "border-orange-500/20"
       case "withdrawal_approved":
         return "border-red-500/20"
+      case "trade":
+        return "border-purple-500/20"
+      case "kyc_submission":
+        return "border-amber-500/20"
       case "balance_change":
         return "border-amber-500/20"
       case "profile_update":
@@ -98,9 +131,20 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
 
   return (
     <div className="space-y-4 pb-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white">Activity Panel</h2>
-        <p className="text-sm text-neutral-400 mt-1">Your account activity and important events</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Activity Panel</h2>
+          <p className="text-sm text-neutral-400 mt-1">Your account activity and important events</p>
+        </div>
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        )}
       </div>
 
       {/* Filter Tabs */}
@@ -126,14 +170,54 @@ export function ActivityPanel({ userId, maxItems = 10 }: ActivityPanelProps) {
           Logins
         </button>
         <button
-          onClick={() => setFilter("deposit_approved")}
+          onClick={() => setFilter("logout")}
           className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
-            filter === "deposit_approved"
+            filter === "logout"
+              ? "bg-neutral-400 text-black"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
+          }`}
+        >
+          Sign Outs
+        </button>
+        <button
+          onClick={() => setFilter("deposit")}
+          className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
+            filter === "deposit"
               ? "bg-lime-400 text-white"
               : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
           }`}
         >
           Deposits
+        </button>
+        <button
+          onClick={() => setFilter("withdraw")}
+          className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
+            filter === "withdraw"
+              ? "bg-orange-500 text-white"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
+          }`}
+        >
+          Withdrawals
+        </button>
+        <button
+          onClick={() => setFilter("trade")}
+          className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
+            filter === "trade"
+              ? "bg-purple-500 text-white"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
+          }`}
+        >
+          Trading
+        </button>
+        <button
+          onClick={() => setFilter("kyc_submission")}
+          className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
+            filter === "kyc_submission"
+              ? "bg-amber-500 text-white"
+              : "bg-neutral-900 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
+          }`}
+        >
+          KYC
         </button>
         <button
           onClick={() => setFilter("balance_change")}
