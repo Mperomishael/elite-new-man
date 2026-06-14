@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react"
 import { Wallet, Check, AlertCircle } from "lucide-react"
 import { createWithdrawalRequest } from "@/lib/admin-service"
 import { auth } from "@/lib/firebase"
+import { logUserActivity } from "@/lib/auth-service"
 
 interface WithdrawViewProps {
   userId?: string
@@ -35,8 +36,6 @@ export function WithdrawView({ userId = "", username = "", availableBalance = 0 
       "United States": ["Bank of America", "Chase", "Wells Fargo", "CitiBank", "US Bank", "PNC Bank"],
       Canada: ["RBC", "TD Canada Trust", "Scotiabank", "BMO", "CIBC"],
       "United Kingdom": ["HSBC", "Barclays", "Lloyds", "NatWest", "Santander"],
-      Nigeria: ["Zenith Bank", "GTBank", "UBA", "Access Bank", "First Bank"],
-      Ghana: ["Ecobank", "GCB Bank", "Fidelity Bank Ghana", "Stanbic Ghana"],
       Kenya: ["Equity Bank", "KCB", "Co-operative Bank", "Stanbic Bank Kenya"],
       "South Africa": ["Standard Bank", "FNB", "Nedbank", "Absa", "Capitec"],
       Liberia: ["LBDI", "Ecobank Liberia", "UBA Liberia", "Global Bank Liberia"],
@@ -120,6 +119,16 @@ export function WithdrawView({ userId = "", username = "", availableBalance = 0 
       console.log("[v0] Withdrawal result:", result)
 
       if (result?.success) {
+        try {
+          await logUserActivity(currentUser.uid, {
+            type: "withdraw",
+            description: `Withdrawal request submitted via ${withdrawMethod === "crypto" ? selectedCrypto : "Bank Transfer"}`,
+            amount: parsedAmount,
+          })
+        } catch (err) {
+          console.error("[v0] Failed to log withdrawal activity:", err)
+        }
+
         setShowSuccessAnimation(true)
         setTimeout(() => {
           setWithdrawalId(result.requestId || "")
