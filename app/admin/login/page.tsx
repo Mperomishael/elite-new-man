@@ -4,11 +4,11 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { signInWithRedirect, getRedirectResult } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"
-import { isAdminByEmail, createAdminRecord } from "@/lib/admin-service"
+import { isAdminByEmail, createAdminRecord, ADMIN_EMAILS } from "@/lib/admin-service"
 import { Button } from "@/components/ui/button"
 import { DollarSign, Loader2, AlertCircle, CheckCircle } from "lucide-react"
 
-const APPROVED_ADMIN_EMAILS = ["empiredigitalsworldwide@gmail.com", "bigdrem35@gmail.com"]
+const APPROVED_ADMIN_EMAILS = ADMIN_EMAILS
 
 export default function AdminLoginPage() {
   const router = useRouter()
