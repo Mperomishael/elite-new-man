@@ -19,6 +19,7 @@ import { CopyTradingView } from "@/components/copy-trading-view"
 import { TermsView } from "@/components/terms-view"
 import { ActivityPanel } from "@/components/activity-panel"
 import { OnboardingModal } from "@/components/onboarding-modal"
+import { PageLoader } from "@/components/page-loader"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
@@ -44,6 +45,7 @@ export default function TradingDashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [pageTransitioning, setPageTransitioning] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [userName, setUserName] = useState("")
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -129,10 +131,18 @@ export default function TradingDashboard() {
     router.push("/auth/login")
   }
 
+  const navigateTo = (view: typeof activeView) => {
+    setPageTransitioning(true)
+    setTimeout(() => {
+      setActiveView(view)
+      setPageTransitioning(false)
+    }, 520)
+  }
+
   const renderView = () => {
     switch (activeView) {
       case "dashboard":
-        return <DashboardView userName={userName} onNavigate={setActiveView} />
+        return <DashboardView userName={userName} onNavigate={navigateTo} />
       case "history":
         return <TransactionHistory userId={userProfile?.uid || ""} />
       case "activity":
@@ -173,9 +183,23 @@ export default function TradingDashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-lime-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Loading...</p>
+        <div className="text-center flex flex-col items-center gap-5">
+          <div className="relative">
+            <img
+              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+              alt="Loading"
+              className="w-20 h-20 animate-logo-pulse"
+            />
+            <span className="absolute inset-0 rounded-full border-2 border-lime-400/60 animate-ripple" />
+            <span className="absolute inset-0 rounded-full border-2 border-lime-400/30 animate-ripple [animation-delay:0.4s]" />
+          </div>
+          <div className="flex items-center gap-2">
+            {[0,1,2,3,4].map((i) => (
+              <span key={i} className="block rounded-full bg-lime-400 animate-dot-wave"
+                style={{ width: i===2?10:6, height: i===2?10:6, animationDelay: `${i*0.12}s` }} />
+            ))}
+          </div>
+          <p className="text-neutral-400 text-sm tracking-widest uppercase animate-pulse">Loading…</p>
         </div>
       </div>
     )
@@ -187,10 +211,11 @@ export default function TradingDashboard() {
 
   return (
     <div className="bg-black min-h-screen font-sans text-white pb-20">
+      <PageLoader isLoading={pageTransitioning} />
       <TopBar
         onMenuClick={() => setIsMenuOpen(true)}
         userName={userName}
-        onNavigateToKyc={() => setActiveView("kyc")}
+        onNavigateToKyc={() => navigateTo("kyc")}
         onLogout={handleLogout}
       />
       <SideMenu
@@ -198,14 +223,14 @@ export default function TradingDashboard() {
         onClose={() => setIsMenuOpen(false)}
         activeView={activeView}
         onNavigate={(view) => {
-          setActiveView(view)
           setIsMenuOpen(false)
+          navigateTo(view)
         }}
         onLogout={handleLogout}
       />
       <ActivityNotifications />
       <main className="px-4 pt-4">{renderView()}</main>
-      <BottomNav activeView={activeView} onNavigate={setActiveView} />
+      <BottomNav activeView={activeView} onNavigate={navigateTo} />
       {userProfile && (
         <OnboardingModal
           userProfile={userProfile}
