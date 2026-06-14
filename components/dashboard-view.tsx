@@ -22,74 +22,30 @@ interface DashboardViewProps {
 
 export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   const [activeTab, setActiveTab] = useState<"daily" | "weekly" | "monthly" | "yearly">("daily")
-  const [cryptoPrices, setCryptoPrices] = useState({
-    bitcoin: { price: 0, change: 0 },
-    ethereum: { price: 0, change: 0 },
-    tether: { price: 0, change: 0 },
-    binancecoin: { price: 0, change: 0 },
-    ripple: { price: 0, change: 0 },
-    cardano: { price: 0, change: 0 },
-    solana: { price: 0, change: 0 },
-    polkadot: { price: 0, change: 0 },
-  })
   const [balance, setBalance] = useState(0)
   const [profitBalance, setProfitBalance] = useState(0)
   const [selectedCurrency, setSelectedCurrency] = useState("USD")
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [kycStatus, setKycStatus] = useState("pending")
 
+  // TradingView crypto price widget - same widget used in the Buying section
   useEffect(() => {
     const script = document.createElement("script")
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js"
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
     script.async = true
     script.innerHTML = JSON.stringify({
-      colorTheme: "dark",
-      dateRange: "12M",
-      showChart: true,
-      locale: "en",
       width: "100%",
-      height: "400",
-      largeChartUrl: "",
-      isTransparent: false,
-      showSymbolLogo: true,
-      showFloatingTooltip: false,
-      plotLineColorGrowing: "rgba(16, 185, 129, 1)",
-      plotLineColorFalling: "rgba(239, 68, 68, 1)",
-      gridLineColor: "rgba(42, 46, 57, 0)",
-      scaleFontColor: "rgba(120, 123, 134, 1)",
-      belowLineFillColorGrowing: "rgba(16, 185, 129, 0.12)",
-      belowLineFillColorFalling: "rgba(239, 68, 68, 0.12)",
-      belowLineFillColorGrowingBottom: "rgba(16, 185, 129, 0)",
-      belowLineFillColorFallingBottom: "rgba(239, 68, 68, 0)",
-      symbolActiveColor: "rgba(16, 185, 129, 0.12)",
-      tabs: [
-        {
-          title: "Crypto",
-          symbols: [
-            { s: "BINANCE:BTCUSDT", d: "Bitcoin" },
-            { s: "BINANCE:ETHUSDT", d: "Ethereum" },
-            { s: "BINANCE:BNBUSDT", d: "BNB" },
-            { s: "BINANCE:SOLUSDT", d: "Solana" },
-            { s: "BINANCE:XRPUSDT", d: "Ripple" },
-          ],
-          originalTitle: "Crypto",
-        },
-        {
-          title: "Forex",
-          symbols: [
-            { s: "FX:EURUSD", d: "EUR/USD" },
-            { s: "FX:GBPUSD", d: "GBP/USD" },
-            { s: "FX:USDJPY", d: "USD/JPY" },
-            { s: "FX:USDCHF", d: "USD/CHF" },
-            { s: "FX:AUDUSD", d: "AUD/USD" },
-          ],
-          originalTitle: "Forex",
-        },
-      ],
+      height: 400,
+      defaultColumn: "overview",
+      screener_type: "crypto_mkt",
+      displayCurrency: "USD",
+      colorTheme: "dark",
+      locale: "en",
     })
 
-    const widgetContainer = document.getElementById("tradingview-market-overview")
+    const widgetContainer = document.getElementById("tradingview-dashboard-screener")
     if (widgetContainer) {
+      widgetContainer.innerHTML = ""
       widgetContainer.appendChild(script)
     }
 
@@ -99,34 +55,6 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
       }
     }
   }, [])
-
-  useEffect(() => {
-    const fetchCryptoPrices = async () => {
-      try {
-        const response = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,cardano,solana,polkadot&vs_currencies=usd&include_24hr_change=true",
-        )
-        const data = await response.json()
-        setCryptoPrices({
-          bitcoin: { price: data.bitcoin.usd, change: data.bitcoin.usd_24h_change },
-          ethereum: { price: data.ethereum.usd, change: data.ethereum.usd_24h_change },
-          tether: { price: data.tether.usd, change: data.tether.usd_24h_change },
-          binancecoin: { price: data.binancecoin.usd, change: data.binancecoin.usd_24h_change },
-          ripple: { price: data.ripple.usd, change: data.ripple.usd_24h_change },
-          cardano: { price: data.cardano.usd, change: data.cardano.usd_24h_change },
-          solana: { price: data.solana.usd, change: data.solana.usd_24h_change },
-          polkadot: { price: data.polkadot.usd, change: data.polkadot.usd_24h_change },
-        })
-      } catch (error) {
-        console.log("[v0] Error fetching crypto prices:", error)
-      }
-    }
-
-    fetchCryptoPrices()
-    const interval = setInterval(fetchCryptoPrices, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
   useEffect(() => {
     const user = auth.currentUser
     if (!user) return
@@ -176,19 +104,19 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
     }
   }, [])
 
-  const cryptoData = [
-    { id: "bitcoin", name: "Bitcoin", symbol: "BTC", icon: "₿", color: "orange" },
-    { id: "ethereum", name: "Ethereum", symbol: "ETH", icon: "Ξ", color: "purple" },
-    { id: "tether", name: "Tether", symbol: "USDT", icon: "₮", color: "emerald" },
-    { id: "binancecoin", name: "BNB", symbol: "BNB", icon: "◆", color: "yellow" },
-    { id: "ripple", name: "Ripple", symbol: "XRP", icon: "✕", color: "blue" },
-    { id: "cardano", name: "Cardano", symbol: "ADA", icon: "₳", color: "cyan" },
-    { id: "solana", name: "Solana", symbol: "SOL", icon: "◎", color: "violet" },
-    { id: "polkadot", name: "Polkadot", symbol: "DOT", icon: "●", color: "pink" },
-  ]
-
   return (
-    <div className="max-w-2xl mx-auto space-y-5 pb-24 px-4">
+    <div className="relative max-w-2xl mx-auto space-y-5 pb-24 px-4">
+      {/* Faint background image */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none opacity-[0.06]"
+        style={{
+          backgroundImage: "url('https://i.ibb.co/xKZFTHJW/hero-image.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+
       {/* Welcome Section with Status Badge */}
       <div className="pt-3">
         <p className="text-neutral-500 text-xs uppercase tracking-wider font-semibold">Welcome back,</p>
@@ -256,6 +184,14 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
         >
           <span>↗</span> Withdraw
         </button>
+      </div>
+
+      {/* Live Crypto Prices - same widget used in the Buying section */}
+      <div className="bg-neutral-900 rounded-2xl p-3 sm:p-4 border border-neutral-800 overflow-hidden">
+        <h3 className="text-sm font-bold text-white uppercase tracking-wider px-2 pt-1 pb-2">Live Crypto Prices</h3>
+        <div id="tradingview-dashboard-screener" className="tradingview-widget-container w-full overflow-hidden">
+          <div className="tradingview-widget-container__widget"></div>
+        </div>
       </div>
 
       {/* Portfolio Performance Section */}
