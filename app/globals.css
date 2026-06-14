@@ -377,4 +377,37 @@
   textarea:focus {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* ---- Page Loader Animations ---- */
+  @keyframes shimmer-bead {
+    0%   { left: -15%; }
+    100% { left: 110%; }
+  }
+  .animate-shimmer-bead {
+    animation: shimmer-bead 1.4s ease-in-out infinite;
+  }
+
+  @keyframes ripple {
+    0%   { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .animate-ripple {
+    animation: ripple 1.6s ease-out infinite;
+  }
+
+  @keyframes logo-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.7; transform: scale(0.92); }
+  }
+  .animate-logo-pulse {
+    animation: logo-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes dot-wave {
+    0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
+    30%            { transform: translateY(-8px); opacity: 1;   }
+  }
+  .animate-dot-wave {
+    animation: dot-wave 1s ease-in-out infinite;
+  }
 }
