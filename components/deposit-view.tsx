@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Bitcoin, Copy, Check, AlertCircle, Upload, X, Download } from "lucide-react"
 import { getAdminWalletSettings, createDepositRequest, listenToBankDetails } from "@/lib/admin-service"
 import type { AdminWalletSettings, BankDetails } from "@/lib/admin-service"
+import { logUserActivity } from "@/lib/auth-service"
 import QRCode from "qrcode"
 
 interface DepositViewProps {
@@ -172,6 +173,16 @@ export function DepositView({ userId, username }: DepositViewProps) {
           await generateQRCode(result.transactionId)
         }
         setIsSubmitted(true)
+
+        try {
+          await logUserActivity(userId, {
+            type: "deposit",
+            description: `Deposit request submitted via ${depositMethod === "crypto" ? selectedCrypto : "Bank Transfer"}`,
+            amount: parsedAmount,
+          })
+        } catch (err) {
+          console.error("[v0] Failed to log deposit activity:", err)
+        }
       } else {
         alert(`Failed: ${result.error}`)
       }
