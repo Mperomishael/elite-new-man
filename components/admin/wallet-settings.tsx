@@ -23,6 +23,8 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
     xrpTag: "",
     ethAddress: "",
     ethTag: "",
+    whatsappNumber: "",
+    supportPhone: "",
     lastUpdated: "",
     updatedBy: "",
   })
@@ -38,7 +40,7 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
-  const [activeTab, setActiveTab] = useState<"crypto" | "bank">("crypto")
+  const [activeTab, setActiveTab] = useState<"crypto" | "bank" | "support">("crypto")
 
   useEffect(() => {
     loadSettings()
@@ -118,6 +120,16 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
           }`}
         >
           Bank Details
+        </button>
+        <button
+          onClick={() => setActiveTab("support")}
+          className={`px-4 py-3 font-medium transition-colors border-b-2 ${
+            activeTab === "support"
+              ? "text-amber-500 border-amber-500"
+              : "text-slate-400 border-transparent hover:text-white"
+          }`}
+        >
+          Support Contact
         </button>
       </div>
 
@@ -329,8 +341,6 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
                 <option value="United States">United States</option>
                 <option value="Canada">Canada</option>
                 <option value="United Kingdom">United Kingdom</option>
-                <option value="Nigeria">Nigeria</option>
-                <option value="Ghana">Ghana</option>
                 <option value="Kenya">Kenya</option>
                 <option value="South Africa">South Africa</option>
                 <option value="India">India</option>
@@ -353,6 +363,63 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
             className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900"
           >
             {saving ? "Saving..." : "Save Bank Details"}
+          </Button>
+
+          {settings.lastUpdated && (
+            <p className="text-xs text-slate-500 text-center">
+              Last updated: {new Date(settings.lastUpdated).toLocaleString()}
+            </p>
+          )}
+        </div>
+      )}
+
+      {activeTab === "support" && (
+        <div className="bg-slate-900 rounded-lg p-6 border border-slate-800 space-y-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Support Contact Details</h3>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">WhatsApp Number</label>
+              <input
+                type="text"
+                value={settings.whatsappNumber || ""}
+                onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
+                placeholder="e.g. +27715403179"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Include the country code (e.g. +1, +44, +234). Used for the WhatsApp Support button in the user app.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Support Phone Number</label>
+              <input
+                type="text"
+                value={settings.supportPhone || ""}
+                onChange={(e) => setSettings({ ...settings, supportPhone: e.target.value })}
+                placeholder="e.g. +1 (800) 123-4567"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                This number will be displayed to users on the Contact / Support page.
+              </p>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+              <p className="text-xs text-blue-300">
+                These numbers update instantly across the app, including the Support page&apos;s WhatsApp button and
+                contact phone display.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900"
+          >
+            {saving ? "Saving..." : "Save Support Contact"}
           </Button>
 
           {settings.lastUpdated && (
