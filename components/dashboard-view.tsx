@@ -31,9 +31,9 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   // TradingView crypto price widget - same widget used in the Buying section
   useEffect(() => {
     const script = document.createElement("script")
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
+    script.type = "text/javascript"
     script.async = true
-    script.innerHTML = JSON.stringify({
+    script.textContent = JSON.stringify({
       width: "100%",
       height: 400,
       defaultColumn: "overview",
@@ -49,9 +49,17 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
       widgetContainer.appendChild(script)
     }
 
+    const scriptLoader = document.createElement("script")
+    scriptLoader.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
+    scriptLoader.async = true
+    widgetContainer?.appendChild(scriptLoader)
+
     return () => {
       if (widgetContainer && widgetContainer.contains(script)) {
         widgetContainer.removeChild(script)
+      }
+      if (widgetContainer && widgetContainer.contains(scriptLoader)) {
+        widgetContainer.removeChild(scriptLoader)
       }
     }
   }, [])
