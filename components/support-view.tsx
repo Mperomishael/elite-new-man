@@ -1,9 +1,10 @@
 "use client"
 
-import { Mail, Send, MessageSquare, Clock, MessageCircle, Loader } from "lucide-react"
+import { Mail, Send, MessageSquare, Clock, MessageCircle, Loader, Phone } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { collection, query, where, onSnapshot, addDoc, Timestamp, type Unsubscribe } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { getAdminWalletSettings } from "@/lib/admin-service"
 
 interface Message {
   id: string
@@ -26,6 +27,21 @@ export function SupportView({ userId, username }: SupportViewProps) {
   const [sending, setSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [subject, setSubject] = useState("")
+  const [whatsappNumber, setWhatsappNumber] = useState("")
+  const [supportPhone, setSupportPhone] = useState("")
+
+  useEffect(() => {
+    const loadContactSettings = async () => {
+      try {
+        const settings = await getAdminWalletSettings()
+        if (settings?.whatsappNumber) setWhatsappNumber(settings.whatsappNumber)
+        if (settings?.supportPhone) setSupportPhone(settings.supportPhone)
+      } catch (err) {
+        console.error("[v0] Error loading support contact settings:", err)
+      }
+    }
+    loadContactSettings()
+  }, [])
 
   useEffect(() => {
     let unsubscribe: Unsubscribe | null = null
@@ -96,10 +112,10 @@ export function SupportView({ userId, username }: SupportViewProps) {
     }
   }
 
-  const whatsappNumber = "+27715403179"
   const whatsappMessage = "Hello, USTrader, I need help"
 
   const handleWhatsAppClick = () => {
+    if (!whatsappNumber) return
     const encodedMessage = encodeURIComponent(whatsappMessage)
     window.open(`https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodedMessage}`, "_blank")
   }
@@ -193,18 +209,32 @@ export function SupportView({ userId, username }: SupportViewProps) {
 
       {/* Contact Info */}
       <div className="grid grid-cols-1 gap-3">
-        <button
-          onClick={handleWhatsAppClick}
-          className="bg-gradient-to-br from-green-600 to-lime-500 hover:from-green-700 hover:to-lime-700 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-95"
-        >
-          <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-            <MessageCircle className="w-6 h-6 text-white" />
+        {whatsappNumber && (
+          <button
+            onClick={handleWhatsAppClick}
+            className="bg-gradient-to-br from-green-600 to-lime-500 hover:from-green-700 hover:to-lime-700 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-95"
+          >
+            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+              <MessageCircle className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs text-green-100">WhatsApp Support</p>
+              <p className="font-semibold text-white">{whatsappNumber}</p>
+            </div>
+          </button>
+        )}
+
+        {supportPhone && (
+          <div className="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl p-5 flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+              <Phone className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-xs text-blue-100">Call Us</p>
+              <p className="font-semibold text-white">{supportPhone}</p>
+            </div>
           </div>
-          <div className="text-left">
-            <p className="text-xs text-green-100">WhatsApp Support</p>
-            <p className="font-semibold text-white">{whatsappNumber}</p>
-          </div>
-        </button>
+        )}
 
         <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-5 flex items-center gap-4">
           <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
