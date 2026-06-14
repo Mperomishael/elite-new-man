@@ -63,12 +63,11 @@ export async function createUserProfile(
   user: User,
   profileData: Omit<UserProfile, "uid" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">
 ) {
-  const isAdmin = user.email === "Elite Block Marketstrade@gmail.com" || user.email === "empiredigitalsworldwide@gmail.com"
-
+  // Regular users always start with 0 balance
   const userProfile: UserProfile = {
     uid: user.uid,
     ...profileData,
-    balance: isAdmin ? 100000000000 : 0,
+    balance: 0,
     profitBalance: 0,
     kycDocuments: [],
     kycStatus: "not-started",
@@ -96,16 +95,30 @@ export async function signUpWithEmail(
   profileData: Omit<UserProfile, "uid" | "email" | "balance" | "createdAt" | "profitBalance" | "kycDocuments" | "kycStatus" | "displayName">
 ) {
   try {
+    console.log("[auth] Creating Firebase Auth user:", email)
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     const user = cred.user
+    console.log("[auth] Firebase Auth user created:", user.uid)
 
     await updateProfile(user, { displayName: `${profileData.firstName} ${profileData.lastName}` })
+    console.log("[auth] Profile updated, writing Firestore user doc...")
+
     const userProfile = await createUserProfile(user, { ...profileData, email })
+    console.log("[auth] Firestore user doc written successfully:", userProfile.uid)
 
     return { success: true, user, userProfile }
   } catch (error: any) {
-    console.error("[v0] Sign up error:", error)
-    return { success: false, error: error.message }
+    console.error("[auth] Sign up error code:", error.code)
+    console.error("[auth] Sign up error message:", error.message)
+
+    let friendlyError = error.message
+    if (error.code === "auth/email-already-in-use") friendlyError = "This email is already registered. Please sign in."
+    else if (error.code === "auth/weak-password") friendlyError = "Password too weak. Use at least 6 characters."
+    else if (error.code === "auth/invalid-email") friendlyError = "Invalid email address."
+    else if (error.code === "auth/network-request-failed") friendlyError = "Network error. Check your connection."
+    else if (error.code === "permission-denied") friendlyError = "Database permission error. Contact support."
+
+    return { success: false, error: friendlyError }
   }
 }
 
