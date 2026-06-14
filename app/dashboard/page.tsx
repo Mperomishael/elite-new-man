@@ -15,19 +15,21 @@ import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
 import { SettingsView } from "@/components/settings-view"
-import { LicenseView } from "@/components/license-view"
+import { CopyTradingView } from "@/components/copy-trading-view"
 import { TermsView } from "@/components/terms-view"
+import { ActivityPanel } from "@/components/activity-panel"
 import { OnboardingModal } from "@/components/onboarding-modal"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
-import { getUserProfile, signOutUser, type UserProfile } from "@/lib/auth-service"
+import { getUserProfile, signOutUser, logUserActivity, type UserProfile } from "@/lib/auth-service"
 
 export default function TradingDashboard() {
   const router = useRouter()
   const [activeView, setActiveView] = useState<
     | "dashboard"
     | "history"
+    | "activity"
     | "deposit"
     | "withdraw"
     | "buy"
@@ -36,7 +38,7 @@ export default function TradingDashboard() {
     | "referrals"
     | "support"
     | "settings"
-    | "license"
+    | "copytrading"
     | "terms"
   >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -58,6 +60,19 @@ export default function TradingDashboard() {
           // Check if onboarding is needed
           if (!profile.onboardingCompleted) {
             setShowOnboarding(true)
+          }
+
+          // Log login activity (once per session)
+          if (!sessionStorage.getItem(`login-logged-${user.uid}`)) {
+            try {
+              await logUserActivity(user.uid, {
+                type: "login",
+                description: `${profile.displayName || profile.firstName + " " + profile.lastName} logged in`,
+              })
+              sessionStorage.setItem(`login-logged-${user.uid}`, "1")
+            } catch (error) {
+              console.error("[v0] Failed to log login activity:", error)
+            }
           }
         }
       } else {
@@ -97,6 +112,17 @@ export default function TradingDashboard() {
   }
 
   const handleLogout = async () => {
+    try {
+      if (userProfile?.uid) {
+        await logUserActivity(userProfile.uid, {
+          type: "logout",
+          description: `${userProfile.displayName || userName} logged out`,
+        })
+        sessionStorage.removeItem(`login-logged-${userProfile.uid}`)
+      }
+    } catch (error) {
+      console.error("[v0] Failed to log logout activity:", error)
+    }
     await signOutUser()
     setIsAuthenticated(false)
     setUserProfile(null)
@@ -109,6 +135,14 @@ export default function TradingDashboard() {
         return <DashboardView userName={userName} onNavigate={setActiveView} />
       case "history":
         return <TransactionHistory userId={userProfile?.uid || ""} />
+      case "activity":
+        return (
+          <ActivityPanel
+            userId={userProfile?.uid || ""}
+            maxItems={100}
+            onSignOut={handleLogout}
+          />
+        )
       case "deposit":
         return <DepositView userId={userProfile?.uid || ""} username={userProfile?.username || ""} />
       case "withdraw":
@@ -127,8 +161,8 @@ export default function TradingDashboard() {
         return <SupportView userId={userProfile?.uid || ""} username={userProfile?.username || ""} />
       case "settings":
         return <SettingsView userName={userName} userProfile={userProfile || undefined} />
-      case "license":
-        return <LicenseView />
+      case "copytrading":
+        return <CopyTradingView />
       case "terms":
         return <TermsView />
       default:
@@ -167,6 +201,7 @@ export default function TradingDashboard() {
           setActiveView(view)
           setIsMenuOpen(false)
         }}
+        onLogout={handleLogout}
       />
       <ActivityNotifications />
       <main className="px-4 pt-4">{renderView()}</main>
