@@ -1,229 +1,193 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { signInWithRedirect, getRedirectResult } from "firebase/auth"
+import { signInWithPopup, onAuthStateChanged } from "firebase/auth"
 import { auth, googleProvider } from "@/lib/firebase"
 import { isAdminByEmail, createAdminRecord, ADMIN_EMAILS } from "@/lib/admin-service"
 import { Button } from "@/components/ui/button"
-import { DollarSign, Loader2, AlertCircle, CheckCircle } from "lucide-react"
-
-const APPROVED_ADMIN_EMAILS = ADMIN_EMAILS
+import { Loader2, AlertCircle, CheckCircle, ShieldCheck } from "lucide-react"
 
 export default function AdminLoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  // Start false — don't block UI while checking
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const didRedirect = useRef(false)
 
-  // Check for redirect result on page load
+  // Only check once on mount — if already a verified admin, skip login
   useEffect(() => {
-    let isMounted = true
-
-    const checkRedirectResult = async () => {
-      try {
-        console.log("[v0] Checking redirect result...")
-        const result = await getRedirectResult(auth)
-        console.log("[v0] Redirect result:", result?.user?.email || "No user")
-        
-        if (!isMounted) return
-        
-        if (result && result.user) {
-          console.log("[v0] User authenticated:", result.user.email)
-          setIsLoading(true)
-          await handleAuthSuccess(result.user)
-        } else {
-          console.log("[v0] No redirect result, user not authenticated yet")
-        }
-      } catch (error: any) {
-        console.error("[v0] Redirect result error:", error.message || error)
-        if (isMounted) {
-          setMessage({ type: "error", text: `Error: ${error.message || "Authentication failed"}` })
-        }
-      } finally {
-        if (isMounted) {
-          setIsCheckingAuth(false)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user?.email && !didRedirect.current) {
+        const ok = await isAdminByEmail(user.email)
+        if (ok) {
+          didRedirect.current = true
+          router.replace("/admin")
+          return
         }
       }
-    }
-
-    checkRedirectResult()
-
+      setIsCheckingAuth(false)
+      // Unsubscribe after first check — we don't want ongoing listener here
+      unsubscribe()
+    })
+    // Safety: show login form after 3s even if Firebase is slow
+    const timer = setTimeout(() => setIsCheckingAuth(false), 3000)
     return () => {
-      isMounted = false
+      clearTimeout(timer)
     }
   }, [router])
 
-  const handleAuthSuccess = async (user: any) => {
+  const handleGoogleLogin = async () => {
+    setIsLoading(true)
+    setMessage(null)
+
     try {
+      const result = await signInWithPopup(auth, googleProvider)
+      const user = result.user
+
       if (!user.email) {
-        console.error("[v0] No email in user object")
-        setMessage({ type: "error", text: "Could not retrieve email from Google account" })
-        setIsLoading(false)
-        return
-      }
-
-      console.log("[v0] Google user authenticated:", user.email)
-
-      // Check if email is in approved admin list
-      console.log("[v0] Checking if user is admin...")
-      const isAdmin = await isAdminByEmail(user.email)
-      console.log("[v0] isAdmin result:", isAdmin)
-
-      if (!isAdmin) {
-        console.log("[v0] User not authorized as admin:", user.email)
-        setMessage({
-          type: "error",
-          text: `Access denied. Email ${user.email} is not authorized as an admin.`,
-        })
-        // Sign out the user since they're not approved
+        setMessage({ type: "error", text: "Could not retrieve email from Google account." })
         await auth.signOut()
         setIsLoading(false)
         return
       }
 
-      console.log("[v0] User is admin, creating admin record...")
-      // Create/update admin record
-      const result = await createAdminRecord(user.uid, user.email, user.displayName || user.email)
-      console.log("[v0] Admin record creation result:", result)
+      console.log("[admin-login] Signed in as:", user.email)
+      console.log("[admin-login] Approved emails:", ADMIN_EMAILS)
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to create admin record")
+      const isAdmin = await isAdminByEmail(user.email)
+      console.log("[admin-login] isAdmin result:", isAdmin)
+
+      if (!isAdmin) {
+        setMessage({
+          type: "error",
+          text: `Access denied. "${user.email}" is not an approved admin.`,
+        })
+        await auth.signOut()
+        setIsLoading(false)
+        return
       }
 
-      console.log("[v0] Admin record created successfully, redirecting to dashboard...")
-      setMessage({ type: "success", text: "Admin authentication successful! Redirecting..." })
-      
-      // Use router.push without timeout for immediate redirect
-      router.push("/admin")
+      // Write admin record — fire and don't await to avoid blocking redirect
+      createAdminRecord(user.uid, user.email, user.displayName || user.email).catch(console.error)
+
+      setMessage({ type: "success", text: "Admin verified! Entering dashboard…" })
+      didRedirect.current = true
+      // Small delay so user sees the success message, then hard navigate
+      setTimeout(() => {
+        window.location.href = "/admin"
+      }, 600)
+
     } catch (error: any) {
-      console.error("[v0] Auth success error:", error.message || error)
-      setMessage({ type: "error", text: error.message || "An error occurred" })
+      console.error("[admin-login] Error:", error)
+
+      if (
+        error.code === "auth/popup-closed-by-user" ||
+        error.code === "auth/cancelled-popup-request"
+      ) {
+        setIsLoading(false)
+        return
+      }
+
+      let msg = "Authentication failed. Please try again."
+      if (error.code === "auth/popup-blocked") msg = "Popup was blocked. Please allow popups for this site and try again."
+      else if (error.code === "auth/network-request-failed") msg = "Network error. Check your connection."
+      else if (error.code === "auth/operation-not-allowed") msg = "Google Sign-In is not enabled in Firebase Console."
+      else if (error.message) msg = error.message
+
+      setMessage({ type: "error", text: msg })
       setIsLoading(false)
     }
   }
 
-  const handleGoogleLogin = () => {
-    setIsLoading(true)
-    setMessage(null)
-
-    try {
-      // Use redirect instead of popup - bypasses popup blockers completely
-      // User will be redirected to Google, then back to this page
-      // The useEffect hook above will handle the redirect result
-      signInWithRedirect(auth, googleProvider)
-    } catch (error: any) {
-      console.error("[v0] Google redirect error:", error)
-      let errorMessage = "Failed to initiate Google Sign-In"
-
-      if (error.code === "auth/network-request-failed") {
-        errorMessage = "Network error. Please check your connection and try again."
-      } else if (error.code === "auth/operation-not-allowed") {
-        errorMessage = "Google Sign-In is not enabled. Contact support."
-      } else if (error.message) {
-        errorMessage = `Error: ${error.message}`
-      }
-
-      setMessage({ type: "error", text: errorMessage })
-      setIsLoading(false)
-    }
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+          <p className="text-neutral-400 text-sm">Checking session…</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="text-center mb-8 animate-logo-bounce-in">
-            <img
-              src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
-              alt="Elite Block Market"
-              className="w-20 h-20 mx-auto"
-            />
-          </div>
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md">
 
-          {/* Login Card */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl backdrop-blur-sm animate-form-scale-in">
-            {isCheckingAuth ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-lime-400 mb-4" />
-                <p className="text-neutral-400 text-sm">Checking authentication...</p>
-              </div>
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <img
+            src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
+            alt="Elite Block Market"
+            className="w-28 h-28 mx-auto drop-shadow-[0_0_20px_rgba(251,191,36,0.4)]"
+          />
+          <p className="text-amber-500 text-xs mt-3 uppercase tracking-widest font-semibold">Admin Portal</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl">
+          <div className="flex items-center gap-2 justify-center mb-1">
+            <ShieldCheck className="w-5 h-5 text-amber-500" />
+            <h2 className="text-xl font-bold text-white">Secure Admin Login</h2>
+          </div>
+          <p className="text-neutral-400 text-sm text-center mb-8">
+            Sign in with your approved Google account
+          </p>
+
+          {message && (
+            <div
+              className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${
+                message.type === "success"
+                  ? "bg-lime-400/10 border border-lime-400/30"
+                  : "bg-red-500/10 border border-red-500/30"
+              }`}
+            >
+              {message.type === "success" ? (
+                <CheckCircle className="w-5 h-5 text-lime-400 flex-shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              )}
+              <p className={`text-sm ${message.type === "success" ? "text-lime-300" : "text-red-300"}`}>
+                {message.text}
+              </p>
+            </div>
+          )}
+
+          <Button
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            className="w-full h-12 bg-white hover:bg-neutral-100 text-neutral-900 font-semibold text-base rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg disabled:opacity-50"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin text-neutral-700" />
+                Signing in…
+              </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-white text-center mb-2">Admin Portal</h2>
-                <p className="text-neutral-400 text-center text-sm mb-8">
-                  Sign in with your approved Google account to access the admin dashboard
-                </p>
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
               </>
             )}
+          </Button>
 
-            {!isCheckingAuth && (
-              <>
-                {/* Message Display */}
-                {message && (
-                  <div
-                    className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
-                      message.type === "success"
-                        ? "bg-lime-400/10 border border-lime-400/30"
-                        : "bg-red-500/10 border border-red-500/30"
-                    }`}
-                  >
-                    {message.type === "success" ? (
-                      <CheckCircle className="w-5 h-5 flex-shrink-0 text-lime-400 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
-                    )}
-                    <p className={`text-sm ${message.type === "success" ? "text-lime-300" : "text-red-300"}`}>
-                      {message.text}
-                    </p>
-                  </div>
-                )}
-
-                {/* Google Login Button */}
-                <Button
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="w-full h-12 bg-lime-400 hover:bg-lime-500 text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  Sign in with Google
-                </>
-              )}
-            </Button>
-                <div className="mt-6 text-center">
-                  <a href="/" className="text-sm text-lime-400 hover:text-lime-300 transition-colors">
-                    Back to Login
-                  </a>
-                </div>
-              </>
-            )}
+          <div className="mt-6 text-center">
+            <a href="/auth/login" className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors">
+              ← Back to user login
+            </a>
           </div>
         </div>
+
+        <p className="text-center text-xs text-neutral-600 mt-4">
+          Only pre-approved email addresses can access this panel.
+        </p>
       </div>
     </div>
   )
