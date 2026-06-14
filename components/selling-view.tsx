@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { TrendingDown, Wallet } from "lucide-react"
-import { auth, getUserProfile, getUserTransactions, updateUserBalance, addTransaction } from "@/lib/auth-service"
+import { auth, getUserProfile, getUserTransactions, updateUserBalance, addTransaction, logUserActivity } from "@/lib/auth-service"
 
 export function SellingView() {
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
@@ -336,6 +336,16 @@ export function SellingView() {
                 timestamp: new Date().toISOString(),
                 description: `Sold ${sellQuantity} ${selectedAsset} at $${holding.currentPrice}`,
               })
+
+              try {
+                await logUserActivity(user.uid, {
+                  type: "trade",
+                  description: `Sold ${sellQuantity} ${selectedAsset} at $${holding.currentPrice}`,
+                  amount: sellAmount,
+                })
+              } catch (err) {
+                console.error("[v0] Failed to log trade activity:", err)
+              }
 
               setUserBalance(newBalance)
               setAmount("")
