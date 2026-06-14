@@ -15,6 +15,7 @@ import {
   Settings,
   HelpCircle,
   LogOut,
+  Repeat,
 } from "lucide-react"
 
 interface SideMenuProps {
@@ -34,12 +35,13 @@ interface SideMenuProps {
       | "referrals"
       | "support"
       | "settings"
-      | "license"
+      | "copytrading"
       | "terms",
   ) => void
+  onLogout?: () => void
 }
 
-export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuProps) {
+export function SideMenu({ isOpen, onClose, activeView, onNavigate, onLogout }: SideMenuProps) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: Home },
     { id: "history", label: "Transaction History", icon: History },
@@ -50,7 +52,7 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
     { id: "sell", label: "Selling", icon: TrendingDown },
     { id: "kyc", label: "KYC Verification", icon: FileCheck },
     { id: "referrals", label: "Referrals", icon: Users },
-    { id: "license", label: "Company License", icon: FileCheck },
+    { id: "copytrading", label: "Copy Trading", icon: Repeat },
     { id: "terms", label: "Terms & Conditions", icon: FileCheck },
     { id: "support", label: "Email Support", icon: Mail },
     { id: "settings", label: "Settings", icon: Settings },
@@ -130,7 +132,10 @@ export function SideMenu({ isOpen, onClose, activeView, onNavigate }: SideMenuPr
               <HelpCircle className="w-5 h-5" />
               <span>Help & Support</span>
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+            >
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </button>
