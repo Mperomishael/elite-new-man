@@ -32,7 +32,7 @@ export default function AdminPage() {
       const adminStatus = await isAdminByEmail(user.email)
       if (adminStatus) {
         // Create/update admin record
-        await createAdminRecord(user.uid, user.email)
+        await createAdminRecord(user.uid, user.email, user.displayName || user.email)
         setIsAdminUser(true)
         setAdminId(user.uid)
         setError("")
