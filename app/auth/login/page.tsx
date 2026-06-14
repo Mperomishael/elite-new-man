@@ -106,7 +106,7 @@ export default function LoginPage() {
             <img
               src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
               alt="Elite Block Market"
-              className="w-20 h-20 mx-auto"
+              className="w-36 h-36 mx-auto drop-shadow-[0_0_25px_rgba(212,255,0,0.35)]"
             />
           </div>
 
