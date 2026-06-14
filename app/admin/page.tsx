@@ -1,186 +1,89 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { signInWithPopup, onAuthStateChanged } from "firebase/auth"
-import { auth, googleProvider } from "@/lib/firebase"
-import { isAdminByEmail, createAdminRecord, ADMIN_EMAILS } from "@/lib/admin-service"
-import { Button } from "@/components/ui/button"
-import { Loader2, AlertCircle, CheckCircle, ShieldCheck } from "lucide-react"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { isAdminByEmail } from "@/lib/admin-service"
+import { AdminDashboard } from "@/components/admin/admin-dashboard"
 
-export default function AdminLoginPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+export default function AdminPage() {
+  const [status, setStatus] = useState<"loading" | "ok" | "denied" | "nouser">("loading")
+  const [adminId, setAdminId] = useState("")
 
-  // If already authenticated admin, go straight to /admin
   useEffect(() => {
+    // Hard timeout — if Firebase takes more than 5s, show denied rather than spin forever
+    const timeout = setTimeout(() => {
+      setStatus((s) => (s === "loading" ? "nouser" : s))
+    }, 5000)
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.email) {
-        const adminOk = await isAdminByEmail(user.email)
-        if (adminOk) {
-          router.replace("/admin")
-          return
-        }
+      clearTimeout(timeout)
+
+      if (!user || !user.email) {
+        setStatus("nouser")
+        return
       }
-      setIsCheckingAuth(false)
+
+      console.log("[admin] Auth user:", user.email)
+
+      // Check entirely in memory — no Firestore round-trip needed here
+      const ok = await isAdminByEmail(user.email)
+      console.log("[admin] isAdmin:", ok)
+
+      if (ok) {
+        setAdminId(user.uid)
+        setStatus("ok")
+      } else {
+        setStatus("denied")
+      }
     })
-    return () => unsubscribe()
-  }, [router])
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    setMessage(null)
-
-    try {
-      // signInWithPopup works reliably across all environments (no redirect quirks)
-      const result = await signInWithPopup(auth, googleProvider)
-      const user = result.user
-
-      if (!user.email) {
-        setMessage({ type: "error", text: "Could not retrieve email from Google account." })
-        await auth.signOut()
-        setIsLoading(false)
-        return
-      }
-
-      console.log("[admin] Signed in as:", user.email)
-
-      const isAdmin = await isAdminByEmail(user.email)
-      console.log("[admin] isAdmin:", isAdmin, "| email:", user.email)
-      console.log("[admin] Approved list:", ADMIN_EMAILS)
-
-      if (!isAdmin) {
-        setMessage({
-          type: "error",
-          text: `Access denied. "${user.email}" is not on the approved admin list.`,
-        })
-        await auth.signOut()
-        setIsLoading(false)
-        return
-      }
-
-      // Write/update admin record in Firestore
-      const record = await createAdminRecord(user.uid, user.email, user.displayName || user.email)
-      if (!record.success) {
-        throw new Error(record.error || "Failed to save admin record")
-      }
-
-      setMessage({ type: "success", text: "Admin verified! Redirecting to dashboard…" })
-      setTimeout(() => router.replace("/admin"), 800)
-
-    } catch (error: any) {
-      console.error("[admin] Login error:", error)
-
-      // User closed the popup — don't show error
-      if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-        setIsLoading(false)
-        return
-      }
-
-      let msg = "Authentication failed. Please try again."
-      if (error.code === "auth/network-request-failed") msg = "Network error. Check your connection."
-      else if (error.code === "auth/operation-not-allowed") msg = "Google Sign-In is not enabled in Firebase."
-      else if (error.code === "auth/popup-blocked") msg = "Popup was blocked by the browser. Allow popups for this site."
-      else if (error.message) msg = error.message
-
-      setMessage({ type: "error", text: msg })
-      setIsLoading(false)
+    return () => {
+      clearTimeout(timeout)
+      unsubscribe()
     }
-  }
+  }, [])
 
-  if (isCheckingAuth) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
-          <p className="text-neutral-400 text-sm">Checking session…</p>
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 rounded-full border-4 border-amber-500/30" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-amber-500 animate-spin" />
+          </div>
+          <p className="text-neutral-400 text-sm tracking-wide">Loading Admin Panel…</p>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md">
-
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <img
-            src="https://i.ibb.co/DPWT64HW/file-00000000899871f49095bc51ed0ef7c0.png"
-            alt="Elite Block Market"
-            className="w-28 h-28 mx-auto drop-shadow-[0_0_20px_rgba(251,191,36,0.4)]"
-          />
-          <p className="text-amber-500 text-xs mt-3 uppercase tracking-widest font-semibold">Admin Portal</p>
-        </div>
-
-        {/* Card */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl">
-          <div className="flex items-center gap-2 justify-center mb-1">
-            <ShieldCheck className="w-5 h-5 text-amber-500" />
-            <h2 className="text-xl font-bold text-white">Secure Admin Login</h2>
-          </div>
-          <p className="text-neutral-400 text-sm text-center mb-8">
-            Sign in with your approved Google account
-          </p>
-
-          {/* Message */}
-          {message && (
-            <div
-              className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${
-                message.type === "success"
-                  ? "bg-lime-400/10 border border-lime-400/30"
-                  : "bg-red-500/10 border border-red-500/30"
-              }`}
-            >
-              {message.type === "success" ? (
-                <CheckCircle className="w-5 h-5 text-lime-400 flex-shrink-0 mt-0.5" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              )}
-              <p className={`text-sm ${message.type === "success" ? "text-lime-300" : "text-red-300"}`}>
-                {message.text}
-              </p>
-            </div>
-          )}
-
-          {/* Google Button */}
-          <Button
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-            className="w-full h-13 bg-white hover:bg-neutral-100 text-neutral-900 font-semibold text-base rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Signing in…
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Continue with Google
-              </>
-            )}
-          </Button>
-
-          <div className="mt-6 text-center">
-            <a href="/auth/login" className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors">
-              ← Back to user login
-            </a>
-          </div>
-        </div>
-
-        {/* Hint */}
-        <p className="text-center text-xs text-neutral-600 mt-4">
-          Only pre-approved email addresses can access this panel.
-        </p>
+  if (status === "nouser") {
+    // Not signed in — hard redirect to admin login
+    if (typeof window !== "undefined") window.location.href = "/admin/login"
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-neutral-400 text-sm">Redirecting to login…</p>
       </div>
-    </div>
-  )
+    )
+  }
+
+  if (status === "denied") {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="bg-neutral-900 border border-red-500/30 rounded-2xl p-8 max-w-md text-center space-y-4">
+          <p className="text-red-400 font-semibold">Access Denied</p>
+          <p className="text-neutral-400 text-sm">Your account is not authorised to access the admin panel.</p>
+          <a
+            href="/auth/login"
+            className="inline-block mt-2 px-6 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg text-sm transition-colors"
+          >
+            Go to User Login
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  return <AdminDashboard adminId={adminId} />
 }
