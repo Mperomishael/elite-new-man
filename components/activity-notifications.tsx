@@ -126,7 +126,7 @@ export function ActivityNotifications({ userProfile, userId }: ActivityNotificat
   if (!isVisible) return null
 
   return (
-    <div className="fixed top-20 left-1/2 -tranneutral-x-1/2 z-50 animate-in slide-in-from-top duration-300 max-w-md w-full px-4">
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300 w-[calc(100%-2rem)] max-w-md px-0">
       {notificationType === "news" ? (
         <div className="bg-gradient-to-r from-amber-900 to-orange-900 border border-amber-500/50 rounded-xl shadow-2xl p-4 pr-12">
           <button
