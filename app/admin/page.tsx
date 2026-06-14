@@ -53,7 +53,9 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4 relative">
+            <span className="absolute inset-0 rounded-full border-2 border-amber-400/40 animate-ripple" />
+          </div>
           <p className="text-white">Loading Admin Panel...</p>
         </div>
       </div>
