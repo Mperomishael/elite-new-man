@@ -259,7 +259,18 @@ export interface Activity {
   id?: string
   userId: string
   username: string
-  type: "login" | "deposit_approved" | "withdrawal_approved" | "kyc_approved" | "balance_change" | "profile_update"
+  type:
+    | "login"
+    | "logout"
+    | "deposit"
+    | "deposit_approved"
+    | "withdraw"
+    | "withdrawal_approved"
+    | "trade"
+    | "kyc_submission"
+    | "kyc_approved"
+    | "balance_change"
+    | "profile_update"
   description: string
   amount?: number
   previousValue?: number | string
