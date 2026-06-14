@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Search, TrendingUp, Star } from "lucide-react"
 import { auth } from "@/lib/firebase"
-import { getUserProfile, getUserTransactions, updateUserBalance, addTransaction } from "@/lib/auth-service"
+import { getUserProfile, getUserTransactions, updateUserBalance, addTransaction, logUserActivity } from "@/lib/auth-service"
 
 export function BuyingView() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -308,6 +308,16 @@ export function BuyingView() {
                 timestamp: new Date().toISOString(),
                 description: `Bought ${quantity.toFixed(6)} ${selectedAsset} at $${assetPrice}`,
               })
+
+              try {
+                await logUserActivity(user.uid, {
+                  type: "trade",
+                  description: `Bought ${quantity.toFixed(6)} ${selectedAsset} at $${assetPrice}`,
+                  amount: buyAmount,
+                })
+              } catch (err) {
+                console.error("[v0] Failed to log trade activity:", err)
+              }
 
               setUserBalance(newBalance)
               setAmount("")
