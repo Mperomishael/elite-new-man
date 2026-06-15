@@ -1,29 +1,15 @@
 "use client"
 
 import { PlusCircle, Bot, Home, FileCheck, Headphones } from "lucide-react"
+import type { AppView } from "@/lib/views"
 
 interface BottomNavProps {
   activeView: string
-  onNavigate: (
-    view:
-      | "dashboard"
-      | "history"
-      | "activity"
-      | "deposit"
-      | "withdraw"
-      | "buy"
-      | "sell"
-      | "kyc"
-      | "referrals"
-      | "support"
-      | "settings"
-      | "license"
-      | "terms",
-  ) => void
+  onNavigate: (view: AppView) => void
 }
 
 export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
-  const navItems = [
+  const navItems: { id: AppView; label: string; icon: any; isCenter?: boolean }[] = [
     { id: "deposit", label: "Add Funds", icon: PlusCircle },
     { id: "buy", label: "Auto Trade", icon: Bot },
     { id: "dashboard", label: "Home", icon: Home, isCenter: true },
@@ -42,7 +28,7 @@ export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
             return (
               <button
                 key={item.id}
-                onClick={() => onNavigate(item.id as any)}
+                onClick={() => onNavigate(item.id)}
                 className="flex flex-col items-center gap-0.5 py-2 px-2 sm:px-3 -mt-6 active:scale-95 transition-transform"
               >
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-lime-400 rounded-full flex items-center justify-center shadow-lg shadow-lime-400/50">
@@ -56,7 +42,7 @@ export function BottomNav({ activeView, onNavigate }: BottomNavProps) {
           return (
             <button
               key={item.id}
-              onClick={() => onNavigate(item.id as any)}
+              onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center gap-0.5 py-2.5 sm:py-3 px-2 sm:px-3 transition-all active:scale-95 ${
                 isActive ? "text-lime-400" : "text-neutral-400"
               }`}
