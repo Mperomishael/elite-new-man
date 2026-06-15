@@ -66,36 +66,32 @@ export function SellingView() {
 
   useEffect(() => {
     if (!selectedAsset) {
+      const widgetContainer = document.getElementById("tradingview-screener-sell")
+      if (!widgetContainer) return
+
+      widgetContainer.innerHTML = ""
+
       const script = document.createElement("script")
       script.type = "text/javascript"
-      script.async = true
-      script.textContent = JSON.stringify({
-        width: "100%",
-        height: 490,
-        defaultColumn: "overview",
-        screener_type: assetType === "crypto" ? "crypto_mkt" : "forex_mkt",
-        displayCurrency: "USD",
-        colorTheme: "dark",
-        locale: "en",
-      })
-
-      const widgetContainer = document.getElementById("tradingview-screener-sell")
-      if (widgetContainer) {
-        widgetContainer.innerHTML = ""
-        widgetContainer.appendChild(script)
-      }
+      script.textContent = `{
+        "width": "100%",
+        "height": 490,
+        "defaultColumn": "overview",
+        "screener_type": "${assetType === "crypto" ? "crypto_mkt" : "forex_mkt"}",
+        "displayCurrency": "USD",
+        "colorTheme": "dark",
+        "locale": "en"
+      }`
+      widgetContainer.appendChild(script)
 
       const scriptLoader = document.createElement("script")
       scriptLoader.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
       scriptLoader.async = true
-      widgetContainer?.appendChild(scriptLoader)
+      widgetContainer.appendChild(scriptLoader)
 
       return () => {
-        if (widgetContainer && widgetContainer.contains(script)) {
-          widgetContainer.removeChild(script)
-        }
-        if (widgetContainer && widgetContainer.contains(scriptLoader)) {
-          widgetContainer.removeChild(scriptLoader)
+        if (widgetContainer && widgetContainer.innerHTML) {
+          widgetContainer.innerHTML = ""
         }
       }
     }
