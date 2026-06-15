@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background dark">
       <head>
-        <script src="//code.jivosite.com/widget/58f9qTOD4U" async></script>
+       <script src="//code.jivosite.com/widget/0fjHk31MUi" async></script>
 
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased bg-black text-white`}>
