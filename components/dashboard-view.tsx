@@ -5,6 +5,8 @@ import { TrendingUp, TrendingDown, Eye, Check, MoreVertical } from "lucide-react
 import { auth, db } from "@/lib/firebase"
 import { doc, onSnapshot, collection, query, where, orderBy, limit, onSnapshot as firestoreOnSnapshot } from "firebase/firestore"
 
+import type { AppView } from "@/lib/views"
+
 interface Transaction {
   id: string
   userId: string
@@ -17,7 +19,7 @@ interface Transaction {
 
 interface DashboardViewProps {
   userName: string
-  onNavigate: (view: "deposit" | "withdraw") => void
+  onNavigate: (view: AppView) => void
 }
 
 export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
@@ -31,9 +33,9 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
   // TradingView crypto price widget - same widget used in the Buying section
   useEffect(() => {
     const script = document.createElement("script")
-    script.type = "text/javascript"
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
     script.async = true
-    script.textContent = JSON.stringify({
+    script.innerHTML = JSON.stringify({
       width: "100%",
       height: 400,
       defaultColumn: "overview",
@@ -49,17 +51,9 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
       widgetContainer.appendChild(script)
     }
 
-    const scriptLoader = document.createElement("script")
-    scriptLoader.src = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js"
-    scriptLoader.async = true
-    widgetContainer?.appendChild(scriptLoader)
-
     return () => {
       if (widgetContainer && widgetContainer.contains(script)) {
         widgetContainer.removeChild(script)
-      }
-      if (widgetContainer && widgetContainer.contains(scriptLoader)) {
-        widgetContainer.removeChild(scriptLoader)
       }
     }
   }, [])
