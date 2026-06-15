@@ -1,0 +1,15 @@
+// Single source of truth for all navigable view names
+export type AppView =
+  | "dashboard"
+  | "history"
+  | "activity"
+  | "deposit"
+  | "withdraw"
+  | "buy"
+  | "sell"
+  | "kyc"
+  | "referrals"
+  | "support"
+  | "settings"
+  | "copytrading"
+  | "terms"
