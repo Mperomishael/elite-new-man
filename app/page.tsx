@@ -10,7 +10,7 @@ import { SellingView } from "@/components/selling-view"
 import { BottomNav } from "@/components/bottom-nav"
 import { TopBar } from "@/components/top-bar"
 import { SideMenu } from "@/components/side-menu"
-import { KycView } from "@/components/kyc-view"
+import { KYCUpload as KycView } from "@/components/kyc-view"
 import { ReferralsView } from "@/components/referrals-view"
 import { SupportView } from "@/components/support-view"
 import { ActivityNotifications } from "@/components/activity-notifications"
@@ -24,11 +24,24 @@ import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import { getUserProfile, signOutUser, logUserActivity, type UserProfile } from "@/lib/auth-service"
-import type { AppView } from "@/lib/views"
 
 export default function TradingDashboard() {
   const router = useRouter()
-  const [activeView, setActiveView] = useState<AppView>("dashboard")
+  const [activeView, setActiveView] = useState<
+    | "dashboard"
+    | "history"
+    | "activity"
+    | "deposit"
+    | "withdraw"
+    | "buy"
+    | "sell"
+    | "kyc"
+    | "referrals"
+    | "support"
+    | "settings"
+    | "copytrading"
+    | "terms"
+  >("dashboard")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -118,7 +131,7 @@ export default function TradingDashboard() {
     router.push("/auth/login")
   }
 
-  const navigateTo = (view: AppView) => {
+  const navigateTo = (view: typeof activeView) => {
     setPageTransitioning(true)
     setTimeout(() => {
       setActiveView(view)
@@ -163,7 +176,7 @@ export default function TradingDashboard() {
       case "terms":
         return <TermsView />
       default:
-        return <DashboardView userName={userName} onNavigate={navigateTo} />
+        return <DashboardView userName={userName} onNavigate={setActiveView} />
     }
   }
 
