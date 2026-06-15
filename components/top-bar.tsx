@@ -1,19 +1,21 @@
 "use client"
 
-import { Menu, Bell } from "lucide-react"
+import { Menu, Bell, LogOut } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { UserProfile } from "@/lib/auth-service"
 import { getMessageCount } from "@/lib/news-service"
+import type { AppView } from "@/lib/views"
 
 interface TopBarProps {
   onMenuClick: () => void
   userName: string
   onNavigateToKyc: () => void
+  onLogout?: () => void
   userProfile?: UserProfile
   userId?: string
 }
 
-export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, userId }: TopBarProps) {
+export function TopBar({ onMenuClick, userName, onNavigateToKyc, onLogout, userProfile, userId }: TopBarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const [messageCount, setMessageCount] = useState(0)
 
@@ -50,102 +52,116 @@ export function TopBar({ onMenuClick, userName, onNavigateToKyc, userProfile, us
             </div>
           </div>
         </div>
-        <div className="relative">
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative text-white hover:text-lime-400 transition-colors p-2 -mr-2 active:scale-95"
-          >
-            <Bell className="w-5 h-5 md:w-6 md:h-6" />
-            {messageCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 flex items-center justify-center bg-lime-400 text-black text-xs font-bold w-5 h-5 rounded-full">
-                {messageCount > 99 ? "99+" : messageCount}
-              </span>
-            )}
-            {messageCount === 0 && (
-              <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-lime-400 ring-2 ring-black"></span>
-            )}
-          </button>
 
-          {showNotifications && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50">
-              <div className="p-4 border-b border-neutral-800">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-sm">Notifications</h3>
-                  {messageCount > 0 && (
-                    <span className="text-xs bg-lime-400/20 text-lime-400 px-2 py-1 rounded-full font-semibold">
-                      {messageCount} new
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="max-h-96 overflow-y-auto">
-                {/* Welcome Message */}
-                <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">👋</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm mb-1">Welcome, {userName}!</p>
-                      <p className="text-xs text-neutral-400">
-                        Welcome to Elite Block Market. Start trading crypto and forex today!
-                      </p>
-                      <p className="text-xs text-neutral-500 mt-1">Just now</p>
-                    </div>
+        <div className="flex items-center gap-1">
+          {/* Notification Bell */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative text-white hover:text-lime-400 transition-colors p-2 active:scale-95"
+            >
+              <Bell className="w-5 h-5 md:w-6 md:h-6" />
+              {messageCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 flex items-center justify-center bg-lime-400 text-black text-xs font-bold w-5 h-5 rounded-full">
+                  {messageCount > 99 ? "99+" : messageCount}
+                </span>
+              )}
+              {messageCount === 0 && (
+                <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-lime-400 ring-2 ring-black"></span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="p-4 border-b border-neutral-800">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-sm">Notifications</h3>
+                    {messageCount > 0 && (
+                      <span className="text-xs bg-lime-400/20 text-lime-400 px-2 py-1 rounded-full font-semibold">
+                        {messageCount} new
+                      </span>
+                    )}
                   </div>
                 </div>
-
-                {userProfile?.kycStatus !== "approved" && (
+                <div className="max-h-96 overflow-y-auto">
                   <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xl">🔐</span>
+                        <span className="text-xl">👋</span>
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-sm mb-1">Complete KYC Verification</p>
-                        <p className="text-xs text-neutral-400 mb-2">
-                          Verify your identity to unlock higher trading limits and withdrawal amounts.
+                        <p className="font-semibold text-sm mb-1">Welcome, {userName}!</p>
+                        <p className="text-xs text-neutral-400">
+                          Welcome to Elite Block Market. Start trading crypto and forex today!
                         </p>
-                        <button
-                          onClick={() => {
-                            setShowNotifications(false)
-                            onNavigateToKyc()
-                          }}
-                          className="text-xs bg-lime-400 hover:bg-lime-500 text-black px-3 py-1.5 rounded-lg transition-colors font-semibold"
-                        >
-                          Verify Now
-                        </button>
-                        <p className="text-xs text-neutral-500 mt-2">2 hours ago</p>
+                        <p className="text-xs text-neutral-500 mt-1">Just now</p>
                       </div>
                     </div>
                   </div>
-                )}
 
-                {/* Trading Activity */}
-                <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">📈</span>
+                  {userProfile?.kycStatus !== "approved" && (
+                    <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xl">🔐</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-sm mb-1">Complete KYC Verification</p>
+                          <p className="text-xs text-neutral-400 mb-2">
+                            Verify your identity to unlock higher trading limits.
+                          </p>
+                          <button
+                            onClick={() => {
+                              setShowNotifications(false)
+                              onNavigateToKyc()
+                            }}
+                            className="text-xs bg-lime-400 hover:bg-lime-500 text-black px-3 py-1.5 rounded-lg transition-colors font-semibold"
+                          >
+                            Verify Now
+                          </button>
+                          <p className="text-xs text-neutral-500 mt-2">2 hours ago</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm mb-1">Market Update</p>
-                      <p className="text-xs text-neutral-400">
-                        Bitcoin is up 5.2% today. Great time to review your portfolio!
-                      </p>
-                      <p className="text-xs text-neutral-500 mt-1">5 hours ago</p>
+                  )}
+
+                  <div className="p-4 border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-lime-400/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl">📈</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm mb-1">Market Update</p>
+                        <p className="text-xs text-neutral-400">
+                          Bitcoin is up 5.2% today. Great time to review your portfolio!
+                        </p>
+                        <p className="text-xs text-neutral-500 mt-1">5 hours ago</p>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div className="p-3 border-t border-neutral-800 text-center">
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="text-xs text-lime-400 hover:text-lime-300 font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-              <div className="p-3 border-t border-neutral-800 text-center">
-                <button
-                  onClick={() => setShowNotifications(false)}
-                  className="text-xs text-lime-400 hover:text-lime-300 font-medium"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            )}
+          </div>
+
+          {/* Sign Out button */}
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="text-neutral-400 hover:text-red-400 transition-colors p-2 active:scale-95"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           )}
         </div>
       </div>
