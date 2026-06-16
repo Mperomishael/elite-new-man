@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { X, TrendingUp } from "lucide-react"
 
-// Define types locally since we are troubleshooting build errors
 interface TradingNews {
   title: string
   description: string
@@ -18,19 +17,7 @@ const activities = [
   { country: "USA", action: "is trading with", amount: 10800, type: "trading" },
   { country: "Madagascar", action: "just withdrew", amount: 6615, type: "withdrawal" },
   { country: "United Kingdom", action: "is trading with", amount: 22500, type: "trading" },
-  { country: "Canada", action: "just withdrew", amount: 8010, type: "withdrawal" },
-  { country: "Australia", action: "made", amount: 10350, type: "profit" },
-  { country: "Germany", action: "is trading with", amount: 28800, type: "trading" },
-  { country: "Brazil", action: "just withdrew", amount: 5040, type: "withdrawal" },
-  { country: "India", action: "made", amount: 7020, type: "profit" },
-  { country: "France", action: "is trading with", amount: 16200, type: "trading" },
-  { country: "Japan", action: "just withdrew", amount: 8280, type: "withdrawal" },
-  { country: "Mexico", action: "made", amount: 5760, type: "profit" },
-  { country: "Spain", action: "is trading with", amount: 13500, type: "trading" },
-  { country: "Italy", action: "just withdrew", amount: 9900, type: "withdrawal" },
-  { country: "Singapore", action: "made", amount: 18900, type: "profit" },
-  { country: "UAE", action: "is trading with", amount: 40500, type: "trading" },
-  { country: "South Korea", action: "just withdrew", amount: 12150, type: "withdrawal" }
+  { country: "Germany", action: "is trading with", amount: 28800, type: "trading" }
 ];
 
 const mockTradingNews: TradingNews[] = [
@@ -43,14 +30,6 @@ const mockTradingNews: TradingNews[] = [
     changePercent: -1.0,
   },
   {
-    title: "EUR/USD Holds Above 1.16",
-    description: "Euro strengthens against dollar on ECB policy expectations.",
-    source: "Trading Economics",
-    category: "forex",
-    symbol: "EURUSD",
-    changePercent: 0.16,
-  },
-  {
     title: "Gold Hits New All-Time High",
     description: "Safe-haven demand surges as geopolitical tensions drive gold above $3,400/oz.",
     source: "Kitco",
@@ -60,7 +39,7 @@ const mockTradingNews: TradingNews[] = [
   }
 ];
 
-export function ActivityNotifications() {
+export function ActivityNotification() {
   const [currentActivity, setCurrentActivity] = useState<any>(activities[0])
   const [currentNews, setCurrentNews] = useState<any>(mockTradingNews[0])
   const [isVisible, setIsVisible] = useState(false)
@@ -71,7 +50,7 @@ export function ActivityNotifications() {
     try {
       const audio = new Audio('/audio/notification.mp3');
       audio.volume = 0.4;
-      audio.play().catch(() => console.log("Audio play blocked by browser"));
+      audio.play().catch(() => console.log("Audio play blocked"));
     } catch (e) {
       console.error("Audio error", e);
     }
@@ -91,7 +70,6 @@ export function ActivityNotifications() {
       
       setIsVisible(true);
       playNotificationSound();
-
       setTimeout(() => setIsVisible(false), 4000);
     };
 
@@ -108,8 +86,12 @@ export function ActivityNotifications() {
           <button onClick={() => setIsVisible(false)} className="absolute top-2 right-2 text-zinc-500"><X size={16}/></button>
           <div className="flex gap-3">
             <div className="bg-amber-500 p-2 rounded-full h-fit"><TrendingUp size={16} className="text-white"/></div>
-            <div>
-              <h4 className="text-white text-sm font-bold">{currentNews.title}</h4>
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <h4 className="text-white text-sm font-bold">{currentNews.title}</h4>
+                {/* messageCount is now used here */}
+                <span className="text-[10px] text-zinc-600 ml-2">ID: {messageCount}</span>
+              </div>
               <p className="text-zinc-400 text-xs mt-1">{currentNews.description}</p>
               <div className="flex justify-between mt-2 items-center">
                 <span className="text-[10px] text-amber-500 font-mono">{currentNews.symbol}</span>
@@ -119,13 +101,12 @@ export function ActivityNotifications() {
           </div>
         </div>
       ) : (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-2xl relative">
-          <button onClick={() => setIsVisible(false)} className="absolute top-2 right-2 text-zinc-500"><X size={16}/></button>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-2xl relative flex items-center justify-between">
           <p className="text-sm text-zinc-200">
             Someone from <span className="text-lime-400 font-bold">{currentActivity.country}</span> {currentActivity.action} 
-            <span className="text-white font-mono ml-1">${currentActivity.amount.toLocaleString()}</span>
-            {currentActivity.type === "profit" && <span className="text-lime-500 ml-1">profit</span>}
+            {currentActivity.type === "profit" && <span className="text-lime-500 ml-1 font-bold">profit</span>}
           </p>
+          <button onClick={() => setIsVisible(false)} className="text-zinc-500 ml-4"><X size={16}/></button>
         </div>
       )}
     </div>
