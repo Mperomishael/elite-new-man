@@ -36,7 +36,7 @@ window.smartsupp||(function(d) {
   c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
 })(document);
 </script>
-   target="_blank">Smartsupp</a></noscript>
+  <noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
 
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased bg-black text-white`}>
