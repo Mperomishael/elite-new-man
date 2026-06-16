@@ -47,10 +47,6 @@ export function DepositView({ userId, username }: DepositViewProps) {
             btcTag: (settings as any).btcTag || (settings as any).btc_tag || null,
             usdtAddress: (settings as any).usdtAddress || (settings as any).usdt_address || null,
             usdtTag: (settings as any).usdtTag || (settings as any).usdt_tag || null,
-            xrpAddress: (settings as any).xrpAddress || (settings as any).xrp_address || null,
-            xrpTag: (settings as any).xrpTag || (settings as any).xrp_tag || null,
-            ethAddress: (settings as any).ethAddress || (settings as any).eth_address || null,
-            ethTag: (settings as any).ethTag || (settings as any).eth_tag || null,
           }
           setWalletSettings(normalized as AdminWalletSettings)
         }
@@ -70,7 +66,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
     return () => unsubscribe()
   }, [])
 
-  const handleCryptoChange = (crypto: "BTC" | "USDT" | "XRP" | "ETH") => {
+  const handleCryptoChange = (crypto: "BTC" | "USDT") => {
     setSelectedCrypto(crypto)
   }
 
@@ -78,7 +74,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
     const parsed = Number.parseFloat(amount || "0")
 
     if (depositMethod === "crypto") {
-      const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress : selectedCrypto === "XRP" ? walletSettings?.xrpAddress : walletSettings?.ethAddress
+      const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress
       if (parsed >= 50 && walletAddress) {
         setStep("payment")
       } else {
@@ -163,7 +159,7 @@ export function DepositView({ userId, username }: DepositViewProps) {
         userId,
         username,
         parsedAmount,
-        depositMethod === "crypto" ? (selectedCrypto as "BTC" | "USDT" | "XRP" | "ETH") : "BANK",
+        depositMethod === "crypto" ? (selectedCrypto as "BTC" | "USDT") : "BANK",
         proofBase64,
       )
 
@@ -193,8 +189,8 @@ export function DepositView({ userId, username }: DepositViewProps) {
     }
   }
 
-  const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress : selectedCrypto === "XRP" ? walletSettings?.xrpAddress : walletSettings?.ethAddress
-  const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : selectedCrypto === "USDT" ? walletSettings?.usdtTag : selectedCrypto === "XRP" ? walletSettings?.xrpTag : walletSettings?.ethTag
+  const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress
+  const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : selectedCrypto === "USDT" ? walletSettings?.usdtTag 
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
