@@ -17,7 +17,8 @@ const activities = [
   { country: "USA", action: "is trading with", amount: 10800, type: "trading" },
   { country: "Madagascar", action: "just withdrew", amount: 6615, type: "withdrawal" },
   { country: "United Kingdom", action: "is trading with", amount: 22500, type: "trading" },
-  { country: "Germany", action: "is trading with", amount: 28800, type: "trading" }
+  { country: "Germany", action: "is trading with", amount: 28800, type: "trading" },
+  { country: "Brazil", action: "just withdrew", amount: 5040, type: "withdrawal" }
 ];
 
 const mockTradingNews: TradingNews[] = [
@@ -39,7 +40,6 @@ const mockTradingNews: TradingNews[] = [
   }
 ];
 
-// Function name matches the new file name (plural)
 export function ActivityNotifications() {
   const [currentActivity, setCurrentActivity] = useState<any>(activities[0])
   const [currentNews, setCurrentNews] = useState<any>(mockTradingNews[0])
@@ -104,7 +104,11 @@ export function ActivityNotifications() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-2xl relative flex items-center justify-between">
           <p className="text-sm text-zinc-200">
             Someone from <span className="text-lime-400 font-bold">{currentActivity.country}</span> {currentActivity.action} 
-            {currentActivity.type === "profit" && <span className="text-lime-500 ml-1 font-bold">profit</span>}
+            <span className="text-white font-bold mx-1">
+              ${currentActivity.amount.toLocaleString()}
+            </span>
+            {currentActivity.type === "profit" && <span className="text-lime-500 font-bold">profit</span>}
+            {currentActivity.type === "withdrawal" && <span className="text-orange-500 font-bold">withdrawal</span>}
           </p>
           <button onClick={() => setIsVisible(false)} className="text-zinc-500 ml-4"><X size={16}/></button>
         </div>
