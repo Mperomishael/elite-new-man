@@ -155,7 +155,7 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
         {/* Main Balance */}
         <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-2xl p-4 border border-purple-500/30">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-neutral-400 text-xs font-semibold">Main Balance</p>
+            <p className="text-neutral-400 text-xs font-semibold">Deposit Balance</p>
             <span className="text-xl">👜</span>
           </div>
           <h3 className="text-2xl font-bold text-white">${balance.toFixed(2)}</h3>
@@ -179,7 +179,7 @@ export function DashboardView({ userName, onNavigate }: DashboardViewProps) {
           onClick={() => onNavigate("deposit")}
           className="bg-lime-400 hover:bg-lime-500 text-black font-bold py-4 rounded-2xl transition-all active:scale-95 text-sm flex items-center justify-center gap-2"
         >
-          <span>+</span> Fund Wallet
+          <span>+</span> Deposit
         </button>
         <button
           onClick={() => onNavigate("withdraw")}
