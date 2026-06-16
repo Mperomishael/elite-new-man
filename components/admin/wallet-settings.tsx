@@ -19,10 +19,6 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
     btcTag: "",
     usdtAddress: "",
     usdtTag: "",
-    xrpAddress: "",
-    xrpTag: "",
-    ethAddress: "",
-    ethTag: "",
     whatsappNumber: "",
     supportPhone: "",
     lastUpdated: "",
@@ -195,64 +191,7 @@ export function WalletSettings({ adminId }: WalletSettingsProps) {
 
           <div className="border-t border-slate-800"></div>
 
-          {/* XRP Settings */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <span className="text-2xl">✕</span>
-              Ripple (XRP)
-            </h3>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">XRP Wallet Address</label>
-              <input
-                type="text"
-                value={settings.xrpAddress}
-                onChange={(e) => setSettings({ ...settings, xrpAddress: e.target.value })}
-                placeholder="Enter XRP wallet address"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">XRP Destination Tag (Optional)</label>
-              <input
-                type="text"
-                value={settings.xrpTag}
-                onChange={(e) => setSettings({ ...settings, xrpTag: e.target.value })}
-                placeholder="Enter XRP destination tag if required"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-          </div>
-
-          <div className="border-t border-slate-800"></div>
-
-          {/* ETH Settings */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <span className="text-2xl">Ξ</span>
-              Ethereum (ETH)
-            </h3>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">ETH Wallet Address</label>
-              <input
-                type="text"
-                value={settings.ethAddress}
-                onChange={(e) => setSettings({ ...settings, ethAddress: e.target.value })}
-                placeholder="Enter ETH wallet address (0x...)"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">ETH Memo/Tag (Optional)</label>
-              <input
-                type="text"
-                value={settings.ethTag}
-                onChange={(e) => setSettings({ ...settings, ethTag: e.target.value })}
-                placeholder="Enter memo/tag if required by exchange"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-          </div>
-
+        
           <Button
             onClick={handleSave}
             disabled={saving}
