@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background dark">
       <head>
- <!-- Smartsupp Live Chat script -->
+ 
 <script type="text/javascript">
 var _smartsupp = _smartsupp || {};
 _smartsupp.key = '7b4841efa688aedfe6f7e1fa634e5dac501b905b';
