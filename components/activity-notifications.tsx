@@ -39,7 +39,8 @@ const mockTradingNews: TradingNews[] = [
   }
 ];
 
-export function ActivityNotification() {
+// Function name matches the new file name (plural)
+export function ActivityNotifications() {
   const [currentActivity, setCurrentActivity] = useState<any>(activities[0])
   const [currentNews, setCurrentNews] = useState<any>(mockTradingNews[0])
   const [isVisible, setIsVisible] = useState(false)
@@ -89,7 +90,6 @@ export function ActivityNotification() {
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <h4 className="text-white text-sm font-bold">{currentNews.title}</h4>
-                {/* messageCount is now used here */}
                 <span className="text-[10px] text-zinc-600 ml-2">ID: {messageCount}</span>
               </div>
               <p className="text-zinc-400 text-xs mt-1">{currentNews.description}</p>
