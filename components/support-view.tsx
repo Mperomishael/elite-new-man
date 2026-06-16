@@ -240,10 +240,6 @@ export function SupportView({ userId, username }: SupportViewProps) {
           <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
             <Mail className="w-6 h-6 text-white" />
           </div>
-          <div>
-            <p className="text-xs text-blue-100">Email Us</p>
-            <p className="font-semibold text-white">support@Elite Block Market.online</p>
-          </div>
         </div>
 
         <div className="bg-neutral-700/50 rounded-2xl p-5 flex items-center gap-4">
