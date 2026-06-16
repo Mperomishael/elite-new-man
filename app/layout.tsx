@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
+import Script from "next/script" // Added this import
 
 export const metadata: Metadata = {
   title: "Elite Block Market - Trade Crypto & Forex",
@@ -24,24 +25,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background dark">
-      <head>
- 
-<script type="text/javascript">
-var _smartsupp = _smartsupp || {};
-_smartsupp.key = '7b4841efa688aedfe6f7e1fa634e5dac501b905b';
-window.smartsupp||(function(d) {
-  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
-  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
-  c.type='text/javascript';c.charset='utf-8';c.async=true;
-  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
-})(document);
-</script>
-    <noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
+      <body className={`font-sans antialiased bg-black text-white`}>
+        {/* Smartsupp Chat Integration using Next.js Script component */}
+        <Script id="smartsupp-chat" strategy="afterInteractive">
+          {`
+            var _smartsupp = _smartsupp || {};
+            _smartsupp.key = '7b4841efa688aedfe6f7e1fa634e5dac501b905b';
+            window.smartsupp||(function(d) {
+              var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+              s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+              c.type='text/javascript';c.charset='utf-8';c.async=true;
+              c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+            })(document);
+          `}
+        </Script>
 
-      </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased bg-black text-white`}>
-        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
+          {children}
+        </Suspense>
+        
         <Analytics />
+        
+        <noscript>
+          Powered by <a href="https://www.smartsupp.com" target="_blank" rel="noreferrer">Smartsupp</a>
+        </noscript>
       </body>
     </html>
   )
