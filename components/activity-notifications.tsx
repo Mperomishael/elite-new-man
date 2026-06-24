@@ -18,14 +18,20 @@ const activities = [
   { country: "Madagascar", action: "just withdrew", amount: 6615, type: "withdrawal" },
   { country: "United Kingdom", action: "is trading with", amount: 22500, type: "trading" },
   { country: "Germany", action: "is trading with", amount: 28800, type: "trading" },
-  { country: "Brazil", action: "just withdrew", amount: 5040, type: "withdrawal" }
+  { country: "Brazil", action: "just withdrew", amount: 5040, type: "withdrawal" },
+  { country: "Poland", action: "just withdrew", amount: 8250, type: "withdrawal" },
+  { country: "England", action: "just withdrew", amount: 20169, type: "withdrawal" },
+  { country: "Madagascar", action: "is trading with", amount: 34234, type: "trading" },
+   { country: "Canada", action: "made", amount: 23456, type: "profit" },
+   { country: "Brazil", action: "made", amount: 19274, type: "profit" },
+  
 ];
 
 const mockTradingNews: TradingNews[] = [
   {
     title: "Bitcoin Rebounds Above $65,700",
     description: "BTC recovers from weekly lows near $60K as volatility persists.",
-    source: "Yahoo Finance",
+    source: "Mentos Finance",
     category: "crypto",
     symbol: "BTC",
     changePercent: -1.0,
