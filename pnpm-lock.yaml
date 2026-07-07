@@ -168,6 +168,9 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
+      '@tailwindcss/oxide-linux-x64-gnu':
+        specifier: 4.3.1
+        version: 4.3.1
       '@tailwindcss/postcss':
         specifier: ^4.1.9
         version: 4.3.1
@@ -1383,7 +1386,6 @@ packages:
     engines: {node: '>= 20'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@tailwindcss/oxide-linux-x64-musl@4.3.1':
     resolution: {integrity: sha512-M+P/91qJ6uILLw4k2G93GMDRAXj61SMvFQYt39AqvUqYgExXpLL5aepfns7sj4HiAQeolirQF9E0lzRvdf4zPQ==}
@@ -3395,8 +3397,7 @@ snapshots:
   '@tailwindcss/oxide-linux-arm64-musl@4.3.1':
     optional: true
 
-  '@tailwindcss/oxide-linux-x64-gnu@4.3.1':
-    optional: true
+  '@tailwindcss/oxide-linux-x64-gnu@4.3.1': {}
 
   '@tailwindcss/oxide-linux-x64-musl@4.3.1':
     optional: true

@@ -74,7 +74,13 @@ export function DepositView({ userId, username }: DepositViewProps) {
     const parsed = Number.parseFloat(amount || "0")
 
     if (depositMethod === "crypto") {
-      const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress
+      const walletAddress =
+        selectedCrypto === "BTC"
+          ? walletSettings?.btcAddress
+          : selectedCrypto === "USDT"
+            ? walletSettings?.usdtAddress
+            : undefined
+
       if (parsed >= 50 && walletAddress) {
         setStep("payment")
       } else {
@@ -189,8 +195,19 @@ export function DepositView({ userId, username }: DepositViewProps) {
     }
   }
 
-  const walletAddress = selectedCrypto === "BTC" ? walletSettings?.btcAddress : selectedCrypto === "USDT" ? walletSettings?.usdtAddress
-  const tag = selectedCrypto === "BTC" ? walletSettings?.btcTag : selectedCrypto === "USDT" ? walletSettings?.usdtTag 
+  const walletAddress =
+    selectedCrypto === "BTC"
+      ? walletSettings?.btcAddress
+      : selectedCrypto === "USDT"
+        ? walletSettings?.usdtAddress
+        : undefined
+
+  const tag =
+    selectedCrypto === "BTC"
+      ? walletSettings?.btcTag
+      : selectedCrypto === "USDT"
+        ? walletSettings?.usdtTag
+        : undefined
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

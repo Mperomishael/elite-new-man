@@ -279,3 +279,5 @@ export function KYCUpload({ userId, onUploadSuccess }: KYCUploadProps) {
   )
 }
 
+export const KycView = KYCUpload
+

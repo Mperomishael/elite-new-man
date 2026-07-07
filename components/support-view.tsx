@@ -257,6 +257,5 @@ export function SupportView({ userId, username }: SupportViewProps) {
           </div>
         </div>
       </div>
-    </div>
   )
 }
