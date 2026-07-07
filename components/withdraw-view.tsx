@@ -4,6 +4,7 @@ import { Wallet, Check, AlertCircle } from "lucide-react"
 import { createWithdrawalRequest } from "@/lib/admin-service"
 import { auth } from "@/lib/firebase"
 import { logUserActivity } from "@/lib/auth-service"
+import { BANKS } from "@/lib/bank"
 
 interface WithdrawViewProps {
   userId?: string
@@ -31,21 +32,8 @@ export function WithdrawView({ userId = "", username = "", availableBalance = 0 
 
   const MIN_WITHDRAWAL = 100
 
-  const BANK_OPTIONS: Record<string, string[]> = useMemo(
-    () => ({
-      "United States": ["Bank of America", "Chase", "Wells Fargo", "CitiBank", "US Bank", "PNC Bank"],
-      Canada: ["RBC", "TD Canada Trust", "Scotiabank", "BMO", "CIBC"],
-      "United Kingdom": ["HSBC", "Barclays", "Lloyds", "NatWest", "Santander"],
-      Kenya: ["Equity Bank", "KCB", "Co-operative Bank", "Stanbic Bank Kenya"],
-      "South Africa": ["Standard Bank", "FNB", "Nedbank", "Absa", "Capitec"],
-      Liberia: ["LBDI", "Ecobank Liberia", "UBA Liberia", "Global Bank Liberia"],
-      "United Arab Emirates": ["Emirates NBD", "Abu Dhabi Commercial Bank", "Mashreq Bank"],
-      India: ["SBI", "HDFC Bank", "ICICI Bank", "Axis Bank"],
-      China: ["ICBC", "China Construction Bank", "Agricultural Bank of China", "Bank of China"],
-      Brazil: ["Itaú", "Bradesco", "Banco do Brasil", "Santander Brasil"],
-    }),
-    [],
-  )
+  const BANK_OPTIONS: Record<string, string[]> = useMemo(() => BANKS, [])
+  const countryOptions = useMemo(() => Object.keys(BANK_OPTIONS).sort((a, b) => a.localeCompare(b)), [BANK_OPTIONS])
 
   useEffect(() => {
     if (BANK_OPTIONS[bankCountry] && !bankName) {
@@ -316,7 +304,7 @@ export function WithdrawView({ userId = "", username = "", availableBalance = 0 
             className="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400 text-white"
             disabled={formDisabled}
           >
-            {Object.keys(BANK_OPTIONS).map((c) => (
+            {countryOptions.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
